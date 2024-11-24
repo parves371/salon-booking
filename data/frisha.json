@@ -5,32 +5,32 @@
             "name": "Advance Scalp Treatment",
             "items": [
                 {
-                    "id": 1,
+                    "id": 10,
                     "name": "Dry Scalp Treatment",
                     "time": "1hr",
                     "price": 800,
                     "option": true,
                     "options": [
                         {
-                            "id": 1,
+                            "id": 11,
                             "name": "Dry Scalp Treatment",
                             "time": "1hr",
                             "price": 850
                         },
                         {
-                            "id": 2,
+                            "id": 12,
                             "name": "Dry Scalp with Early Age Hair Loss",
                             "time": "3hr",
                             "price": 50
                         },
                         {
-                            "id": 3,
+                            "id": 13,
                             "name": "Dry Scalp with Early Age Hair Loss and Dandruff",
                             "time": "30min",
                             "price": 550
                         },
                         {
-                            "id": 4,
+                            "id": 14,
                             "name": "Dry Scalp with Extreme Environmental Hair Loss",
                             "time": "2hr",
                             "price": 850
@@ -66,18 +66,114 @@
                     "price": 800,
                     "option": false,
                     "options": []
+                },
+                {
+                    "id": 457,
+                    "name": "Restyle Hair Cut & Blow Dry",
+                    "time": "20min",
+                    "price": 1600,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 458,
+                    "name": "Creative Cut & Blow Dry",
+                    "time": "3hr",
+                    "price": 800,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 459,
+                    "name": "Restyle Hair Cut & Blow Dry",
+                    "time": "2hr",
+                    "price": 750,
+                    "option": false,
+                    "options": []
                 }
             ]
         },
         {
-            "id": 3,
+            "id": 5,
             "name": "Hair Colouring",
             "items": [
                 {
-                    "id": 100,
+                    "id": 101,
                     "name": "Creative Full Head Highlights",
                     "time": "1hr",
                     "price": 800,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 102,
+                    "name": "Balayage",
+                    "time": "3hr",
+                    "price": 500,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 103,
+                    "name": "Full Head Highlights",
+                    "time": "20min",
+                    "price": 250,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 125,
+                    "name": "Half Head Highlights",
+                    "time": "2hr",
+                    "price": 750,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 126,
+                    "name": "Toner",
+                    "time": "1hr",
+                    "price": 950,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 104,
+                    "name": "Wig Coloring",
+                    "time": "1hr",
+                    "price": 1099,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 105,
+                    "name": "Air Touch Highlights",
+                    "time": "1hr , 10min",
+                    "price": 1350,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 130,
+                    "name": "Baby Lights",
+                    "time": "1hr",
+                    "price": 1109,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 131,
+                    "name": "Lowlights & Highlights",
+                    "time": "1hr",
+                    "price": 1049,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 132,
+                    "name": "Half Ombre (Balayge Refresh)",
+                    "time": "1hr, 10min",
+                    "price": 599,
                     "option": false,
                     "options": []
                 }

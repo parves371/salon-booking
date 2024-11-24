@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import React, { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 
 // Types for the props and treatments
@@ -144,29 +144,34 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({
               }
             }}
           >
-            {treatment.option &&
-              treatment.options.map((option) => (
-                <div
-                  key={option.id}
-                  className="flex items-center space-x-4 space-y-6 hover:bg-accent hover:text-accent-foreground p-4"
-                >
-                  <RadioGroupItem value={option.name} id={option.name} />
-                  <div className="w-full">
-                    <Label
-                      htmlFor={option.name}
-                      className="leading-none space-y-1 w-full cursor-pointer block"
-                    >
-                      <p className="text-xl font-bold">{option.name}</p>
-                      <p className="text-gray-500 text-base font-medium">
-                        {option.time}
-                      </p>
-                      <p className="text-gray-500 text-lg font-bold">
-                        AED {option.price}
-                      </p>
-                    </Label>
+            {treatment.option && (
+              <div className="">
+                {treatment.options.map((option) => (
+                  <div
+                    key={option.id}
+                    className="flex items-center space-x-4 space-y-6 hover:bg-accent hover:text-accent-foreground p-4"
+                  >
+                    <RadioGroupItem value={option.name} id={option.name} />
+                    <div className="w-full">
+                      <Label
+                        htmlFor={option.name}
+                        className="leading-none space-y-1 w-full cursor-pointer block"
+
+                        
+                      >
+                        <p className="text-xl font-bold">{option.name}</p>
+                        <p className="text-gray-500 text-base font-medium">
+                          {option.time}
+                        </p>
+                        <p className="text-gray-500 text-lg font-bold">
+                          AED {option.price}
+                        </p>
+                      </Label>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
 
             {!treatment.option && (
               <div className="flex items-center space-x-4 space-y-6 hover:bg-accent hover:text-accent-foreground p-4">

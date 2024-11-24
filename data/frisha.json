@@ -2,37 +2,37 @@
     "data": [
         {
             "id": 1,
-            "name": "Category 1",
+            "name": "Advance Scalp Treatment",
             "items": [
                 {
                     "id": 1,
-                    "name": "item 1",
+                    "name": "Dry Scalp Treatment",
                     "time": "1hr",
                     "price": 800,
                     "option": true,
                     "options": [
                         {
                             "id": 1,
-                            "name": "Options 1",
+                            "name": "Dry Scalp Treatment",
                             "time": "1hr",
                             "price": 850
                         },
                         {
                             "id": 2,
-                            "name": "Options 2",
-                            "time": "1hr",
+                            "name": "Dry Scalp with Early Age Hair Loss",
+                            "time": "3hr",
                             "price": 50
                         },
                         {
                             "id": 3,
-                            "name": "Options 3",
-                            "time": "1hr",
+                            "name": "Dry Scalp with Early Age Hair Loss and Dandruff",
+                            "time": "30min",
                             "price": 550
                         },
                         {
                             "id": 4,
-                            "name": "Options 4",
-                            "time": "1hr",
+                            "name": "Dry Scalp with Extreme Environmental Hair Loss",
+                            "time": "2hr",
                             "price": 850
                         }
                     ]
@@ -41,12 +41,28 @@
         },
         {
             "id": 2,
-            "name": "Category 2",
+            "name": "Hair Styling",
             "items": [
                 {
-                    "id": 2,
-                    "name": "item 1",
-                    "time": "1hr",
+                    "id": 45,
+                    "name": "Blow Dry",
+                    "time": "7hr",
+                    "price": 800,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 15,
+                    "name": "Blow Dry with Junior Stylist",
+                    "time": "2hr",
+                    "price": 900,
+                    "option": false,
+                    "options": []
+                },
+                {
+                    "id": 456,
+                    "name": "Creative Cut & Blow Dry",
+                    "time": "3hr",
                     "price": 800,
                     "option": false,
                     "options": []

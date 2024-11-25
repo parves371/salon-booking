@@ -31,6 +31,7 @@ export const SelectServices: React.FC = () => {
   const [activeSection, setActiveSection] = useState<number | null>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Update active section during scroll
   useEffect(() => {
     const currentSections = sectionRefs.current;
 
@@ -45,7 +46,9 @@ export const SelectServices: React.FC = () => {
           }
         });
       },
-      { threshold: 0.5 }
+      {
+        threshold: 0.3, // Trigger when 30% of the section is visible
+      }
     );
 
     currentSections.forEach((section) => {
@@ -83,15 +86,15 @@ export const SelectServices: React.FC = () => {
     const target = sectionRefs.current[index];
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
-      setActiveSection(index);
+      setActiveSection(data.data[index].id); // Update activeSection after scrolling
     }
   };
 
   return (
     <div className="container mx-auto mt-16 flex justify-between">
-      <div className="w-[60%]">
+      <div className="w-[50%]">
         {/* Sticky Menu */}
-        <div className="flex space-x-6 fixed top-0 left-0 w-[60%] bg-white p-4 shadow-md z-10">
+        <div className="flex space-x-6 fixed top-0 left-18 w-[50%] bg-white p-4 shadow-md z-10">
           {data.data.map((category, index) => (
             <div
               key={category.id}
@@ -115,7 +118,7 @@ export const SelectServices: React.FC = () => {
               sectionRefs.current[index] = el;
             }}
             data-id={category.id}
-            className="pt-4"
+            className="pt-20"
           >
             <h1 className="text-2xl font-bold my-4">{category.name}</h1>
             <div className="space-y-6">
@@ -133,7 +136,7 @@ export const SelectServices: React.FC = () => {
       </div>
 
       {/* Selected Treatments Sidebar */}
-      <div className="w-[30%] border border-gray-600 rounded-lg p-4 h-[600px] overflow-y-auto">
+      <div className="w-[40%] border border-gray-600 rounded-lg p-4 h-[600px] overflow-y-auto">
         {selectedTreatments.map((treatment) => (
           <div key={treatment.id} className="flex justify-between items-center mb-4 px-3">
             <div>

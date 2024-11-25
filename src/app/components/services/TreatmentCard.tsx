@@ -112,8 +112,8 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({
             </Button>
           </div>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[800px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[800px]  ">
+          <DialogHeader className="">
             <DialogTitle className="text-3xl">
               {hasBeenSelected ? "Upgrade Treatment" : treatment.name}
             </DialogTitle>
@@ -125,6 +125,9 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({
           </DialogHeader>
 
           <RadioGroup
+            className={`${
+              treatment.option ? "h-[400px] overflow-auto scrollbar-hidden" : ""
+            }`}
             defaultValue={selectedOption?.name || ""}
             onValueChange={(value) => {
               if (treatment.option) {
@@ -149,21 +152,19 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({
                 {treatment.options.map((option) => (
                   <div
                     key={option.id}
-                    className="flex items-center space-x-4 space-y-6 hover:bg-accent hover:text-accent-foreground p-4"
+                    className="flex items-center space-x-4 space-y-6  hover:bg-accent hover:text-accent-foreground px-4"
                   >
                     <RadioGroupItem value={option.name} id={option.name} />
                     <div className="w-full">
                       <Label
                         htmlFor={option.name}
-                        className="leading-none space-y-1 w-full cursor-pointer block"
-
-                        
+                        className="leading-none space-y-1 w-full cursor-pointer block p-4"
                       >
-                        <p className="text-xl font-bold">{option.name}</p>
+                        <p className="text-base font-bold">{option.name}</p>
                         <p className="text-gray-500 text-base font-medium">
                           {option.time}
                         </p>
-                        <p className="text-gray-500 text-lg font-bold">
+                        <p className="text-gray-500 text-base font-bold">
                           AED {option.price}
                         </p>
                       </Label>
@@ -179,7 +180,7 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({
                 <div className="w-full">
                   <Label
                     htmlFor={treatment.name}
-                    className="leading-none space-y-1 w-full cursor-pointer block"
+                    className="leading-none space-y-1 w-full cursor-pointer block py-4"
                   >
                     <p className="text-xl font-bold">{treatment.name}</p>
                     <p className="text-gray-500 text-base font-medium">

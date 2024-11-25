@@ -37,7 +37,7 @@ interface TreatmentCardProps {
   onTreatmentRemove: (treatmentId: number) => void;
 }
 
-const TreatmentCard: React.FC<TreatmentCardProps> = ({
+export const TreatmentCard: React.FC<TreatmentCardProps> = ({
   treatment,
   onTreatmentUpdate,
   onTreatmentRemove,
@@ -228,4 +228,3 @@ const TreatmentCard: React.FC<TreatmentCardProps> = ({
   );
 };
 
-export default TreatmentCard;

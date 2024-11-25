@@ -192,6 +192,34 @@
                     "options": []
                 }
             ]
+        },
+        {
+            "id": 4,
+            "name": "Hair Treatments",
+            "items": [
+                {
+                    "id": 500,
+                    "name": "Keratin Treatment - Coconut",
+                    "time": "1hr",
+                    "price": 800,
+                    "option": false,
+                    "options": []
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "Hair Treatments",
+            "items": [
+                {
+                    "id": 500,
+                    "name": "Keratin Treatment - Coconut",
+                    "time": "1hr",
+                    "price": 800,
+                    "option": false,
+                    "options": []
+                }
+            ]
         }
     ]
 }

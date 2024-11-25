@@ -91,73 +91,80 @@ export const SelectServices: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto mt-16 flex justify-between">
-      <div className="w-[50%]">
-        {/* Sticky Menu */}
-        <div className="flex space-x-6 fixed top-0 left-18 w-[50%] bg-white p-4 shadow-md z-10">
+    <section>
+      <div className="container mx-auto mt-16 flex justify-between">
+        <div className="w-[50%]">
+          {/* Sticky Menu */}
+          <div className="flex space-x-6 sticky top-0 left-18 w-[115%] bg-white p-4 shadow-md z-10 overflow-auto">
+            {data.data.map((category, index) => (
+              <div
+                key={category.id}
+                className={`px-4 py-2 rounded-full cursor-pointer transition-all ${
+                  activeSection === category.id
+                    ? "bg-black text-white "
+                    : "text-gray-700 hover:text-black"
+                }`}
+                onClick={() => scrollToSection(index)}
+              >
+                <h1 className="text-sm font-bold">{category.name}</h1>
+              </div>
+            ))}
+          </div>
+
+          {/* Service Sections */}
           {data.data.map((category, index) => (
             <div
               key={category.id}
-              className={`px-4 py-2 rounded-full cursor-pointer transition-all ${
-                activeSection === category.id
-                  ? "bg-black text-white"
-                  : "text-gray-700 hover:text-black"
-              }`}
-              onClick={() => scrollToSection(index)}
+              ref={(el) => {
+                sectionRefs.current[index] = el;
+              }}
+              data-id={category.id}
+              className="pt-20"
             >
-              <h1 className="text-sm font-bold">{category.name}</h1>
+              <h1 className="text-2xl font-bold my-4">{category.name}</h1>
+              <div className="space-y-6">
+                {category.items.map((treatment) => (
+                  <TreatmentCard
+                    key={treatment.id}
+                    treatment={treatment}
+                    onTreatmentUpdate={handleTreatmentUpdate}
+                    onTreatmentRemove={handleTreatmentRemove}
+                  />
+                ))}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Service Sections */}
-        {data.data.map((category, index) => (
-          <div
-            key={category.id}
-            ref={(el) => {
-              sectionRefs.current[index] = el;
-            }}
-            data-id={category.id}
-            className="pt-20"
-          >
-            <h1 className="text-2xl font-bold my-4">{category.name}</h1>
-            <div className="space-y-6">
-              {category.items.map((treatment) => (
-                <TreatmentCard
-                  key={treatment.id}
-                  treatment={treatment}
-                  onTreatmentUpdate={handleTreatmentUpdate}
-                  onTreatmentRemove={handleTreatmentRemove}
-                />
-              ))}
+        {/* Selected Treatments Sidebar */}
+        <div className="w-[40%] border border-gray-600 rounded-lg p-4 h-[600px] overflow-y-auto sticky top-10">
+          {selectedTreatments.map((treatment) => (
+            <div
+              key={treatment.id}
+              className="flex justify-between items-center mb-4 px-3"
+            >
+              <div>
+                <h4>{treatment.selectedOption?.name || treatment.name}</h4>
+                <span>{treatment.selectedOption?.time || treatment.time}</span>
+              </div>
+              <div>
+                <span>
+                  AED {treatment.selectedOption?.price || treatment.price}
+                </span>
+              </div>
             </div>
+          ))}
+          <div className="px-3">
+            <Separator className="my-4 px-3" />
           </div>
-        ))}
-      </div>
-
-      {/* Selected Treatments Sidebar */}
-      <div className="w-[40%] border border-gray-600 rounded-lg p-4 h-[600px] overflow-y-auto">
-        {selectedTreatments.map((treatment) => (
-          <div key={treatment.id} className="flex justify-between items-center mb-4 px-3">
-            <div>
-              <h4>{treatment.selectedOption?.name || treatment.name}</h4>
-              <span>{treatment.selectedOption?.time || treatment.time}</span>
-            </div>
-            <div>
-              <span>AED {treatment.selectedOption?.price || treatment.price}</span>
-            </div>
+          <div className="flex justify-between font-bold text-lg px-3">
+            <h3>Total</h3>
+            <h3>AED {totalPrice}</h3>
           </div>
-        ))}
-        <div className="px-3">
-          <Separator className="my-4 px-3" />
-        </div>
-        <div className="flex justify-between font-bold text-lg px-3">
-          <h3>Total</h3>
-          <h3>AED {totalPrice}</h3>
-        </div>
 
-        <Button className="w-full mt-16">Continue</Button>
+          <Button className="w-full mt-16">Continue</Button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };

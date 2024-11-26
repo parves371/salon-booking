@@ -1,9 +1,44 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import data from "../../../data/frisha.json";
-import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 import { TreatmentCard } from "./treatment-card";
+
+// Define the types for treatments and options
+interface TreatmentOption {
+  id: number;
+  name: string;
+  time: string;
+  price: number;
+}
+
+interface Treatment {
+  id: number;
+  name: string;
+  time: string;
+  price: number;
+  option: boolean;
+  options: TreatmentOption[];
+}
+
+interface SelectedTreatment extends Treatment {
+  selectedOption?: TreatmentOption;
+}
+
+interface CustomSliderProps {
+  data: { id: number; name: string }[];
+  activeSection: number | null;
+  scrollToSection: (index: number) => void;
+}
+
+// Define types for the category data and scrollToSection function
+interface CustomSliderProps {
+  data: { id: number; name: string }[];
+  activeSection: number | null;
+  scrollToSection: (index: number) => void;
+}
 
 // Define the types for treatments and options
 interface TreatmentOption {
@@ -105,28 +140,14 @@ export const SelectServices: React.FC = () => {
 
   return (
     <section>
-      <div className="container mx-auto mt-16 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 px-4 lg-px-0 ">
+      <div className="container mx-auto mt-16 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 px-4 lg-px-0">
         <div className="w-full md:w-[60%]">
-          {/* Sticky Menu */}
-          <div className="flex space-x-6 sticky top-0 left-18 w-full bg-white p-4 shadow-md z-10 overflow-auto">
-            <ul className="flex space-x-4 overflow-x-auto">
-              {data.data.map((category, index) => (
-                <li
-                  key={category.id}
-                  className={`px-4 py-2 rounded-full cursor-pointer transition-all ${
-                    activeSection === category.id
-                      ? "bg-black text-white"
-                      : "text-gray-700 hover:text-black"
-                  } flex items-center justify-center`}
-                  onClick={() => scrollToSection(index)}
-                >
-                  <h1 className="text-sm text-center justify-center font-bold max-w-[220px] min-w-[120px] ">
-                    {category.name}
-                  </h1>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Slider for Categories */}
+          <CustomSlider
+            data={data.data}
+            activeSection={activeSection}
+            scrollToSection={scrollToSection}
+          />
 
           {/* Service Sections */}
           {data.data.map((category, index) => (
@@ -154,7 +175,7 @@ export const SelectServices: React.FC = () => {
         </div>
 
         {/* Selected Treatments Sidebar */}
-        <div className="w-full md:w-[35%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin ">
+        <div className="w-full md:w-[35%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
           {selectedTreatments.map((treatment) => (
             <div
               key={treatment.id}
@@ -183,5 +204,88 @@ export const SelectServices: React.FC = () => {
         </div>
       </div>
     </section>
+  );
+};
+
+const CustomSlider: React.FC<CustomSliderProps> = ({
+  data,
+  activeSection,
+  scrollToSection,
+}) => {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const totalItems = data.length;
+
+  useEffect(() => {
+    if (activeSection !== null) {
+      const activeIndex = data.findIndex(
+        (category) => category.id === activeSection
+      );
+      if (activeIndex !== -1) {
+        setCurrentIndex(activeIndex);
+      }
+    }
+  }, [activeSection, data]);
+
+  const handlePrevClick = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? totalItems - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextClick = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === totalItems - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handleItemClick = (index: number) => {
+    setCurrentIndex(index);
+    scrollToSection(index); // Trigger scroll to section when an item is clicked
+  };
+
+  return (
+    <div className="slider-container w-[100%] container mx-auto overflow-hidden sticky top-0 bg-white">
+      <h1 className="sticky top-0 text-2xl md:text-2xl lg:text-4xl font-bold bg-white text-black p-4">
+        Select services
+      </h1>
+
+      <div
+        className="slider-items flex transition-transform duration-500 ease-in-out"
+        style={{ transform: `translateX(-${currentIndex * 25}%)` }} // Display 4 items at once
+      >
+        {data.map((category, index) => (
+          <div
+            key={category.id}
+            onClick={() => handleItemClick(index)}
+            className={`slider-item flex-shrink-0 w-1/4 p-1 cursor-pointer transition-transform duration-300 flex items-center justify-center rounded-full ${
+              category.id === activeSection
+                ? "scale-105 bg-black text-white"
+                : "bg-gray-200 text-black"
+            }`}
+          >
+            <h3 className="text-center ">{category.name}</h3>
+          </div>
+        ))}
+      </div>
+      <div
+        className="absolute z-50 top-0 right-[-3px] bg-white p-[9px] h-full flex items-center space-x-1 text-2xl"
+        style={{
+          boxShadow: "white 0 0px 27px 18px",
+        }}
+      >
+        <button
+          onClick={handlePrevClick}
+          className="prev-btn z-10  text-[#131b1e]  py-2 rounded-full"
+        >
+          <MdChevronLeft />
+        </button>
+        <button
+          onClick={handleNextClick}
+          className="next-btn z-10  text-[#131b1e]  py-2 rounded-full"
+        >
+          <MdChevronRight />
+        </button>
+      </div>
+    </div>
   );
 };

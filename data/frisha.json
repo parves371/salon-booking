@@ -94,7 +94,7 @@
             ]
         },
         {
-            "id": 5,
+            "id": 8,
             "name": "Hair Colouring",
             "items": [
                 {
@@ -180,7 +180,7 @@
             ]
         },
         {
-            "id": 4,
+            "id": 5,
             "name": "Hair Treatments",
             "items": [
                 {
@@ -194,11 +194,11 @@
             ]
         },
         {
-            "id": 4,
+            "id": 6,
             "name": "Hair Treatments",
             "items": [
                 {
-                    "id": 500,
+                    "id": 502,
                     "name": "Keratin Treatment - Coconut",
                     "time": "1hr",
                     "price": 800,
@@ -208,11 +208,11 @@
             ]
         },
         {
-            "id": 4,
+            "id": 7,
             "name": "Hair Treatments",
             "items": [
                 {
-                    "id": 500,
+                    "id": 503,
                     "name": "Keratin Treatment - Coconut",
                     "time": "1hr",
                     "price": 800,
@@ -220,6 +220,71 @@
                     "options": []
                 }
             ]
+        }
+    ],
+    "professional":[
+        {
+            "id": 1,
+            "name": "Rechelle",
+            "professional": "Creative Stylist",
+            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "ratting": 5,
+            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
+            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+        },
+        {
+            "id": 1,
+            "name": "Rechelle",
+            "professional": "Creative Stylist",
+            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "ratting": 4,
+            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
+            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+        },
+        {
+            "id": 1,
+            "name": "Rechelle",
+            "professional": "Creative Stylist",
+            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "ratting": 5,
+            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
+            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+        },
+        {
+            "id": 1,
+            "name": "Rechelle",
+            "professional": "Creative Stylist",
+            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "ratting": 5,
+            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
+            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+        },
+        {
+            "id": 1,
+            "name": "Rechelle",
+            "professional": "Creative Stylist",
+            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "ratting": 5,
+            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
+            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+        },
+        {
+            "id": 1,
+            "name": "Rechelle",
+            "professional": "Creative Stylist",
+            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "ratting": 5,
+            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
+            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+        },
+        {
+            "id": 1,
+            "name": "Rechelle",
+            "professional": "Creative Stylist",
+            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "ratting": 5,
+            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
+            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
         }
     ]
 }

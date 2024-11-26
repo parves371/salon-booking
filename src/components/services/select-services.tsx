@@ -213,75 +213,92 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
   scrollToSection,
 }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const totalItems = data.length;
+  const [itemWidths, setItemWidths] = useState<number[]>([]); // Store the width of each item
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
 
+  // Calculate the width of each slider item on mount
   useEffect(() => {
-    if (activeSection !== null) {
-      const activeIndex = data.findIndex(
-        (category) => category.id === activeSection
-      );
-      if (activeIndex !== -1) {
-        setCurrentIndex(activeIndex);
-      }
+    const widths: number[] = [];
+    const sliderItems = sliderContainerRef.current?.querySelectorAll(".slider-item");
+    if (sliderItems) {
+      sliderItems.forEach((item) => {
+        widths.push(item.clientWidth); // Push each item's width to the array
+      });
     }
-  }, [activeSection, data]);
+    setItemWidths(widths); // Store the widths in state
+  }, [data]); // Recalculate when data changes (optional if data is dynamic)
 
+  const totalItems = data.length; // Calculate the total number of items
+
+  // Handle previous button click
   const handlePrevClick = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? totalItems - 1 : prevIndex - 1
     );
   };
 
+  // Handle next button click
   const handleNextClick = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === totalItems - 1 ? 0 : prevIndex + 1
     );
   };
 
+  // Handle item click and ensure clicked item comes to first position
   const handleItemClick = (index: number) => {
-    setCurrentIndex(index);
-    scrollToSection(index); // Trigger scroll to section when an item is clicked
+    setCurrentIndex(index); // Set the clicked item as the active item
+    scrollToSection(index); // Scroll to section when an item is clicked
+  };
+
+  // Slider item container styles
+  const sliderStyle = {
+    transform: `translateX(-${itemWidths.slice(0, currentIndex).reduce((a, b) => a + b, 0)}px)`, // Adjust scroll position based on item widths
+    transition: "transform 0.5s ease-in-out",
   };
 
   return (
-    <div className="slider-container w-[100%] container mx-auto overflow-hidden sticky top-0 bg-white">
+    <div className="slider-container w-full mx-auto overflow-hidden sticky top-0 bg-white">
       <h1 className="sticky top-0 text-2xl md:text-2xl lg:text-4xl font-bold bg-white text-black p-4">
         Select services
       </h1>
 
+      {/* Slider Items Container */}
       <div
-        className="slider-items flex transition-transform duration-500 ease-in-out"
-        style={{ transform: `translateX(-${currentIndex * 25}%)` }} // Display 4 items at once
+        className="slider-items flex gap-4"
+        ref={sliderContainerRef}
+        style={sliderStyle}
       >
         {data.map((category, index) => (
           <div
             key={category.id}
-            onClick={() => handleItemClick(index)}
-            className={`slider-item flex-shrink-0 w-1/4 p-1 cursor-pointer transition-transform duration-300 flex items-center justify-center rounded-full ${
+            onClick={() => handleItemClick(index)} // Click event to move clicked item to the front
+            className={`slider-item flex-shrink-0 p-4 cursor-pointer transition-transform duration-300 flex items-center justify-center rounded-full ${
               category.id === activeSection
                 ? "scale-105 bg-black text-white"
                 : "bg-gray-200 text-black"
             }`}
           >
-            <h3 className="text-center ">{category.name}</h3>
+            <h3 className="text-center">{category.name}</h3>
           </div>
         ))}
       </div>
+
+      {/* Navigation Buttons */}
       <div
-        className="absolute z-50 top-0 right-[-3px] bg-white p-[9px] h-full flex items-center space-x-1 text-2xl"
+        className="absolute z-50 top-9 right-[-3px] bg-white p-[9px] h-full flex items-center space-x-1 text-2xl"
         style={{
-          boxShadow: "white 0 0px 27px 18px",
+          boxShadow: "0px 0px 27px 18px rgba(255, 255, 255, 0.5)", // White shadow
         }}
       >
         <button
           onClick={handlePrevClick}
-          className="prev-btn z-10  text-[#131b1e]  py-2 rounded-full"
+          className="prev-btn z-10 text-[#131b1e] py-2 rounded-full"
         >
           <MdChevronLeft />
         </button>
         <button
           onClick={handleNextClick}
-          className="next-btn z-10  text-[#131b1e]  py-2 rounded-full"
+          className="next-btn z-10 text-[#131b1e] py-2 rounded-full"
         >
           <MdChevronRight />
         </button>
@@ -289,3 +306,4 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
     </div>
   );
 };
+

@@ -6,6 +6,7 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import {
   addTreatment,
   removeTreatment,
+  updateTotalPrice,
   updateTreatment,
 } from "@/lib/features/SelectServices/treatmentSlice";
 import { Button } from "../ui/button";
@@ -28,10 +29,11 @@ interface Treatment {
   price: number;
   option: boolean;
   options: TreatmentOption[];
+  selectedOption?: TreatmentOption; // Make selectedOption optional
 }
 
 interface SelectedTreatment extends Treatment {
-  selectedOption?: TreatmentOption;
+  selectedOption?: TreatmentOption; // Optional here too
 }
 
 interface CustomSliderProps {
@@ -45,26 +47,58 @@ export const SelectServices: React.FC = () => {
   const selectedTreatments = useAppSelector(
     (state) => state.treatments.selectedTreatments // Redux state for selected treatments
   );
+  const totalPrice = useAppSelector(
+    (state) => state.treatments.totalPrice // Redux state for total price
+  ); // Fetch total price from Redux state
   const [activeSection, setActiveSection] = useState<number | null>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+ const calculateTotalPrice = (treatments: Treatment[]) => {
+  return treatments.reduce((sum, treatment) => {
+    // Use optional chaining to access selectedOption safely
+    const price = treatment.selectedOption?.price ?? treatment.price; // Default to treatment.price if selectedOption doesn't exist
+    return sum + price;
+  }, 0);
+};
 
   // Load selected treatments from localStorage if they exist
   useEffect(() => {
     const storedTreatments = localStorage.getItem("selectedTreatments");
     if (storedTreatments) {
-      dispatch(addTreatment(JSON.parse(storedTreatments)));
+      const treatments: Treatment[] = JSON.parse(storedTreatments);
+      
+      // Check if the treatments already exist in the Redux state
+      const existingTreatmentIds = selectedTreatments.map(treatment => treatment.id);
+  
+      // Filter out the treatments that are already in the Redux store
+      const newTreatments = treatments.filter(treatment => !existingTreatmentIds.includes(treatment.id));
+      
+      // Dispatch only the new treatments to avoid duplication
+      if (newTreatments.length > 0) {
+        dispatch(addTreatment(newTreatments)); // Add only new treatments
+      }
+  
+      // Manually recalculate the total price after loading the treatments
+      const updatedTotalPrice = calculateTotalPrice(selectedTreatments); // Recalculate total price
+      dispatch(updateTotalPrice(updatedTotalPrice)); // Dispatch the updated total price
     }
-  }, [dispatch]);
+  }, [dispatch, selectedTreatments]);
+   // Ensure this effect runs after selectedTreatments is loaded
+  
+   // Make sure the effect runs after selectedTreatments is loaded
+  
+  
+  
+  
 
   // Save selected treatments to localStorage when it changes
   useEffect(() => {
     if (selectedTreatments.length > 0) {
-      localStorage.setItem(
-        "selectedTreatments",
-        JSON.stringify(selectedTreatments)
-      );
+      // Ensure total price is updated and stored in localStorage
+      localStorage.setItem('selectedTreatments', JSON.stringify(selectedTreatments));
     }
   }, [selectedTreatments]);
+  
 
   // Update active section during scroll
   useEffect(() => {
@@ -100,22 +134,16 @@ export const SelectServices: React.FC = () => {
   const handleTreatmentUpdate = (treatment: SelectedTreatment) => {
     const exists = selectedTreatments.find((item) => item.id === treatment.id);
     if (exists) {
-      dispatch(updateTreatment(treatment)); // Update treatment in Redux store
+      dispatch(updateTreatment([treatment])); // Pass an array of treatments
     } else {
-      dispatch(addTreatment(treatment)); // Add treatment to Redux store
+      dispatch(addTreatment([treatment])); // Pass an array of treatments
     }
   };
+  
 
   const handleTreatmentRemove = (treatmentId: number) => {
     dispatch(removeTreatment(treatmentId)); // Remove treatment from Redux store
   };
-
-  const totalPrice = selectedTreatments.reduce((sum, treatment) => {
-    const price = treatment.selectedOption
-      ? treatment.selectedOption.price
-      : treatment.price;
-    return sum + price;
-  }, 0);
 
   const scrollToSection = (index: number) => {
     const target = sectionRefs.current[index];
@@ -200,7 +228,7 @@ export const SelectServices: React.FC = () => {
           </div>
           <div className="flex justify-between font-bold text-lg px-3">
             <h3>Total</h3>
-            <h3>AED {totalPrice}</h3>
+            <h3>AED {totalPrice}</h3> {/* Display total price */}
           </div>
 
           <Button
@@ -219,6 +247,7 @@ export const SelectServices: React.FC = () => {
     </section>
   );
 };
+
 
 const CustomSlider: React.FC<CustomSliderProps> = ({
   data,

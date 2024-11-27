@@ -1,7 +1,11 @@
 "use client";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import data from "../../../data/frisha.json"; // Assuming this is an array of professionals
 import ProfileCard from "./profile-card"; // Make sure this is the correct path to the ProfileCard component
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { Separator } from "../ui/separator";
+import { Button } from "../ui/button";
+import { updateTotalPrice } from "@/lib/features/SelectServices/treatmentSlice";
 
 // Defining the type for the professional data
 // Correct the ProfileCardProps type to describe the structure of each individual professional
@@ -14,10 +18,16 @@ interface ProfileCardProps {
   skils: string[];
 }
 
-
 export const SelectProfessional = () => {
+  const dispatch = useAppDispatch();
+
   // Directly using the professional array in the state
   const [datas, setDatas] = useState<ProfileCardProps[]>(data.professional);
+  const { selectedTreatments, totalPrice } = useAppSelector(
+    (state) => state.treatments // Redux state for selected treatments
+  );
+
+
 
   return (
     <section className="flex container mx-auto">
@@ -45,11 +55,52 @@ export const SelectProfessional = () => {
               />
             ))
           ) : (
-            <p className="w-full text-center text-gray-600">No professionals available</p>
+            <p className="w-full text-center text-gray-600">
+              No professionals available
+            </p>
           )}
         </div>
       </div>
-      <div className="w-[30%]"></div>
+      <div className="w-full md:w-[30%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
+        {selectedTreatments.map((treatment) => (
+          <div
+            key={treatment.id}
+            className="flex justify-between items-center mb-4 px-3"
+          >
+            <div className="w-[50%]">
+              <h4>{treatment.selectedOption?.name || treatment.name}</h4>
+              <span>{treatment.selectedOption?.time || treatment.time}</span>
+            </div>
+            <div>
+              {treatment.selectedOption?.price ||
+                (treatment.price && (
+                  <span>
+                    AED {treatment.selectedOption?.price || treatment.price}
+                  </span>
+                ))}
+            </div>
+          </div>
+        ))}
+        <div className="px-3">
+          <Separator className="my-4 px-3" />
+        </div>
+        <div className="flex justify-between font-bold text-lg px-3">
+          <h3>Total</h3>
+          <h3>AED {totalPrice}</h3> {/* Display total price */}
+        </div>
+
+        <Button
+          className="w-full mt-16"
+          onClick={() =>
+            localStorage.setItem(
+              "selectedTreatments",
+              JSON.stringify(selectedTreatments)
+            )
+          }
+        >
+          Continue
+        </Button>
+      </div>
     </section>
   );
 };

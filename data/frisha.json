@@ -222,69 +222,62 @@
             ]
         }
     ],
-    "professional":[
+    "professional": [
         {
             "id": 1,
             "name": "Rechelle",
             "professional": "Creative Stylist",
-            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
-            "ratting": 5,
-            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
-            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
-        },
-        {
-            "id": 1,
-            "name": "Rechelle",
-            "professional": "Creative Stylist",
-            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "img": "https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
             "ratting": 4,
-            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
-            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+            "skils": ["Dry Scalp Treatment,Blow Dry with Junior Stylist", "Creative Cut & Blow Dry"]
         },
         {
-            "id": 1,
-            "name": "Rechelle",
-            "professional": "Creative Stylist",
-            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
-            "ratting": 5,
-            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
-            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+            "id": 2,
+            "name": "Salwa",
+            "professional": "Senior Stylist",
+            "img": "https://cdn-partners-api.fresha.com/employee-avatars/processed/414248/medium/8c022729-7ee4-4ad9-9523-bc66acd95868-Salwa.jpeg?class=square128",
+            "ratting": 4,
+            "skils": ["Dry Scalp Treatment,Blow Dry with Junior Stylist", "Creative Cut & Blow Dry"]
         },
         {
-            "id": 1,
-            "name": "Rechelle",
-            "professional": "Creative Stylist",
-            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "id": 3,
+            "name": "Vini",
+            "professional": "Stylist",
+            "img": "https://cdn-partners-api.fresha.com/employee-avatars/processed/413702/medium/8b578563-a7c4-49b7-8a44-2896f1095c1f-Vini.jpeg?class=square128",
             "ratting": 5,
-            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
-            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+            "skils": ["Dry Scalp Treatment,Blow Dry with Junior Stylist", "Creative Cut & Blow Dry", "Restyle Hair Cut & Blow Dry"]
         },
         {
-            "id": 1,
-            "name": "Rechelle",
+            "id": 4,
+            "name": "Glenda",
             "professional": "Creative Stylist",
-            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "img": "https://cdn-partners-api.fresha.com/employee-avatars/processed/413703/medium/b8b98a01-0bc9-4845-a9ff-56c8c83cfda1-Glenda.jpeg?class=square128",
             "ratting": 5,
-            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
-            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+            "skils": ["Dry Scalp Treatment,Blow Dry with Junior Stylist", "Creative Cut & Blow Dry"]
         },
         {
-            "id": 1,
-            "name": "Rechelle",
+            "id": 5,
+            "name": "Linh",
             "professional": "Creative Stylist",
-            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "img": "https://cdn-partners-api.fresha.com/employee-avatars/processed/419441/medium/91a72586-3163-4468-9606-d14035ee25af-IMG_7543.jpg?class=square128",
             "ratting": 5,
-            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
-            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+            "skils": ["Dry Scalp Treatment,Blow Dry with Junior Stylist", "Creative Cut & Blow Dry"]
         },
         {
-            "id": 1,
-            "name": "Rechelle",
+            "id": 6,
+            "name": "Archi",
             "professional": "Creative Stylist",
-            "img":"https://cdn-partners-api.fresha.com/employee-avatars/processed/413701/medium/ac4d7880-eeba-4864-937b-226272bb2f56-Rachelle.jpeg?class=square128",
+            "img": "https://cdn-partners-api.fresha.com/employee-avatars/processed/413705/medium/63356bec-34ad-4a4a-9a2e-48636eb42b1c-Archi.jpeg?class=square128",
             "ratting": 5,
-            "skils":["Advance Scalp Treatment","Hair Styling","Hair Coloring"]	,
-            "subSkils":["Dry Scalp Treatment,Blow Dry with Junior Stylist","Creative Cut & Blow Dry"]
+            "skils": ["Dry Scalp Treatment,Blow Dry with Junior Stylist", "Creative Cut & Blow Dry"]
+        },
+        {
+            "id": 7,
+            "name": "Alma",
+            "professional": "Creative Stylist",
+            "img": "https://cdn-partners-api.fresha.com/employee-avatars/processed/413693/medium/ef787849-1ae7-4f7a-ae91-366346654f45-Suman%20(2).jpeg?class=square128",
+            "ratting": 5,
+            "skils": ["Dry Scalp Treatment,Blow Dry with Junior Stylist", "Creative Cut & Blow Dry"]
         }
     ]
 }

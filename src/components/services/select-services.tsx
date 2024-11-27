@@ -1,12 +1,19 @@
+// SelectServices.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"; // Ensure you have the hooks set up for Redux
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import data from "../../../data/frisha.json";
+import {
+  addTreatment,
+  removeTreatment,
+  updateTreatment,
+} from "@/lib/features/SelectServices/treatmentSlice";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { TreatmentCard } from "./treatment-card";
+import data from "../../../data/frisha.json";
 
-// Define the types for treatments and options
+// Types for treatment options and treatments
 interface TreatmentOption {
   id: number;
   name: string;
@@ -31,42 +38,33 @@ interface CustomSliderProps {
   data: { id: number; name: string }[];
   activeSection: number | null;
   scrollToSection: (index: number) => void;
-}
-
-// Define types for the category data and scrollToSection function
-interface CustomSliderProps {
-  data: { id: number; name: string }[];
-  activeSection: number | null;
-  scrollToSection: (index: number) => void;
-}
-
-// Define the types for treatments and options
-interface TreatmentOption {
-  id: number;
-  name: string;
-  time: string;
-  price: number;
-}
-
-interface Treatment {
-  id: number;
-  name: string;
-  time: string;
-  price: number;
-  option: boolean;
-  options: TreatmentOption[];
-}
-
-interface SelectedTreatment extends Treatment {
-  selectedOption?: TreatmentOption;
 }
 
 export const SelectServices: React.FC = () => {
-  const [selectedTreatments, setSelectedTreatments] = useState<
-    SelectedTreatment[]
-  >([]);
+  const dispatch = useAppDispatch();
+  const selectedTreatments = useAppSelector(
+    (state) => state.treatments.selectedTreatments // Redux state for selected treatments
+  );
   const [activeSection, setActiveSection] = useState<number | null>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Load selected treatments from localStorage if they exist
+  useEffect(() => {
+    const storedTreatments = localStorage.getItem("selectedTreatments");
+    if (storedTreatments) {
+      dispatch(addTreatment(JSON.parse(storedTreatments)));
+    }
+  }, [dispatch]);
+
+  // Save selected treatments to localStorage when it changes
+  useEffect(() => {
+    if (selectedTreatments.length > 0) {
+      localStorage.setItem(
+        "selectedTreatments",
+        JSON.stringify(selectedTreatments)
+      );
+    }
+  }, [selectedTreatments]);
 
   // Update active section during scroll
   useEffect(() => {
@@ -100,22 +98,16 @@ export const SelectServices: React.FC = () => {
   }, []);
 
   const handleTreatmentUpdate = (treatment: SelectedTreatment) => {
-    setSelectedTreatments((prev) => {
-      const exists = prev.find((item) => item.id === treatment.id);
-      if (exists) {
-        return prev.map((item) =>
-          item.id === treatment.id ? treatment : item
-        );
-      } else {
-        return [...prev, treatment];
-      }
-    });
+    const exists = selectedTreatments.find((item) => item.id === treatment.id);
+    if (exists) {
+      dispatch(updateTreatment(treatment)); // Update treatment in Redux store
+    } else {
+      dispatch(addTreatment(treatment)); // Add treatment to Redux store
+    }
   };
 
   const handleTreatmentRemove = (treatmentId: number) => {
-    setSelectedTreatments((prev) =>
-      prev.filter((item) => item.id !== treatmentId)
-    );
+    dispatch(removeTreatment(treatmentId)); // Remove treatment from Redux store
   };
 
   const totalPrice = selectedTreatments.reduce((sum, treatment) => {
@@ -133,7 +125,6 @@ export const SelectServices: React.FC = () => {
         block: "start",
         inline: "start",
       });
-
       setActiveSection(data.data[index].id);
     }
   };
@@ -161,14 +152,23 @@ export const SelectServices: React.FC = () => {
             >
               <h1 className="text-2xl font-bold my-4">{category.name}</h1>
               <div className="space-y-6">
-                {category.items.map((treatment) => (
-                  <TreatmentCard
-                    key={treatment.id}
-                    treatment={treatment}
-                    onTreatmentUpdate={handleTreatmentUpdate}
-                    onTreatmentRemove={handleTreatmentRemove}
-                  />
-                ))}
+                {category.items.map((treatment) => {
+                  // Check if treatment is active (selected)
+                  const isActive = selectedTreatments.some(
+                    (selected) => selected.id === treatment.id
+                  );
+
+                  return (
+                    <TreatmentCard
+                      key={treatment.id}
+                      treatment={treatment}
+                      onTreatmentUpdate={handleTreatmentUpdate}
+                      onTreatmentRemove={handleTreatmentRemove}
+                      isActive={isActive}
+                      // Pass isActive as a prop to mark the selected card
+                    />
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -186,9 +186,12 @@ export const SelectServices: React.FC = () => {
                 <span>{treatment.selectedOption?.time || treatment.time}</span>
               </div>
               <div>
-                <span>
-                  AED {treatment.selectedOption?.price || treatment.price}
-                </span>
+                {treatment.selectedOption?.price ||
+                  (treatment.price && (
+                    <span>
+                      AED {treatment.selectedOption?.price || treatment.price}
+                    </span>
+                  ))}
               </div>
             </div>
           ))}
@@ -200,7 +203,17 @@ export const SelectServices: React.FC = () => {
             <h3>AED {totalPrice}</h3>
           </div>
 
-          <Button className="w-full mt-16">Continue</Button>
+          <Button
+            className="w-full mt-16"
+            onClick={() =>
+              localStorage.setItem(
+                "selectedTreatments",
+                JSON.stringify(selectedTreatments)
+              )
+            }
+          >
+            Continue
+          </Button>
         </div>
       </div>
     </section>
@@ -219,7 +232,8 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
   // Calculate the width of each slider item on mount
   useEffect(() => {
     const widths: number[] = [];
-    const sliderItems = sliderContainerRef.current?.querySelectorAll(".slider-item");
+    const sliderItems =
+      sliderContainerRef.current?.querySelectorAll(".slider-item");
     if (sliderItems) {
       sliderItems.forEach((item) => {
         widths.push(item.clientWidth); // Push each item's width to the array
@@ -252,7 +266,9 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
 
   // Slider item container styles
   const sliderStyle = {
-    transform: `translateX(-${itemWidths.slice(0, currentIndex).reduce((a, b) => a + b, 0)}px)`, // Adjust scroll position based on item widths
+    transform: `translateX(-${itemWidths
+      .slice(0, currentIndex)
+      .reduce((a, b) => a + b, 0)}px)`, // Adjust scroll position based on item widths
     transition: "transform 0.5s ease-in-out",
   };
 
@@ -306,4 +322,3 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
     </div>
   );
 };
-

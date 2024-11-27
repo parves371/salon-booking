@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import miscSliceReducer from "./features/misc/miscSlice";
+import treatmentReducer from "./features/SelectServices/treatmentSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       misc: miscSliceReducer,
+      treatments: treatmentReducer,
     },
   });
 };

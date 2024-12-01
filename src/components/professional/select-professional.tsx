@@ -1,13 +1,17 @@
 "use client";
-import { useState } from "react";
+import { use, useState } from "react";
 import data from "../../../data/frisha.json"; // Assuming this is an array of professionals
 import ProfileCard from "./profile-card"; // Make sure this is the correct path to the ProfileCard component
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import { updateTotalPrice } from "@/lib/features/SelectServices/treatmentSlice";
+import {
+  addProfession,
+  anyProfession,
+  updateTotalPrice,
+} from "@/lib/features/SelectServices/treatmentSlice";
+
 // Defining the type for the professional data
-// Correct the ProfileCardProps type to describe the structure of each individual professional
 export interface ProfileCardProps {
   id: number;
   name: string;
@@ -22,6 +26,8 @@ export const SelectProfessional = () => {
 
   // Directly using the professional array in the state
   const [datas, setDatas] = useState<ProfileCardProps[]>(data.professional);
+  const [selectedProfessional, setSelectedProfessional] = // Fixed the name here
+    useState<ProfileCardProps | null>(null);
   const { selectedTreatments, totalPrice } = useAppSelector(
     (state) => state.treatments // Redux state for selected treatments
   );
@@ -31,9 +37,33 @@ export const SelectProfessional = () => {
   // Handle professional selection and store data
   const handleProfessionalSelect = (professional: ProfileCardProps) => {
     setActiveProfessional(professional); // Set the clicked professional as active
+    setSelectedProfessional(professional); // Update the selected professional state
   };
 
-  console.log(activeProfessional);
+  // Save to localStorage
+  const onSubmit = () => {
+    if (selectedProfessional) {
+      // Save selected treatments to localStorage
+      localStorage.setItem(
+        "selectedTreatments",
+        JSON.stringify(selectedTreatments)
+      );
+  
+      // Prepare the selected treatments data for dispatch
+      const selectedData = selectedTreatments.map((treatment) => ({
+        id: treatment.id,
+        name: treatment.selectedOption?.name || treatment.name,
+        time: treatment.selectedOption?.time || treatment.time,
+        price: treatment.selectedOption?.price || treatment.price,
+      }));
+  
+      // Dispatch action to add the professional and associated treatments
+      dispatch(addProfession({ selectedProfessional, data: selectedData }));
+    } else {
+      dispatch(anyProfession(true));
+    }
+  };
+  
   return (
     <section className="flex container mx-auto">
       <div className="w-[70%]">
@@ -47,7 +77,10 @@ export const SelectProfessional = () => {
             title="for maximum availability"
             professional="Any Professional"
             isActive={activeProfessional === null} // Highlight if no professional is selected
-            onClick={() => setActiveProfessional(null)} // Deselect any professional
+            onClick={() => {
+              setActiveProfessional(null);
+              setSelectedProfessional(null); // Deselect any professional
+            }}
           />
 
           {/* Map through the professionals in 'datas' */}
@@ -111,15 +144,7 @@ export const SelectProfessional = () => {
           <h3>AED {totalPrice}</h3> {/* Display total price */}
         </div>
 
-        <Button
-          className="w-full mt-16"
-          onClick={() =>
-            localStorage.setItem(
-              "selectedTreatments",
-              JSON.stringify(selectedTreatments)
-            )
-          }
-        >
+        <Button className="w-full mt-16" onClick={onSubmit}>
           Continue
         </Button>
       </div>

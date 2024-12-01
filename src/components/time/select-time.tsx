@@ -16,10 +16,12 @@ import data from "../../../data/frisha.json"; // Assuming this is an array of pr
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { useAppSelector } from "@/lib/hooks";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const SelectTime = () => {
   const [datas, setDatas] = useState<ProfileCardProps[]>(data.professional);
-  const { selectedTreatments, totalPrice } = useAppSelector(
+
+  const { selectedTreatments, totalPrice, finaldata } = useAppSelector(
     (state) => state.treatments // Redux state for selected treatments
   );
   const [activeDate, setActiveDate] = useState<string | null>(null);
@@ -67,50 +69,26 @@ const SelectTime = () => {
           <h1 className="text-4xl font-bold bg-white sticky top-0">
             Select time
           </h1>
-
-          <Dialog>
-            <DialogTrigger className="flex gap-2 items-center justify-center border p-2 rounded-full mt-6">
-              <RxAvatar className="text-2xl" /> Any Professional{" "}
-              <IoChevronDown />
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[620px] h-[600px] overflow-auto">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-semibold sticky top-0 bg-white p-4">
-                  Neutral Scalp Treatment
-                </DialogTitle>
-                <DialogDescription>
-                  <div className="gap-4 flex flex-wrap">
-                    {/* Default 'Any Professional' option */}
-                    <ProfileCard
-                      title="for maximum availability"
-                      professional="Any Professional"
-                      isActive={activeProfessional === null} // Highlight if no professional is selected
-                      onClick={() => setActiveProfessional(null)} // Deselect any professional
-                    />
-
-                    {/* Map through the professionals in 'datas' */}
-                    {datas.length > 0 ? (
-                      datas.map((i) => (
-                        <ProfileCard
-                          key={i.id} // Use 'id' as the key instead of 'professional'
-                          title={i.name}
-                          imageUrl={i.img}
-                          professional={i.professional}
-                          rating={i.ratting}
-                          isActive={activeProfessional?.id === i.id} // Highlight active professional
-                          onClick={() => handleProfessionalSelect(i)} // Set active professional
-                        />
-                      ))
-                    ) : (
-                      <p className="w-full text-center text-gray-600">
-                        No professionals available
-                      </p>
-                    )}
-                  </div>
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2 items-center justify-center border p-2 rounded-full mt-6 w-[300px]">
+            {finaldata.length > 0 ? (
+              finaldata.map((i) => {
+                return (
+                  <Avatar>
+                    <AvatarImage src={i.professional.img} alt="@shadcn" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                );
+                <RxAvatar className="text-2xl" />;
+              })
+            ) : (
+              <>
+                {" "}
+                <RxAvatar className="text-2xl" />
+                Any Professional
+                <IoChevronDown />
+              </>
+            )}
+          </div>
 
           <div className="mt-6 flex gap-4">
             {dates.map((date) => (
@@ -142,27 +120,47 @@ const SelectTime = () => {
           )}
         </div>
         <div className="w-full md:w-[40%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
-          {selectedTreatments.map((treatment) => (
-            <div
-              key={treatment.id}
-              className="flex justify-between items-center mb-4 px-3"
-            >
-              <div className="w-[50%]">
-                <h4>{treatment.selectedOption?.name || treatment.name}</h4>
-                <span>{treatment.selectedOption?.time || treatment.time}</span>
-
-                <span className="ml-2">with</span>
-              </div>
-              <div>
-                {treatment.selectedOption?.price ||
-                  (treatment.price && (
+          {finaldata?.length > 0
+            ? finaldata.map((treatment) => (
+                <div
+                  key={treatment.id}
+                  className="flex justify-between items-center mb-4 px-3"
+                >
+                  <div className="w-[50%]">
+                    <h4>{treatment.name}</h4>
+                    <span>{treatment.time}</span>
+                    <span className="mx-2">with</span>
+                    <span className="text-[#7C6DD8] font-semibold text-sm">
+                      {treatment.professional?.name || "Any Professional"}
+                    </span>
+                  </div>
+                  <div>
+                    <span>AED {treatment.price}</span>
+                  </div>
+                </div>
+              ))
+            : selectedTreatments.map((treatment) => (
+                <div
+                  key={treatment.id}
+                  className="flex justify-between items-center mb-4 px-3"
+                >
+                  <div className="w-[50%]">
+                    <h4>{treatment.selectedOption?.name || treatment.name}</h4>
+                    <span>
+                      {treatment.selectedOption?.time || treatment.time}
+                    </span>
+                    <span className="mx-2">with</span>
+                    <span className="text-[#7C6DD8] font-semibold text-sm">
+                      {activeProfessional?.name || "Any Professional"}
+                    </span>
+                  </div>
+                  <div>
                     <span>
                       AED {treatment.selectedOption?.price || treatment.price}
                     </span>
-                  ))}
-              </div>
-            </div>
-          ))}
+                  </div>
+                </div>
+              ))}
           <div className="px-3">
             <Separator className="my-4 px-3" />
           </div>

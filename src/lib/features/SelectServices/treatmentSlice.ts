@@ -72,6 +72,13 @@ const treatmentSlice = createSlice({
         ...state.selectedTreatments,
         ...action.payload,
       ];
+
+      const selectedIds = action.payload.map((treatment) => treatment.id);
+
+      const data = state.finaldata.filter((item) => item.id !== selectedIds);
+
+  
+      // console.log(finalData);
       state.totalPrice = calculateTotalPrice(state.selectedTreatments);
       setToLocalStorage("selectedTreatments", state.selectedTreatments); // Save to localStorage
     },

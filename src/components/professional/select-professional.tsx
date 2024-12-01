@@ -9,7 +9,7 @@ import { updateTotalPrice } from "@/lib/features/SelectServices/treatmentSlice";
 
 // Defining the type for the professional data
 // Correct the ProfileCardProps type to describe the structure of each individual professional
-interface ProfileCardProps {
+export interface ProfileCardProps {
   id: number;
   name: string;
   professional: string;
@@ -26,8 +26,6 @@ export const SelectProfessional = () => {
   const { selectedTreatments, totalPrice } = useAppSelector(
     (state) => state.treatments // Redux state for selected treatments
   );
-
-
 
   return (
     <section className="flex container mx-auto">

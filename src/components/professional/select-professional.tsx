@@ -1,12 +1,11 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 import data from "../../../data/frisha.json"; // Assuming this is an array of professionals
 import ProfileCard from "./profile-card"; // Make sure this is the correct path to the ProfileCard component
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { updateTotalPrice } from "@/lib/features/SelectServices/treatmentSlice";
-
 // Defining the type for the professional data
 // Correct the ProfileCardProps type to describe the structure of each individual professional
 export interface ProfileCardProps {
@@ -26,7 +25,15 @@ export const SelectProfessional = () => {
   const { selectedTreatments, totalPrice } = useAppSelector(
     (state) => state.treatments // Redux state for selected treatments
   );
+  const [activeProfessional, setActiveProfessional] =
+    useState<ProfileCardProps | null>(null); // Track selected professional
 
+  // Handle professional selection and store data
+  const handleProfessionalSelect = (professional: ProfileCardProps) => {
+    setActiveProfessional(professional); // Set the clicked professional as active
+  };
+
+  console.log(activeProfessional);
   return (
     <section className="flex container mx-auto">
       <div className="w-[70%]">
@@ -39,6 +46,8 @@ export const SelectProfessional = () => {
           <ProfileCard
             title="for maximum availability"
             professional="Any Professional"
+            isActive={activeProfessional === null} // Highlight if no professional is selected
+            onClick={() => setActiveProfessional(null)} // Deselect any professional
           />
 
           {/* Map through the professionals in 'datas' */}
@@ -50,6 +59,8 @@ export const SelectProfessional = () => {
                 imageUrl={i.img}
                 professional={i.professional}
                 rating={i.ratting}
+                isActive={activeProfessional?.id === i.id} // Highlight active professional
+                onClick={() => handleProfessionalSelect(i)} // Set active professional
               />
             ))
           ) : (
@@ -59,7 +70,10 @@ export const SelectProfessional = () => {
           )}
         </div>
       </div>
+
+      {/* Selected Professional Section */}
       <div className="w-full md:w-[30%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
+        {/* Treatments and Total Price */}
         {selectedTreatments.map((treatment) => (
           <div
             key={treatment.id}
@@ -68,6 +82,14 @@ export const SelectProfessional = () => {
             <div className="w-[50%]">
               <h4>{treatment.selectedOption?.name || treatment.name}</h4>
               <span>{treatment.selectedOption?.time || treatment.time}</span>
+              <span className="ml-2">with</span>
+
+              <span className="text-[#7C6DD8] font-semibold text-sm">
+                {" "}
+                {activeProfessional?.name
+                  ? activeProfessional?.name
+                  : "Any Professional"}{" "}
+              </span>
             </div>
             <div>
               {treatment.selectedOption?.price ||
@@ -79,9 +101,11 @@ export const SelectProfessional = () => {
             </div>
           </div>
         ))}
+
         <div className="px-3">
           <Separator className="my-4 px-3" />
         </div>
+
         <div className="flex justify-between font-bold text-lg px-3">
           <h3>Total</h3>
           <h3>AED {totalPrice}</h3> {/* Display total price */}

@@ -6,6 +6,8 @@ interface ProfileCardProps {
   title: string;
   rating?: number; // Optional prop
   imageUrl?: string; // Optional prop
+  isActive: boolean; // Prop to highlight the active card
+  onClick: () => void; // Click handler to select the professional
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -13,6 +15,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   title,
   rating = 0, // Default to 0 stars if rating is not provided
   imageUrl = "", // Use a placeholder image if no image URL is provided
+  isActive,
+  onClick,
 }) => {
   // Calculate the number of full stars, half stars, and empty stars
   const fullStars = Math.floor(rating);
@@ -20,7 +24,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const emptyStars = 5 - fullStars - halfStars;
 
   return (
-    <div className="bg-white rounded-lg shadow-md py-4 w-[240px] overflow-hidden">
+    <div
+      onClick={onClick} // Call onClick when the card is clicked
+      className={`bg-white rounded-lg shadow-md py-4 w-[240px] overflow-hidden cursor-pointer ${
+        isActive ? "border-2 border-[#5C4ACE] shadow-lg" : "" // Highlight active card
+      }`}
+    >
       <div className="flex justify-center pt-6">
         {imageUrl ? (
           <Image
@@ -46,9 +55,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         )}
       </div>
       <div className="text-center py-2 px-2 overflow-hidden">
-        <h2 className="text-lg font-semibold text-gray-800 truncate">
-          {professional}
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-800 truncate">{professional}</h2>
         <p className="text-sm text-gray-600 truncate">{title}</p>
         <div className="mt-2">
           {rating !== 0 ? (

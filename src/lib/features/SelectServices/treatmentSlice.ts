@@ -120,6 +120,50 @@ const treatmentSlice = createSlice({
       setToLocalStorage("finaldata", state.finaldata);
       console.log(state.finaldata);
     },
+    updateProfession: (
+      state,
+      action: PayloadAction<{
+        treatmentId: number;
+        newProfessional: ProfileCardProps;
+      }>
+    ) => {
+      const { treatmentId, newProfessional } = action.payload;
+
+      // Find the treatment to update by ID
+      const treatmentToUpdate = state.finaldata.find(
+        (treatment) => treatment.id === treatmentId
+      );
+
+      if (treatmentToUpdate) {
+        // Update the professional for the selected treatment
+        treatmentToUpdate.professional = newProfessional;
+
+        // Save the updated state to localStorage
+        setToLocalStorage("finaldata", state.finaldata);
+      }
+
+      console.log(
+        "Updated treatment with new professional:",
+        treatmentToUpdate
+      );
+    },
+    updateAllProfession: (state, action: PayloadAction<ProfileCardProps>) => {
+      const newProfessional = action.payload;
+
+      // Update the professional for each treatment in finaldata
+      state.finaldata = state.finaldata.map((treatment) => ({
+        ...treatment,
+        professional: newProfessional, // Replace professional for all treatments
+      }));
+
+      // Save the updated state to localStorage
+      setToLocalStorage("finaldata", state.finaldata);
+
+      console.log(
+        "Updated all treatments with new professional:",
+        state.finaldata
+      );
+    },
     anyProfession: (state, action: PayloadAction<boolean>) => {
       console.log(action.payload);
     },
@@ -133,6 +177,7 @@ export const {
   updateTotalPrice,
   addProfession,
   anyProfession,
+  updateAllProfession,
 } = treatmentSlice.actions;
 
 export default treatmentSlice.reducer;

@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import {
   addProfession,
   anyProfession,
+  updateAllProfession,
 } from "@/lib/features/SelectServices/treatmentSlice";
 
 // Defining the type for the professional data
@@ -41,6 +42,7 @@ export const SelectProfessional = () => {
   const handleProfessionalSelect = (professional: ProfileCardProps) => {
     setActiveProfessional(professional);
     setSelectedProfessional(professional);
+    dispatch(updateAllProfession(professional));
   };
 
   const onSubmit = () => {

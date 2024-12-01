@@ -1,14 +1,13 @@
 "use client";
-import { use, useState } from "react";
+import { useState } from "react";
 import data from "../../../data/frisha.json"; // Assuming this is an array of professionals
-import ProfileCard from "./profile-card"; // Make sure this is the correct path to the ProfileCard component
+import ProfileCard from "./profile-card";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import {
   addProfession,
   anyProfession,
-  updateTotalPrice,
 } from "@/lib/features/SelectServices/treatmentSlice";
 
 // Defining the type for the professional data
@@ -24,46 +23,46 @@ export interface ProfileCardProps {
 export const SelectProfessional = () => {
   const dispatch = useAppDispatch();
 
-  // Directly using the professional array in the state
   const [datas, setDatas] = useState<ProfileCardProps[]>(data.professional);
-  const [selectedProfessional, setSelectedProfessional] = // Fixed the name here
+  const [selectedProfessional, setSelectedProfessional] =
     useState<ProfileCardProps | null>(null);
-  const { selectedTreatments, totalPrice } = useAppSelector(
-    (state) => state.treatments // Redux state for selected treatments
-  );
-  const [activeProfessional, setActiveProfessional] =
-    useState<ProfileCardProps | null>(null); // Track selected professional
 
-  // Handle professional selection and store data
+  const { selectedTreatments, totalPrice, finaldata } = useAppSelector(
+    (state) => state.treatments
+  );
+
+  const finalDataPropessionalIds = finaldata.map(
+    (item) => item.professional.id
+  );
+
+  const [activeProfessional, setActiveProfessional] =
+    useState<ProfileCardProps | null>(null);
+
   const handleProfessionalSelect = (professional: ProfileCardProps) => {
-    setActiveProfessional(professional); // Set the clicked professional as active
-    setSelectedProfessional(professional); // Update the selected professional state
+    setActiveProfessional(professional);
+    setSelectedProfessional(professional);
   };
 
-  // Save to localStorage
   const onSubmit = () => {
     if (selectedProfessional) {
-      // Save selected treatments to localStorage
       localStorage.setItem(
         "selectedTreatments",
         JSON.stringify(selectedTreatments)
       );
-  
-      // Prepare the selected treatments data for dispatch
+
       const selectedData = selectedTreatments.map((treatment) => ({
         id: treatment.id,
         name: treatment.selectedOption?.name || treatment.name,
         time: treatment.selectedOption?.time || treatment.time,
         price: treatment.selectedOption?.price || treatment.price,
       }));
-  
-      // Dispatch action to add the professional and associated treatments
+
       dispatch(addProfession({ selectedProfessional, data: selectedData }));
     } else {
       dispatch(anyProfession(true));
     }
   };
-  
+
   return (
     <section className="flex container mx-auto">
       <div className="w-[70%]">
@@ -72,28 +71,31 @@ export const SelectProfessional = () => {
         </h1>
 
         <div className="gap-4 flex flex-wrap">
-          {/* Default 'Any Professional' option */}
+          {/* "Any Professional" card */}
           <ProfileCard
             title="for maximum availability"
             professional="Any Professional"
-            isActive={activeProfessional === null} // Highlight if no professional is selected
+            isActive={activeProfessional === null}
             onClick={() => {
-              setActiveProfessional(null);
-              setSelectedProfessional(null); // Deselect any professional
+              setActiveProfessional(null); // Deactivate any active professional
+              setSelectedProfessional(null); // Clear the selected professional
             }}
           />
 
-          {/* Map through the professionals in 'datas' */}
+          {/* Professional cards */}
           {datas.length > 0 ? (
             datas.map((i) => (
               <ProfileCard
-                key={i.id} // Use 'id' as the key instead of 'professional'
+                key={i.id}
                 title={i.name}
                 imageUrl={i.img}
                 professional={i.professional}
                 rating={i.ratting}
-                isActive={activeProfessional?.id === i.id} // Highlight active professional
-                onClick={() => handleProfessionalSelect(i)} // Set active professional
+                isActive={
+                  // Pre-selected professional
+                  activeProfessional?.id === i.id // Currently clicked professional
+                }
+                onClick={() => handleProfessionalSelect(i)} // Set the clicked card as active
               />
             ))
           ) : (
@@ -104,36 +106,48 @@ export const SelectProfessional = () => {
         </div>
       </div>
 
-      {/* Selected Professional Section */}
       <div className="w-full md:w-[30%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
-        {/* Treatments and Total Price */}
-        {selectedTreatments.map((treatment) => (
-          <div
-            key={treatment.id}
-            className="flex justify-between items-center mb-4 px-3"
-          >
-            <div className="w-[50%]">
-              <h4>{treatment.selectedOption?.name || treatment.name}</h4>
-              <span>{treatment.selectedOption?.time || treatment.time}</span>
-              <span className="ml-2">with</span>
-
-              <span className="text-[#7C6DD8] font-semibold text-sm">
-                {" "}
-                {activeProfessional?.name
-                  ? activeProfessional?.name
-                  : "Any Professional"}{" "}
-              </span>
-            </div>
-            <div>
-              {treatment.selectedOption?.price ||
-                (treatment.price && (
+        {finaldata?.length > 0
+          ? finaldata.map((treatment) => (
+              <div
+                key={treatment.id}
+                className="flex justify-between items-center mb-4 px-3"
+              >
+                <div className="w-[50%]">
+                  <h4>{treatment.name}</h4>
+                  <span>{treatment.time}</span>
+                  <span className="mx-2">with</span>
+                  <span className="text-[#7C6DD8] font-semibold text-sm">
+                    {treatment.professional?.name || "Any Professional"}
+                  </span>
+                </div>
+                <div>
+                  <span>AED {treatment.price}</span>
+                </div>
+              </div>
+            ))
+          : selectedTreatments.map((treatment) => (
+              <div
+                key={treatment.id}
+                className="flex justify-between items-center mb-4 px-3"
+              >
+                <div className="w-[50%]">
+                  <h4>{treatment.selectedOption?.name || treatment.name}</h4>
+                  <span>
+                    {treatment.selectedOption?.time || treatment.time}
+                  </span>
+                  <span className="mx-2">with</span>
+                  <span className="text-[#7C6DD8] font-semibold text-sm">
+                    {activeProfessional?.name || "Any Professional"}
+                  </span>
+                </div>
+                <div>
                   <span>
                     AED {treatment.selectedOption?.price || treatment.price}
                   </span>
-                ))}
-            </div>
-          </div>
-        ))}
+                </div>
+              </div>
+            ))}
 
         <div className="px-3">
           <Separator className="my-4 px-3" />
@@ -141,7 +155,7 @@ export const SelectProfessional = () => {
 
         <div className="flex justify-between font-bold text-lg px-3">
           <h3>Total</h3>
-          <h3>AED {totalPrice}</h3> {/* Display total price */}
+          <h3>AED {totalPrice}</h3>
         </div>
 
         <Button className="w-full mt-16" onClick={onSubmit}>

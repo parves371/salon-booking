@@ -1,6 +1,11 @@
 import { ProfileCardProps } from "@/components/professional/select-professional";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  getFromLocalStorage,
+  setToLocalStorage,
+} from "@/utils/localStorageUtils";
 
+// Interfaces
 interface TreatmentOption {
   id: number;
   name: string;
@@ -16,12 +21,14 @@ interface Treatment {
   option: boolean;
   options: TreatmentOption[];
 }
+
 interface SelectedTreatmentOption {
   id: number;
   name: string;
   time: string;
   price: number;
 }
+
 interface SelectedTreatment extends Treatment {
   selectedOption?: TreatmentOption; // selectedOption is optional
 }
@@ -35,23 +42,22 @@ interface FinaleDataProps {
 }
 
 interface TreatmentState {
-  selectedTreatments: SelectedTreatment[]; // Now this is an array of SelectedTreatment
+  selectedTreatments: SelectedTreatment[];
   totalPrice: number;
   finaldata: FinaleDataProps[];
 }
 
+// Initial state with `localStorage` data
 const initialState: TreatmentState = {
-  selectedTreatments: JSON.parse(
-    localStorage.getItem("selectedTreatments") || "[]"
-  ),
+  selectedTreatments:
+    getFromLocalStorage<SelectedTreatment[]>("selectedTreatments") || [],
   totalPrice: 0,
-  finaldata: [],
+  finaldata: getFromLocalStorage<FinaleDataProps[]>("finaldata") || [],
 };
 
 // Helper function to calculate total price
 const calculateTotalPrice = (treatments: SelectedTreatment[]) => {
   return treatments.reduce((sum, treatment) => {
-    // Use optional chaining to access selectedOption safely
     const price = treatment.selectedOption?.price ?? treatment.price;
     return sum + price;
   }, 0);
@@ -67,20 +73,14 @@ const treatmentSlice = createSlice({
         ...action.payload,
       ];
       state.totalPrice = calculateTotalPrice(state.selectedTreatments);
-      localStorage.setItem(
-        "selectedTreatments",
-        JSON.stringify(state.selectedTreatments)
-      ); // Save to localStorage
+      setToLocalStorage("selectedTreatments", state.selectedTreatments); // Save to localStorage
     },
     removeTreatment: (state, action: PayloadAction<number>) => {
       state.selectedTreatments = state.selectedTreatments.filter(
         (treatment) => treatment.id !== action.payload
       );
       state.totalPrice = calculateTotalPrice(state.selectedTreatments);
-      localStorage.setItem(
-        "selectedTreatments",
-        JSON.stringify(state.selectedTreatments)
-      );
+      setToLocalStorage("selectedTreatments", state.selectedTreatments); // Save to localStorage
     },
     updateTreatment: (state, action: PayloadAction<SelectedTreatment[]>) => {
       action.payload.forEach((updatedTreatment) => {
@@ -92,10 +92,7 @@ const treatmentSlice = createSlice({
         }
       });
       state.totalPrice = calculateTotalPrice(state.selectedTreatments);
-      localStorage.setItem(
-        "selectedTreatments",
-        JSON.stringify(state.selectedTreatments)
-      );
+      setToLocalStorage("selectedTreatments", state.selectedTreatments); // Save to localStorage
     },
     updateTotalPrice: (state, action: PayloadAction<number>) => {
       state.totalPrice = action.payload;
@@ -118,8 +115,10 @@ const treatmentSlice = createSlice({
         professional: selectedProfessional, // Add the selected professional to each treatment
       }));
 
-      // Update finaldata by spreading the old data and adding new items
+      // Update finaldata by spreading the new items
       state.finaldata = [...newFinalData];
+      setToLocalStorage("finaldata", state.finaldata);
+      console.log(state.finaldata);
     },
     anyProfession: (state, action: PayloadAction<boolean>) => {
       console.log(action.payload);

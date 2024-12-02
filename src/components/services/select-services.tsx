@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks"; // Ensure you have
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import {
   addTreatment,
+  anyProfession,
   removeTreatment,
   updateTotalPrice,
   updateTreatment,
@@ -22,7 +23,7 @@ interface TreatmentOption {
   price: number;
 }
 
-interface Treatment {
+export interface Treatment {
   id: number;
   name: string;
   time: string;
@@ -53,52 +54,55 @@ export const SelectServices: React.FC = () => {
   const [activeSection, setActiveSection] = useState<number | null>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
- const calculateTotalPrice = (treatments: Treatment[]) => {
-  return treatments.reduce((sum, treatment) => {
-    // Use optional chaining to access selectedOption safely
-    const price = treatment.selectedOption?.price ?? treatment.price; // Default to treatment.price if selectedOption doesn't exist
-    return sum + price;
-  }, 0);
-};
+  const calculateTotalPrice = (treatments: Treatment[]) => {
+    return treatments.reduce((sum, treatment) => {
+      // Use optional chaining to access selectedOption safely
+      const price = treatment.selectedOption?.price ?? treatment.price; // Default to treatment.price if selectedOption doesn't exist
+      return sum + price;
+    }, 0);
+  };
 
   // Load selected treatments from localStorage if they exist
   useEffect(() => {
     const storedTreatments = localStorage.getItem("selectedTreatments");
     if (storedTreatments) {
       const treatments: Treatment[] = JSON.parse(storedTreatments);
-      
+
       // Check if the treatments already exist in the Redux state
-      const existingTreatmentIds = selectedTreatments.map(treatment => treatment.id);
-  
+      const existingTreatmentIds = selectedTreatments.map(
+        (treatment) => treatment.id
+      );
+
       // Filter out the treatments that are already in the Redux store
-      const newTreatments = treatments.filter(treatment => !existingTreatmentIds.includes(treatment.id));
-      
+      const newTreatments = treatments.filter(
+        (treatment) => !existingTreatmentIds.includes(treatment.id)
+      );
+
       // Dispatch only the new treatments to avoid duplication
       if (newTreatments.length > 0) {
         dispatch(addTreatment(newTreatments)); // Add only new treatments
       }
-  
+
       // Manually recalculate the total price after loading the treatments
       const updatedTotalPrice = calculateTotalPrice(selectedTreatments); // Recalculate total price
       dispatch(updateTotalPrice(updatedTotalPrice)); // Dispatch the updated total price
+      console.log(treatments);
     }
   }, [dispatch, selectedTreatments]);
-   // Ensure this effect runs after selectedTreatments is loaded
-  
-   // Make sure the effect runs after selectedTreatments is loaded
-  
-  
-  
-  
+  // Ensure this effect runs after selectedTreatments is loaded
+
+  // Make sure the effect runs after selectedTreatments is loaded
 
   // Save selected treatments to localStorage when it changes
   useEffect(() => {
     if (selectedTreatments.length > 0) {
       // Ensure total price is updated and stored in localStorage
-      localStorage.setItem('selectedTreatments', JSON.stringify(selectedTreatments));
+      localStorage.setItem(
+        "selectedTreatments",
+        JSON.stringify(selectedTreatments)
+      );
     }
   }, [selectedTreatments]);
-  
 
   // Update active section during scroll
   useEffect(() => {
@@ -139,7 +143,6 @@ export const SelectServices: React.FC = () => {
       dispatch(addTreatment([treatment])); // Pass an array of treatments
     }
   };
-  
 
   const handleTreatmentRemove = (treatmentId: number) => {
     dispatch(removeTreatment(treatmentId)); // Remove treatment from Redux store
@@ -154,6 +157,32 @@ export const SelectServices: React.FC = () => {
         inline: "start",
       });
       setActiveSection(data.data[index].id);
+    }
+  };
+
+  const onsubmit = () => {
+    localStorage.setItem(
+      "selectedTreatments",
+      JSON.stringify(selectedTreatments)
+    );
+
+    const storedTreatments = localStorage.getItem("selectedTreatments");
+    if (storedTreatments) {
+      const treatments: Treatment[] = JSON.parse(storedTreatments);
+
+      const selectedData = selectedTreatments.map((treatment) => ({
+        id: treatment.id,
+        name: treatment.selectedOption?.name || treatment.name,
+        time: treatment.selectedOption?.time || treatment.time,
+        price: treatment.selectedOption?.price || treatment.price,
+      }));
+
+      dispatch(
+        anyProfession({
+          anyProfession: true,
+          data: selectedData,
+        })
+      );
     }
   };
 
@@ -231,15 +260,7 @@ export const SelectServices: React.FC = () => {
             <h3>AED {totalPrice}</h3> {/* Display total price */}
           </div>
 
-          <Button
-            className="w-full mt-16"
-            onClick={() =>
-              localStorage.setItem(
-                "selectedTreatments",
-                JSON.stringify(selectedTreatments)
-              )
-            }
-          >
+          <Button className="w-full mt-16" onClick={() => onsubmit()}>
             Continue
           </Button>
         </div>
@@ -247,7 +268,6 @@ export const SelectServices: React.FC = () => {
     </section>
   );
 };
-
 
 const CustomSlider: React.FC<CustomSliderProps> = ({
   data,

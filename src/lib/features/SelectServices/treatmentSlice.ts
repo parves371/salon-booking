@@ -38,7 +38,8 @@ interface FinaleDataProps {
   name: string;
   time: string;
   price: number;
-  professional: ProfileCardProps;
+  anyProfeton?: boolean;
+  professional?: ProfileCardProps;
 }
 
 interface TreatmentState {
@@ -73,11 +74,6 @@ const treatmentSlice = createSlice({
         ...action.payload,
       ];
 
-      const selectedIds = action.payload.map((treatment) => treatment.id);
-
-      const data = state.finaldata.filter((item) => item.id !== selectedIds);
-
-  
       // console.log(finalData);
       state.totalPrice = calculateTotalPrice(state.selectedTreatments);
       setToLocalStorage("selectedTreatments", state.selectedTreatments); // Save to localStorage
@@ -171,8 +167,24 @@ const treatmentSlice = createSlice({
         state.finaldata
       );
     },
-    anyProfession: (state, action: PayloadAction<boolean>) => {
-      console.log(action.payload);
+    anyProfession: (
+      state,
+      action: PayloadAction<{
+        anyProfession: boolean;
+        data: SelectedTreatmentOption[];
+      }>
+    ) => {
+      const { anyProfession, data } = action.payload;
+      const newFinalData = data.map((treatment) => ({
+        id: treatment.id,
+        name: treatment.name,
+        time: treatment.time,
+        price: treatment.price,
+        anyProfession: true, // Add the selected professional to each treatment
+      }));
+
+      state.finaldata = [...newFinalData];
+      setToLocalStorage("finaldata", state.finaldata);
     },
   },
 });

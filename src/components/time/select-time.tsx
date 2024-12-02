@@ -74,8 +74,8 @@ const SelectTime = () => {
               finaldata.map((i) => {
                 return (
                   <Avatar>
-                    <AvatarImage src={i.professional.img} alt="@shadcn" />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarImage src={i.professional?.img} alt="@shadcn" />
+                    {/* <AvatarFallback>CN</AvatarFallback> */}
                   </Avatar>
                 );
                 <RxAvatar className="text-2xl" />;

@@ -10,6 +10,7 @@ import {
   anyProfession,
   updateAllProfession,
 } from "@/lib/features/SelectServices/treatmentSlice";
+import { Treatment } from "../services/select-services";
 
 // Defining the type for the professional data
 export interface ProfileCardProps {
@@ -33,7 +34,7 @@ export const SelectProfessional = () => {
   );
 
   const finalDataPropessionalIds = finaldata.map(
-    (item) => item.professional.id
+    (item) => item.professional?.id
   );
 
   const [activeProfessional, setActiveProfessional] =
@@ -61,8 +62,44 @@ export const SelectProfessional = () => {
 
       dispatch(addProfession({ selectedProfessional, data: selectedData }));
     } else {
-      dispatch(anyProfession(true));
+      localStorage.setItem(
+        "selectedTreatments",
+        JSON.stringify(selectedTreatments)
+      );
+
+      const storedTreatments = localStorage.getItem("selectedTreatments");
+      if (storedTreatments) {
+        const treatments: Treatment[] = JSON.parse(storedTreatments);
+
+        const selectedData = selectedTreatments.map((treatment) => ({
+          id: treatment.id,
+          name: treatment.selectedOption?.name || treatment.name,
+          time: treatment.selectedOption?.time || treatment.time,
+          price: treatment.selectedOption?.price || treatment.price,
+        }));
+
+        dispatch(
+          anyProfession({
+            anyProfession: true,
+            data: selectedData,
+          })
+        );
+      }
     }
+  };
+
+  const updateAnyProfession = () => {
+    dispatch(
+      anyProfession({
+        anyProfession: true,
+        data: selectedTreatments.map((treatment) => ({
+          id: treatment.id,
+          name: treatment.selectedOption?.name || treatment.name,
+          time: treatment.selectedOption?.time || treatment.time,
+          price: treatment.selectedOption?.price || treatment.price,
+        })),
+      })
+    );
   };
 
   return (
@@ -81,6 +118,7 @@ export const SelectProfessional = () => {
             onClick={() => {
               setActiveProfessional(null); // Deactivate any active professional
               setSelectedProfessional(null); // Clear the selected professional
+              updateAnyProfession();
             }}
           />
 

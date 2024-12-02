@@ -16,12 +16,12 @@
     "react"
   ],
   "rules": {
-    "indent": ["error", 2],
-    "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "double"],
-    "semi": ["error", "always"],
-    "no-console": "warn",
-    "react/prop-types": "off",
-    "react/react-in-jsx-scope": "off"
+    "indent": ["error", 2],  // Enforces 2 spaces for indentation
+    "linebreak-style": ["error", "unix"],  // Enforces LF line endings
+    "quotes": ["error", "double"],  // Enforces double quotes
+    "semi": ["error", "always"],  // Enforces semicolons at the end of statements
+    "no-console": "warn",  // Warns if console statements are used
+    "react/prop-types": "off",  // Disables the rule requiring prop types in React components
+    "react/react-in-jsx-scope": "off"  // Disables the rule requiring React in scope when using JSX (React 17+ no longer requires this)
   }
 }

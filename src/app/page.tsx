@@ -1,8 +1,10 @@
 "use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { Navbar } from "@/components/layout/Header";
-import Image from "next/image";
-import React, { useState } from "react";
 import Slider from "react-slick";
 
 const teamMembers = [
@@ -314,15 +316,66 @@ export default function Home() {
         <div className="flex flex-col md:flex-row items-center justify-center mt-10  gap-5">
           {teamMembers.map((member, index) => (
             <HoverCard
-            key={index}
-            image={member.image}
-            name={member.name}
-            role={member.role}
-            socialLinks={member.socialLinks}  // Pass socialLinks to HoverCard
-          />
+              key={index}
+              image={member.image}
+              name={member.name}
+              role={member.role}
+              socialLinks={member.socialLinks} // Pass socialLinks to HoverCard
+            />
           ))}
         </div>
       </section>
+
+      <section className="container mx-auto my-40 px-4 md:px-0">
+        <div className="flex gap-10">
+          <div className="w-[30%]">
+            <div className="flex flex-col  items-start gap-6 justify-center px-4 md:px-0">
+              <h2 className="text-xl">
+                <span className="bg-gradient-to-r from-[#2e3844] via-[#455161] to-[#e47256] text-transparent bg-clip-text font-bold">
+                  Testimonial
+                </span>
+              </h2>
+              <h3 className="text-[2.5rem] font-normal sm:text-xl md:text-3xl lg:text-[2.5rem] mt-4 md:mt-0">
+                Our happy beauty lovers.
+              </h3>
+            </div>
+          </div>
+          <div className="w-[70%]">
+            <div className="flex gap-4">
+              <Card
+                title="Lesley simms"
+                description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
+                rating={4}
+              />
+              <Card
+                title="Lesley simms"
+                description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
+                rating={4}
+              />
+              <Card
+                title="Lesley simms"
+                description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
+                rating={4}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto my-40 px-4 md:px-0">
+        <div className="flex items-end justify-end">
+          <ContactCard
+            name="Crafto beauty salon"
+            address="401 Broadway, 24th Floor"
+            city="New York, NY 10013"
+            phone="1-800-222-000"
+            email="info@yourdomain.com"
+            mapLink="https://www.google.com/maps"
+          />
+        </div>
+      </section>
+
+      <Footer />
     </>
   );
 }
@@ -347,7 +400,7 @@ const ServicesCard: React.FC<ServicesCardProps> = ({
           className="transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-lg bg-cover w-[371px] h-[328px]"
         />
       </div>
-      <h3 className="mt-6 text-2xl text-[#3C4550] font-medium ">{title}</h3>
+      <h3 className="mt-6 text-2xl text-[#3C4550] font-medium">{title}</h3>
       <span className="mt-1 text-xl font-medium text-[#68717D]">
         {description}
       </span>
@@ -539,7 +592,7 @@ const CustomSlider = () => {
   );
 };
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa"; // Import React Icons
-import Link from "next/link";
+import { Footer } from "@/components/layout/Footer";
 
 // Define the SocialLink interface
 interface SocialLink {
@@ -603,3 +656,80 @@ const HoverCard: React.FC<HoverCardProps> = ({
   );
 };
 
+interface CardProps {
+  title: string;
+  description: string;
+  rating: number; // Rating should be a number between 1 and 5
+}
+
+const Card: React.FC<CardProps> = ({ title, description, rating }) => {
+  // Function to generate the star rating
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    return (
+      <div className="flex items-center">
+        {Array(fullStars).fill(<span className="text-[#394452]">★</span>)}
+        {halfStar && <span className="text-[#394452]">☆</span>}
+        {Array(emptyStars).fill(<span className="text-[#dc7f68]">★</span>)}
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-xs rounded-lg overflow-hidden shadow-lg bg-white">
+      <div className="p-6">
+        <h3 className="text-2xl font-semibold text-gray-800">{title}</h3>
+        <p className="text-gray-600 mt-4">{description}</p>
+
+        {/* Rating Section */}
+        <div className="mt-4">{renderStars(rating)}</div>
+      </div>
+    </div>
+  );
+};
+
+interface ContactCardProps {
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+  email: string;
+  mapLink: string;
+}
+
+const ContactCard: React.FC<ContactCardProps> = ({
+  name,
+  address,
+  city,
+  phone,
+  email,
+  mapLink,
+}) => {
+  return (
+    <div className="max-w-[300px] p-10 rounded-xl shadow-lg bg-white text-start">
+      <h2 className="text-[#2E3844] text-[2.32rem] font-medium">Contact us</h2>
+      <p className="mt-1  text-base font-medium">{name}</p>
+      <p className="mt-1 text-base font-medium text-[#A0A3A7]">{address}</p>
+      <p className="mt-1 text-base font-medium text-[#A0A3A7]">{city}</p>
+      <Link
+        href={`tel:${phone}`}
+        className="pt-5 block text-base font-medium text-[#A0A3A7] hover:text-[#ffa085]"
+      >
+        <strong className="text-sm text-[#2E3844]">Phone:</strong> {phone}
+      </Link>
+      <p className="text-sm font-medium hover:text-[#ffa085]">
+        <strong className="text-base text-[#2E3844]">Email:</strong>{" "}
+        <a href={`mailto:${email}`}>{email}</a>
+      </p>
+      <Link
+        href={mapLink}
+        className="mt-5 inline-block py-2 px-4 text-sm text-[#000] border border-[#ccc] rounded-md hover:bg-[#f7f7f7]"
+      >
+        📍 Show on Google Maps
+      </Link>
+    </div>
+  );
+};

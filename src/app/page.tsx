@@ -1,8 +1,9 @@
 "use client";
-import { FaArrowRight } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { Navbar } from "@/components/layout/Header";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
+import Slider from "react-slick";
 
 export default function Home() {
   return (
@@ -141,7 +142,7 @@ export default function Home() {
               className=""
             />
           </div>
-          <div className="">
+          <div className="border-r border-b flex items-center justify-center">
             {" "}
             <Image
               width={225}
@@ -151,7 +152,7 @@ export default function Home() {
               className=""
             />
           </div>
-          <div className="">
+          <div className="border-b flex items-center justify-center">
             {" "}
             <Image
               width={225}
@@ -161,7 +162,7 @@ export default function Home() {
               className=""
             />
           </div>
-          <div className="">
+          <div className="border-r flex items-center justify-center">
             {" "}
             <Image
               width={225}
@@ -171,7 +172,7 @@ export default function Home() {
               className=""
             />
           </div>
-          <div className="">
+          <div className="border-r flex items-center justify-center">
             {" "}
             <Image
               width={225}
@@ -181,7 +182,7 @@ export default function Home() {
               className=""
             />
           </div>
-          <div className="">
+          <div className="border-r flex items-center justify-center">
             {" "}
             <Image
               width={225}
@@ -191,7 +192,7 @@ export default function Home() {
               className=""
             />
           </div>
-          <div className="">
+          <div className="flex items-center justify-center">
             {" "}
             <Image
               width={225}
@@ -200,6 +201,53 @@ export default function Home() {
               src={"/images/demo-01.png"}
               className=""
             />
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="mt-20 px-4 md:px-0"
+        style={{
+          backgroundImage: 'url("/images/demo-beauty-salon-home-bg-04.jpg")',
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+        }}
+      >
+        <div className="container mx-auto">
+          <div className="flex flex-col-reverse md:flex-row gap-y-8 md:gap-x-16 items-center justify-center px-4">
+            <div className="w-full md:w-1/2">
+              <Image
+                width={500}
+                height={400}
+                alt="banner"
+                src={"/images/demo-beauty-salon-home-10.png"}
+                className="w-full h-auto md:w-[724px] md:h-[665px] "
+              />
+            </div>
+
+            <div className="w-full md:w-[40%] text-center md:text-left mt-4">
+              <h2 className="text-2xl font-semibold text-[#ffa085]">
+                Beauty salon focus on
+              </h2>
+              <p className="text-4xl md:text-5xl text-white w-full md:w-[400px] mt-5">
+                The quest for quality and safety
+              </p>
+              <FAQ />
+              <button className="bg-[#FFA085] text-black px-16 py-4 rounded mt-8 md:mt-20 flex items-center justify-center gap-5 text-sm font-semibold">
+                Book appointment <FaArrowRight />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="text-center md:px-0 mb-16">
+        <div className="flex flex-col md:flex-row items-center border-b w-full">
+          <div className="w-full md:w-[30%] border-b md:border-r p-4 md:border-b-0">
+            <h4 className="text-[#2E3844] text-[2rem]">2023 beauty tips</h4>
+          </div>
+          <div className="w-full md:w-[700px] pt-2 md:mt-0 md:ml-10">
+            <CustomSlider />
           </div>
         </div>
       </section>
@@ -266,5 +314,150 @@ const CardComponent = ({
       </div>
       <div className="text-xl font-medium text-[#68717D]">${price}</div>
     </div>
+  );
+};
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+const faqData: FAQItem[] = [
+  {
+    question: "Quality and safety as our absolute priority",
+    answer:
+      "For more than 110 years, we have devoted our energy and our competencies solely to one business beauty.",
+  },
+  {
+    question: "Helping hundreds of millions of women",
+    answer:
+      "For more than 110 years, we have devoted our energy and our competencies solely to one business beauty.",
+  },
+];
+
+const FAQ = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const toggleFAQ = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <div className="space-y-4 mt-7">
+      {faqData.map((item, index) => (
+        <div key={index} className="border-b pb-4">
+          <div
+            onClick={() => toggleFAQ(index)}
+            className="cursor-pointer text-xl font-medium text-[#2e3844] flex justify-between items-center"
+          >
+            <span className="text-white text-lg font-medium">
+              {item.question}
+            </span>
+            <span className=" text-white">
+              {openIndex === index ? "-" : "+"}
+            </span>
+          </div>
+          {openIndex === index && (
+            <p className="mt-2 text-lg text-[#A88C87] transition-all delay-100">
+              {item.answer}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+interface SliderItem {
+  title: string;
+  description: string;
+}
+
+const sliderData: SliderItem[] = [
+  {
+    title: "Turmeric:",
+    description:
+      "Its healing properties can repair sun damage and reduce sunburns.",
+  },
+  {
+    title: "Avocado:",
+    description:
+      "The fruit is rich in antioxidants and contains anti-inflammatory properties.",
+  },
+  {
+    title: "Honey:",
+    description:
+      "This golden potion is great for your health when taken externally.",
+  },
+];
+
+const CustomSlider = () => {
+  function SampleNextArrow(props: any) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={`${className} absolute top-0 right-4 transform -translate-y-1/2 hidden md:block`} // Hide on small screens, show on medium+
+        style={{
+          ...style,
+          display: "block",
+          background: "transparent",
+          color: "black",
+          fontSize: "2rem",
+        }}
+        onClick={onClick}
+      >
+        <FaArrowRight size={25} className="hidden md:block absolute top-0" />
+      </div>
+    );
+  }
+
+  function SamplePrevArrow(props: any) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={`${className} absolute top-1/2 left-4 transform -translate-y-1/2 hidden lg:block`} // Hide on small screens, show on medium+
+        style={{
+          ...style,
+          display: "block",
+          background: "transparent",
+          color: "black",
+          fontSize: "2rem",
+        }}
+        onClick={onClick}
+      >
+        <FaArrowLeft size={25} className="hidden lg:block absolute top-0" />
+      </div>
+    );
+  }
+
+  const settings = {
+    dots: false,
+    infinite: true,
+    autoplay: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
+  };
+
+  return (
+    <Slider {...settings}>
+      {sliderData.map((item, index) => (
+        <div key={index} className="relative h-full flex items-center justify-center">
+          {/* Center content horizontally and vertically inside the slide */}
+          <div className="text-center flex gap-3 items-center justify-center h-full w-full px-4 md:px-16">
+            <div className="w-full">
+              <h3 className="text-[#404a54] font-semibold text-xl md:text-2xl">{item.title}</h3>
+              {/* Title font size adjusts based on screen size */}
+              <p className="text-base text-[#8d9095] font-medium mt-2 md:text-lg">
+                {item.description}
+              </p>
+              {/* Description font size adjusts based on screen size */}
+            </div>
+          </div>
+        </div>
+      ))}
+    </Slider>
   );
 };

@@ -214,8 +214,8 @@ export default function Home() {
         }}
       >
         <div className="container mx-auto">
-          <div className="flex flex-col-reverse md:flex-row gap-y-8 md:gap-x-16 items-center justify-center px-4">
-            <div className="w-full md:w-1/2">
+          <div className="flex flex-col-reverse lg:flex-row gap-y-8 md:gap-x-16 items-center justify-center px-4">
+            <div className="w-full lg:w-1/2">
               <Image
                 width={500}
                 height={400}
@@ -225,7 +225,7 @@ export default function Home() {
               />
             </div>
 
-            <div className="w-full md:w-[40%] text-center md:text-left mt-4">
+            <div className="w-full lg:w-[40%] text-center md:text-left mt-4">
               <h2 className="text-2xl font-semibold text-[#ffa085]">
                 Beauty salon focus on
               </h2>
@@ -246,7 +246,7 @@ export default function Home() {
           <div className="w-full md:w-[30%] border-b md:border-r p-4 md:border-b-0">
             <h4 className="text-[#2E3844] text-[2rem]">2023 beauty tips</h4>
           </div>
-          <div className="w-full md:w-[700px] pt-2 md:mt-0 md:ml-10">
+          <div className="w-full md:w-[700px] pt-2 md:mt-0 md:ml-10 py-2 md:py-0">
             <CustomSlider />
           </div>
         </div>

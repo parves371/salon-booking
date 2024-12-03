@@ -5,6 +5,53 @@ import Image from "next/image";
 import React, { useState } from "react";
 import Slider from "react-slick";
 
+const teamMembers = [
+  {
+    image: "/images/demo-beauty-salon-team-01.jpg",
+    name: "Jeremy dupont",
+    role: "Director",
+    socialLinks: [
+      { platform: "facebook", url: "https://facebook.com/jeremy" },
+      { platform: "instagram", url: "https://instagram.com/jeremy" },
+      { platform: "twitter", url: "https://twitter.com/jeremy" },
+      { platform: "linkedin", url: "https://linkedin.com/in/jeremy" },
+    ],
+  },
+  {
+    image: "/images/demo-beauty-salon-team-02.jpg",
+    name: "Matthew taylor",
+    role: "Makeup",
+    socialLinks: [
+      { platform: "facebook", url: "https://facebook.com/samantha" },
+      { platform: "instagram", url: "https://instagram.com/samantha" },
+      { platform: "twitter", url: "https://twitter.com/samantha" },
+      { platform: "linkedin", url: "https://linkedin.com/in/samantha" },
+    ],
+  },
+  {
+    image: "/images/demo-beauty-salon-team-03.jpg",
+    name: "Herman miller",
+    role: "Therapist",
+    socialLinks: [
+      { platform: "facebook", url: "https://facebook.com/samantha" },
+      { platform: "instagram", url: "https://instagram.com/samantha" },
+      { platform: "twitter", url: "https://twitter.com/samantha" },
+      { platform: "linkedin", url: "https://linkedin.com/in/samantha" },
+    ],
+  },
+  {
+    image: "/images/demo-beauty-salon-team-04.jpg",
+    name: "Johncy parker",
+    role: "Consultant",
+    socialLinks: [
+      { platform: "facebook", url: "https://facebook.com/samantha" },
+      { platform: "instagram", url: "https://instagram.com/samantha" },
+      { platform: "twitter", url: "https://twitter.com/samantha" },
+      { platform: "linkedin", url: "https://linkedin.com/in/samantha" },
+    ],
+  },
+];
+
 export default function Home() {
   return (
     <>
@@ -241,7 +288,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="text-center md:px-0 mb-16">
+      <section className="text-center md:px-0">
         <div className="flex flex-col md:flex-row items-center border-b w-full">
           <div className="w-full md:w-[30%] border-b md:border-r p-4 md:border-b-0">
             <h4 className="text-[#2E3844] text-[2rem]">2023 beauty tips</h4>
@@ -249,6 +296,31 @@ export default function Home() {
           <div className="w-full md:w-[700px] pt-2 md:mt-0 md:ml-10 py-2 md:py-0">
             <CustomSlider />
           </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto mt-20 px-4 md:px-0">
+        <div className="flex flex-col md:flex-row items-center justify-center px-4 md:px-0">
+          <h2 className="text-xl">
+            <span className="bg-gradient-to-r from-[#2e3844] via-[#455161] to-[#e47256] text-transparent bg-clip-text font-bold">
+              Our specialists
+            </span>
+          </h2>
+          <div className="border-r-[3px] mx-5 h-12 border-[#000] hidden md:block" />
+          <h3 className="text-[2.5rem] font-normal sm:text-xl md:text-3xl lg:text-[2.5rem] mt-4 md:mt-0">
+            Beauty experts
+          </h3>
+        </div>
+        <div className="flex flex-col md:flex-row items-center justify-center mt-10  gap-5">
+          {teamMembers.map((member, index) => (
+            <HoverCard
+            key={index}
+            image={member.image}
+            name={member.name}
+            role={member.role}
+            socialLinks={member.socialLinks}  // Pass socialLinks to HoverCard
+          />
+          ))}
         </div>
       </section>
     </>
@@ -444,11 +516,16 @@ const CustomSlider = () => {
   return (
     <Slider {...settings}>
       {sliderData.map((item, index) => (
-        <div key={index} className="relative h-full flex items-center justify-center">
+        <div
+          key={index}
+          className="relative h-full flex items-center justify-center"
+        >
           {/* Center content horizontally and vertically inside the slide */}
           <div className="text-center flex gap-3 items-center justify-center h-full w-full px-4 md:px-16">
             <div className="w-full">
-              <h3 className="text-[#404a54] font-semibold text-xl md:text-2xl">{item.title}</h3>
+              <h3 className="text-[#404a54] font-semibold text-xl md:text-2xl">
+                {item.title}
+              </h3>
               {/* Title font size adjusts based on screen size */}
               <p className="text-base text-[#8d9095] font-medium mt-2 md:text-lg">
                 {item.description}
@@ -461,3 +538,68 @@ const CustomSlider = () => {
     </Slider>
   );
 };
+import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa"; // Import React Icons
+import Link from "next/link";
+
+// Define the SocialLink interface
+interface SocialLink {
+  platform: string; // Specific string types
+  url: string;
+}
+
+interface HoverCardProps {
+  image: string;
+  name: string;
+  role: string;
+  socialLinks: SocialLink[]; // Array of SocialLink objects
+}
+
+const HoverCard: React.FC<HoverCardProps> = ({
+  image,
+  name,
+  role,
+  socialLinks,
+}) => {
+  return (
+    <div className="max-w-sm w-full mx-auto">
+      <div className="group relative w-full h-96">
+        {/* Image Section */}
+        <div
+          className="w-full h-full bg-cover bg-center rounded-lg"
+          style={{ backgroundImage: `url(${image})` }}
+        >
+          {/* Full Overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+            <div className="flex justify-center gap-4">
+              {socialLinks.map((link, index) => {
+                const Icon =
+                  link.platform === "facebook"
+                    ? FaFacebook
+                    : link.platform === "instagram"
+                    ? FaInstagram
+                    : link.platform === "twitter"
+                    ? FaTwitter
+                    : FaLinkedin;
+
+                return (
+                  <Link href={link.url} key={index} passHref>
+                    <span className="text-white text-2xl hover:text-gray-400">
+                      <Icon />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Card Body */}
+        <div className="mt-4">
+          <h3 className="text-xl font-semibold text-gray-800">{name}</h3>
+          <p className="text-gray-600 mt-2">{role}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+

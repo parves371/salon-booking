@@ -328,10 +328,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="container mx-auto my-40 px-4 md:px-0">
-        <div className="flex gap-10">
-          <div className="w-[30%]">
-            <div className="flex flex-col  items-start gap-6 justify-center px-4 md:px-0">
+      <section className="container mx-auto my-20 px-4 md:px-0 mt-36">
+        <div className="flex flex-col md:flex-row gap-10">
+          <div className="w-full md:w-[30%]">
+            <div className="flex flex-col items-start gap-6 justify-center px-4 md:px-0">
               <h2 className="text-xl">
                 <span className="bg-gradient-to-r from-[#2e3844] via-[#455161] to-[#e47256] text-transparent bg-clip-text font-bold">
                   Testimonial
@@ -342,20 +342,20 @@ export default function Home() {
               </h3>
             </div>
           </div>
-          <div className="w-[70%]">
-            <div className="flex gap-4">
+          <div className="w-full md:w-[70%]">
+            <div className="flex flex-col md:flex-row gap-4">
               <Card
-                title="Lesley simms"
+                title="Lesley Simms"
                 description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
                 rating={4}
               />
               <Card
-                title="Lesley simms"
+                title="Lesley Simms"
                 description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
                 rating={4}
               />
               <Card
-                title="Lesley simms"
+                title="Lesley Simms"
                 description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
                 rating={4}
               />
@@ -377,7 +377,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer/>
+      <Footer />
     </>
   );
 }

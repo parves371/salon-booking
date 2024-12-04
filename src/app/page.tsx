@@ -1,11 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import React, { useState } from "react";
 
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import { Navbar } from "@/components/layout/Header";
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa"; // Import React Icons
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
 import Slider from "react-slick";
+import { Footer } from "@/components/layout/Footer";
 
 const teamMembers = [
   {
@@ -375,7 +377,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer />
+      <Footer/>
     </>
   );
 }
@@ -591,8 +593,6 @@ const CustomSlider = () => {
     </Slider>
   );
 };
-import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa"; // Import React Icons
-import { Footer } from "@/components/layout/Footer";
 
 // Define the SocialLink interface
 interface SocialLink {

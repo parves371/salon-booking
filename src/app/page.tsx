@@ -70,7 +70,7 @@ export default function Home() {
         }}
       >
         <div className="container mx-auto flex flex-col items-center justify-center md:items-start md:justify-start">
-          <div className="relative mt-48">
+          <div className="relative lg:mt-40 mt-10">
             <h1 className="text-[9rem] text-white ">Beauty</h1>
             <span className="text-[9rem] text-white  absolute top-32">
               studio
@@ -100,7 +100,7 @@ export default function Home() {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-x-8 px-4 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 px-4 py-8">
           <ServicesCard
             imageSrc="https://img.freepik.com/free-photo/young-woman-getting-new-hairstyle-professional-hair-styling-saloon-hairdresser-is-massaging-her-head_231208-10831.jpg?ga=GA1.1.1096800660.1727073327&semt=ais_hybrid"
             title="Hair Treatment"
@@ -172,7 +172,7 @@ export default function Home() {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 px-4 py-8">
+        <div className="md:grid hidden grid-cols-1 md:grid-cols-4 px-4 py-8 ">
           <div className="border-r border-b flex items-center justify-center">
             {" "}
             <Image
@@ -234,6 +234,88 @@ export default function Home() {
             />
           </div>
           <div className="border-r flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+          <div className="flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+        </div>
+        <div className="md:hidden  flex flex-col px-4 py-8 ">
+          <div className="border-b flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+          <div className="border-b flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+          <div className=" border-b flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+          <div className="border-b flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+          <div className="border-b flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+          <div className="border-b flex items-center justify-center">
+            {" "}
+            <Image
+              width={225}
+              height={110}
+              alt="XAKS"
+              src={"/images/demo-01.png"}
+              className=""
+            />
+          </div>
+          <div className="border-b flex items-center justify-center">
             {" "}
             <Image
               width={225}
@@ -345,16 +427,19 @@ export default function Home() {
           <div className="w-full md:w-[70%]">
             <div className="flex flex-col md:flex-row gap-4">
               <Card
+                key={1}
                 title="Lesley Simms"
                 description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
                 rating={4}
               />
               <Card
+                key={2}
                 title="Lesley Simms"
                 description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
                 rating={4}
               />
               <Card
+                key={23}
                 title="Lesley Simms"
                 description="Perfection isn't just any other salon. It's a complete cut above the rest. Highly recommended!"
                 rating={4}
@@ -392,18 +477,20 @@ const ServicesCard: React.FC<ServicesCardProps> = ({
   description,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center w-[375px] h-[450px] overflow-hidden">
-      <div className="relative group ">
+    <div className="flex flex-col items-center justify-center w-full sm:w-[300px] md:w-[350px] lg:w-[375px] h-auto overflow-hidden">
+      <div className="relative group">
         <Image
           alt={title}
           src={imageSrc}
           width={500}
           height={500}
-          className="transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-lg bg-cover w-[371px] h-[328px]"
+          className="transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-lg bg-cover w-full h-[250px] sm:h-[280px] md:h-[300px] lg:h-[328px]"
         />
       </div>
-      <h3 className="mt-6 text-2xl text-[#3C4550] font-medium">{title}</h3>
-      <span className="mt-1 text-xl font-medium text-[#68717D]">
+      <h3 className="mt-4 text-xl sm:text-2xl text-[#3C4550] font-medium text-center">
+        {title}
+      </h3>
+      <span className="mt-1 text-base sm:text-lg md:text-xl font-medium text-[#68717D] text-center">
         {description}
       </span>
     </div>
@@ -671,9 +758,21 @@ const Card: React.FC<CardProps> = ({ title, description, rating }) => {
 
     return (
       <div className="flex items-center">
-        {Array(fullStars).fill(<span className="text-[#394452]">★</span>)}
-        {halfStar && <span className="text-[#394452]">☆</span>}
-        {Array(emptyStars).fill(<span className="text-[#dc7f68]">★</span>)}
+        {Array.from({ length: fullStars }).map((_, index) => (
+          <span key={`full-${index}`} className="text-[#394452]">
+            ★
+          </span>
+        ))}
+        {halfStar && (
+          <span key="half-star" className="text-[#394452]">
+            ☆
+          </span>
+        )}
+        {Array.from({ length: emptyStars }).map((_, index) => (
+          <span key={`empty-${index}`} className="text-[#dc7f68]">
+            ★
+          </span>
+        ))}
       </div>
     );
   };

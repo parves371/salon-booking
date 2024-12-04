@@ -16,7 +16,7 @@ export const Navbar: React.FC = () => {
         {/* Navigation Links */}
         <nav className="hidden md:flex space-x-8 ">
           <Link href="/"  className="hover:text-[#969CA3]">Home</Link>
-          <Link href="/story" className="hover:text-[#969CA3]">appointment</Link>
+          <Link href="/appointment" className="hover:text-[#969CA3]">appointment</Link>
 
           <Link href="/contact" className="hover:text-[#969CA3]">Contact</Link>
         </nav>

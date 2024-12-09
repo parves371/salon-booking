@@ -1,0 +1,16 @@
+import { Triangle } from "lucide-react";
+
+interface FormErrorProps {
+  message?: string;
+}
+
+export const FormError = ({ message }: FormErrorProps) => {
+  if (!message) return null;
+
+  return (
+    <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive">
+      <Triangle className="h-4 w-4 animate-spin" />
+      <p>{message}</p>
+    </div>
+  );
+};

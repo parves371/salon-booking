@@ -23,6 +23,7 @@ export const Registerchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address",
   }),
+  number: z.optional(z.string()),
   password: z.string().min(6, {
     message: "minimum 6 characters required!",
   }),

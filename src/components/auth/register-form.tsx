@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -23,7 +24,7 @@ import { FormSuccess } from "./form-success";
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState<boolean | undefined>(false);
   const form = useForm<z.infer<typeof Registerchema>>({
     resolver: zodResolver(Registerchema),
     defaultValues: {
@@ -33,10 +34,33 @@ export const RegisterForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof Registerchema>) => {
-    setError("");
-    setSuccess("");
+  const onSubmit = async (values: z.infer<typeof Registerchema>) => {
+    setError(""); // Clear previous errors
+    setSuccess(""); // Clear previous success messages
+
+    try {
+      // Make the API request
+      const res = await axios.post("/api/login", {
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        number: values.number,
+      });
+
+      // Handle success
+      if (res.status === 200) {
+        setSuccess("Account created successfully!");
+      } else {
+        // Handle unexpected responses
+        setError("Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      // Handle network or server errors
+      setError("An error occurred while processing your request.");
+      console.error("Error:", err);
+    }
   };
+
   return (
     <CardWrapper
       headerLabel="Create an account"
@@ -57,6 +81,23 @@ export const RegisterForm = () => {
                     <Input
                       disabled={isPending}
                       placeholder="john Doe"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="number"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isPending}
+                      placeholder="#####"
                       {...field}
                     />
                   </FormControl>

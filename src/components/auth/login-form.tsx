@@ -57,7 +57,7 @@ export const LoginForm = () => {
 
       if (res.status === 200) {
         setSuccess(res.data.message);
-        route.push("/login");
+        // route.push("/login");
       } else {
         setError("Something went wrong. Please try again.");
       }

@@ -35,28 +35,32 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof Registerchema>) => {
-    setError(""); // Clear previous errors
-    setSuccess(""); // Clear previous success messages
+    setError("");
+    setSuccess("");
 
     try {
-      // Make the API request
-      const res = await axios.post("/api/login", {
+      const res = await axios.post("/api/sign-up", {
         email: values.email,
         password: values.password,
         name: values.name,
         number: values.number,
       });
 
-      // Handle success
+      console.log("Response:", res);
+
       if (res.status === 200) {
-        setSuccess("Account created successfully!");
+        setSuccess(res.data.message);
       } else {
-        // Handle unexpected responses
         setError("Something went wrong. Please try again.");
       }
     } catch (err) {
-      // Handle network or server errors
-      setError("An error occurred while processing your request.");
+      if (axios.isAxiosError(err) && err.response) {
+        // If it's an axios error and response exists, access the error message
+        setError(err.response?.data?.message || "Unknown error occurred.");
+      } else {
+        // Handle non-Axios errors
+        setError("An unexpected error occurred.");
+      }
       console.error("Error:", err);
     }
   };

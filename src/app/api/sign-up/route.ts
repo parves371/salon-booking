@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { RowDataPacket } from "mysql2"; // Import RowDataPacket for typing query results
 
-// Define the types for the request body and response
 interface RegisterRequestBody {
   email: string;
   password: string;
@@ -18,7 +17,6 @@ interface RegisterResponse {
   token?: string;
 }
 
-// Define the expected shape of a customer row
 interface CustomerRow {
   email: string;
 }
@@ -31,12 +29,13 @@ export async function POST(request: Request): Promise<Response> {
     const validatedData = Registerchema.parse(reqBody);
     const { email, password, name, number } = validatedData;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const id = uuidv4();
+    const id = uuidv4(); // Generate UUID
 
     const emailCheckQuery = "SELECT email FROM customers WHERE email = ?";
     const [existingUser] = await db.query<RowDataPacket[]>(emailCheckQuery, [
       email,
     ]);
+
     if (existingUser.length > 0) {
       return new Response(
         JSON.stringify({ success: false, message: "Email already exists" }),
@@ -44,6 +43,7 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
+    // Insert the new user with the generated UUID
     const sql = `INSERT INTO customers (id, profile, email, name, number, password) VALUES (?, ?, ?, ?, ?, ?)`;
     const values = [id, "", email, name, number, hashedPassword];
     await db.query(sql, values);

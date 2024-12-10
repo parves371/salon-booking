@@ -19,11 +19,14 @@ import { FormError } from "./form-error";
 import { FormSuccess } from "./form-success";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import axios from "axios";
 
 export const LoginForm = () => {
   const param = useSearchParams();
+  const route = useRouter();
+
   const callbackUrl = param.get("callbackUrl");
   const urlErrorr =
     param.get("error") === "OAuthAccountNotLinked"
@@ -45,6 +48,29 @@ export const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof Loginchema>) => {
     setError("");
     setSuccess("");
+
+    try {
+      const res = await axios.post("/api/sign-in", {
+        email: values.email,
+        password: values.password,
+      });
+
+      if (res.status === 200) {
+        setSuccess(res.data.message);
+        route.push("/login");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        // If it's an axios error and response exists, access the error message
+        setError(err.response?.data?.message || "Unknown error occurred.");
+      } else {
+        // Handle non-Axios errors
+        setError("An unexpected error occurred.");
+      }
+      console.error("Error:", err);
+    }
   };
   return (
     <CardWrapper

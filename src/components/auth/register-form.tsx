@@ -20,8 +20,10 @@ import { Input } from "@/components/ui/input";
 import { CardWrapper } from "./card-wrapper";
 import { FormError } from "./form-error";
 import { FormSuccess } from "./form-success";
+import { useRouter } from "next/navigation";
 
 export const RegisterForm = () => {
+  const route = useRouter();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, setIsPending] = useState<boolean | undefined>(false);
@@ -46,10 +48,9 @@ export const RegisterForm = () => {
         number: values.number,
       });
 
-      console.log("Response:", res);
-
       if (res.status === 200) {
         setSuccess(res.data.message);
+        route.push("/login");
       } else {
         setError("Something went wrong. Please try again.");
       }

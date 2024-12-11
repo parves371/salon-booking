@@ -132,3 +132,81 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function GET() {
+  try {
+    // Check for authentication token in cookies
+    const userToken = cookies().get("salon-admin");
+    if (!userToken) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Unauthorized user" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const tokenValue = userToken.value;
+
+    // Verify and decode the JWT token
+    let decoded: JwtPayload;
+    try {
+      decoded = jwt.verify(tokenValue, process.env.JWT_SECRET!) as JwtPayload;
+      console.log("Decoded Token:", decoded);
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return new Response(
+        JSON.stringify({ success: false, message: "Invalid token" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Connect to the database
+    const db = await createConnection();
+
+    // Check if the authenticated user exists
+    const userQuery = "SELECT id, email, name, role FROM user WHERE email = ?";
+    const [authenticatedUserRows] = await db.query(userQuery, [decoded.email]);
+    const authenticatedUser = (
+      authenticatedUserRows as { id: string; email: string; role: string }[]
+    )[0];
+
+    if (!authenticatedUser) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Unauthorized user" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Fetch all users in the database (excluding the password field)
+    const fetchAllUsersQuery = "SELECT id, email, name, role, created_at FROM user";
+    const [allUsersRows] = await db.query(fetchAllUsersQuery);
+
+    const allUsers = allUsersRows as {
+      id: string;
+      email: string;
+      name: string;
+      role: string;
+      created_at: string;
+    }[];
+
+    // Return all users in the response
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "All users retrieved successfully",
+        authenticatedUser,
+        allUsers,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    console.error("Error retrieving users:", error);
+    return new Response(
+      JSON.stringify({ success: false, message: "Error retrieving users" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}
+

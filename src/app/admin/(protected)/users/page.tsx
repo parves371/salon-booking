@@ -7,23 +7,40 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import moment from "moment";
+
+interface UserProps {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  created_at: string;
+}
 const UsersPage = () => {
+  const [users, setUsers] = useState<UserProps[]>([]);
   const router = useRouter();
-  const users = [
-    {
-      name: "Esmail Khalifa",
-      email: "esmailkhalifa010@gmail.com",
-      role: "manager",
-      created: "Oct 29, 2024",
-    },
-    {
-      name: "Maahi",
-      email: "landingbuz@gmail.com",
-      role: "manager",
-      created: "Dec 9, 2024",
-    },
-  ];
+
+  const fetchAllUsers = async () => {
+    try {
+      const res = await axios.get("/api/admin/user", { withCredentials: true });
+
+      if (res.status === 200) {
+        setUsers(res.data.allUsers);
+      }
+    } catch (error: any) {
+      console.error(
+        "Error fetching users:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
 
   const newUser = () => {
     router.push("/admin/users/create");
@@ -70,7 +87,7 @@ const UsersPage = () => {
                 <td className="py-2 px-4">{user.name}</td>
                 <td className="py-2 px-4">{user.email}</td>
                 <td className="py-2 px-4">{user.role}</td>
-                <td className="py-2 px-4">{user.created}</td>
+                <td className="py-2 px-4">{moment(user.created_at).format("YYYY-MM-DD HH:mm:ss")}</td>
                 <td className="py-2 px-4 flex gap-2">
                   <Button variant="outline" size="lg">
                     Edit

@@ -50,7 +50,7 @@ export const LoginAdminForm = () => {
 
       if (res.status === 200) {
         setSuccess(res.data.message);
-        // route.push("/login");
+        route.push("/admin/dashboard");
       } else {
         setError("Something went wrong. Please try again.");
       }

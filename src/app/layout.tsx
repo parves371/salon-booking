@@ -5,6 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "./globals.css";
 
 import StoreProvider from "./StoreProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,6 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StoreProvider>{children}</StoreProvider>
+        <Toaster />
       </body>
     </html>
   );

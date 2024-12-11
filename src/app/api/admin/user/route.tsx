@@ -5,17 +5,16 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 // Define the types for the request body and response
 interface LoginRequestBody {
-  creator: string;
   email: string;
   password: string;
   name: string;
-  role: "admin" | "user" | "superadmin" | "employee";
+  role: "SuperAdmin" | "Admin" | "Manager" | "Employee";
 }
 
 export async function POST(request: Request) {
   try {
     const reqBody: LoginRequestBody = await request.json();
-    const { email, password, creator, name, role } = reqBody;
+    const { email, password, name, role } = reqBody;
     if (!name || !email || !password || !role) {
       return new Response(
         JSON.stringify({ success: false, message: "All fields are required" }),
@@ -32,16 +31,32 @@ export async function POST(request: Request) {
       });
     }
     const tokenValue = userToken.value;
-    const decoded = jwt.verify(tokenValue, process.env.JWT_SECRET!) as JwtPayload;
+    const decoded = jwt.verify(
+      tokenValue,
+      process.env.JWT_SECRET!
+    ) as JwtPayload;
 
-    console.log(email, password, creator, name, role, decoded);
-
-    
-
+    console.log("Decoded Token:", decoded);
     const db = await createConnection();
 
     const sql = "SELECT * FROM user WHERE email = ?";
     const [rows] = await db.query(sql, [decoded?.email]);
+    const [existingUserBYEmail] = await db.query(sql, [email]);
+
+
+    const existingUser = (
+        existingUserBYEmail as { id: string; email: string; password: string; name: string }[]
+      )[0];
+
+    if (existingUser) {
+      return new Response(
+        JSON.stringify({ success: false, message: "User already exists" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
     const user = (
       rows as { id: string; email: string; password: string; name: string }[]
@@ -69,7 +84,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error during login process:", error);
     return new Response(
-      JSON.stringify({ success: false, message: "Error during login" }),
+      JSON.stringify({ success: false, message: "error in creating user" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },

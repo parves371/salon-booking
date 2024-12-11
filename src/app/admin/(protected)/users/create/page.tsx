@@ -22,11 +22,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
 
 const UserCreatedPage = () => {
+  const { toast } = useToast();
   const router = useRouter();
   const UserSchema = z.object({
     name: z.string().min(1, {
@@ -53,9 +56,30 @@ const UserCreatedPage = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof UserSchema>) => {
-    console.log("Form Submitted:", data);
+  const onSubmit = async (data: z.infer<typeof UserSchema>) => {
+    try {
+      console.log("Submitting data:", data); // Log the form data
+      const res = await axios.post("/api/admin/user", data);
+  
+      if (res.status === 201) {
+        toast({
+          title: "User created successfully!",
+        });
+      } else {
+        console.log(res);
+        toast({
+          title: res.data.message || "Unexpected error occurred.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title:
+          error.response?.data?.message ||
+          "An error occurred while creating the user.",
+      });
+    }
   };
+  
 
   const cancelButton = () => {
     router.push("/admin/users");
@@ -155,7 +179,7 @@ const UserCreatedPage = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Super Admin">Super Admin</SelectItem>
+                      <SelectItem value="SuperAdmin">Super Admin</SelectItem>
                       <SelectItem value="Admin">Admin</SelectItem>
                       <SelectItem value="Manager">Manager</SelectItem>
                       <SelectItem value="Employee">Employee</SelectItem>

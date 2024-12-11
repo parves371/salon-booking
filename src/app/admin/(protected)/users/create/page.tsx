@@ -26,7 +26,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const UserCreatePage = () => {
+const UserCreatedPage = () => {
   const router = useRouter();
   const UserSchema = z.object({
     name: z.string().min(1, {
@@ -195,4 +195,4 @@ const UserCreatePage = () => {
   );
 };
 
-export default UserCreatePage;
+export default UserCreatedPage;

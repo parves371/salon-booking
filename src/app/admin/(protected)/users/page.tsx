@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-const page = () => {
-    const router = useRouter();
+const UsersPage = () => {
+  const router = useRouter();
   const users = [
     {
       name: "Esmail Khalifa",
@@ -88,4 +88,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default UsersPage;

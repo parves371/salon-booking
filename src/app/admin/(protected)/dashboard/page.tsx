@@ -1,6 +1,6 @@
 import React from "react";
 
-const page = () => {
+const Dashboard = () => {
   return (
     <section>
       <div className="flex items-center gap-4">
@@ -10,4 +10,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Dashboard;

@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import moment from "moment";
 
-interface UserProps {
+export interface UserProps {
   id: string;
   name: string;
   email: string;
@@ -44,6 +44,10 @@ const UsersPage = () => {
 
   const newUser = () => {
     router.push("/admin/users/create");
+  };
+
+  const onEdit = (user: UserProps) => {
+    router.push(`/admin/users/edit/${user.id}`);
   };
 
   return (
@@ -87,9 +91,15 @@ const UsersPage = () => {
                 <td className="py-2 px-4">{user.name}</td>
                 <td className="py-2 px-4">{user.email}</td>
                 <td className="py-2 px-4">{user.role}</td>
-                <td className="py-2 px-4">{moment(user.created_at).format("YYYY-MM-DD HH:mm:ss")}</td>
+                <td className="py-2 px-4">
+                  {moment(user.created_at).format("YYYY-MM-DD HH:mm:ss")}
+                </td>
                 <td className="py-2 px-4 flex gap-2">
-                  <Button variant="outline" size="lg">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => onEdit(user)}
+                  >
                     Edit
                   </Button>
                   <Button variant="destructive" size="lg">

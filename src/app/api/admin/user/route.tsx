@@ -210,3 +210,128 @@ export async function GET() {
   }
 }
 
+export async function PUTE(request: Request) {
+  try {
+    // Check for authentication token in cookies
+    const userToken = cookies().get("salon-admin");
+    if (!userToken) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Unauthorized user" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const tokenValue = userToken.value;
+
+    // Verify and decode the JWT token
+    let decoded: JwtPayload;
+    try {
+      decoded = jwt.verify(tokenValue, process.env.JWT_SECRET!) as JwtPayload;
+      console.log("Decoded Token:", decoded);
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return new Response(
+        JSON.stringify({ success: false, message: "Invalid token" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Connect to the database
+    const db = await createConnection();
+
+    // Check if the authenticated user is a SuperAdmin
+    const userQuery = "SELECT id, email, role FROM user WHERE email = ?";
+    const [authenticatedUserRows] = await db.query(userQuery, [decoded.email]);
+    const authenticatedUser = (
+      authenticatedUserRows as { id: string; email: string; role: string }[]
+    )[0];
+
+    if (!authenticatedUser || authenticatedUser.role !== "SuperAdmin") {
+      return new Response(
+        JSON.stringify({ success: false, message: "Access denied. SuperAdmin only." }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Parse the request body
+    const reqBody = await request.json();
+    const { id, name, email, role, password } = reqBody;
+
+    // Ensure an ID is provided
+    if (!id) {
+      return new Response(
+        JSON.stringify({ success: false, message: "User ID is required" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Fetch the user to update
+    const findUserQuery = "SELECT * FROM user WHERE id = ?";
+    const [userRows] = await db.query(findUserQuery, [id]);
+    const user = (
+      userRows as { id: string; email: string; name: string; role: string }[]
+    )[0];
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ success: false, message: "User not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Build the update query dynamically based on provided fields
+    const fieldsToUpdate: string[] = [];
+    const values: any[] = [];
+
+    if (name) {
+      fieldsToUpdate.push("name = ?");
+      values.push(name);
+    }
+    if (email) {
+      fieldsToUpdate.push("email = ?");
+      values.push(email);
+    }
+    if (role) {
+      fieldsToUpdate.push("role = ?");
+      values.push(role);
+    }
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      fieldsToUpdate.push("password = ?");
+      values.push(hashedPassword);
+    }
+
+    // If no fields to update, return an error
+    if (fieldsToUpdate.length === 0) {
+      return new Response(
+        JSON.stringify({ success: false, message: "No fields to update" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Execute the update query
+    const updateQuery = `UPDATE user SET ${fieldsToUpdate.join(
+      ", "
+    )} WHERE id = ?`;
+    values.push(id); // Add ID as the last parameter
+    const [updateResult] = await db.query(updateQuery, values);
+
+    console.log("Update Result:", updateResult);
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "User updated successfully",
+        updatedFields: { name, email, role, password: !!password },
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return new Response(
+      JSON.stringify({ success: false, message: "Error updating user" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}
+

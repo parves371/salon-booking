@@ -27,8 +27,12 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { UserProps } from "../../page";
+import { useEffect, useState } from "react";
 
-const UserCreatedPage = () => {
+const UserEditedPage = () => {
+  const [users, setUsers] = useState<UserProps[]>([]);
+
   const { toast } = useToast();
   const router = useRouter();
   const UserSchema = z.object({
@@ -56,19 +60,14 @@ const UserCreatedPage = () => {
     },
   });
 
-
   const onSubmit = async (data: z.infer<typeof UserSchema>) => {
     try {
       console.log("Submitting data:", data); // Debug log for payload
-  
-      const res = await axios.post(
-        "/api/admin/user",
-        data,
-        {
-          withCredentials: true, // Ensure cookies are sent
-        }
-      );
-  
+
+      const res = await axios.post("/api/admin/user", data, {
+        withCredentials: true, // Ensure cookies are sent
+      });
+
       // Handle successful response
       if (res.status === 201) {
         toast({
@@ -92,9 +91,27 @@ const UserCreatedPage = () => {
       }
     }
   };
-  
-  
 
+  const fetchAllUsers = async () => {
+    try {
+      const res = await axios.post(`/api/admin/users/edit/id:${1}`, {
+        withCredentials: true,
+      });
+
+      if (res.status === 200) {
+        setUsers(res.data.allUsers);
+      }
+    } catch (error: any) {
+      console.error(
+        "Error fetching users:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
   const cancelButton = () => {
     router.push("/admin/users");
   };
@@ -108,12 +125,12 @@ const UserCreatedPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <span>Create</span>
+            <span>Edit</span>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <div className="p-6 max-w-2xl mx-auto border rounded-lg bg-white shadow mt-16">
-        <h2 className="text-2xl font-bold mb-4">Create User</h2>
+        <h2 className="text-2xl font-bold mb-4">Edit User</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Field */}
@@ -233,4 +250,4 @@ const UserCreatedPage = () => {
   );
 };
 
-export default UserCreatedPage;
+export default UserEditedPage;

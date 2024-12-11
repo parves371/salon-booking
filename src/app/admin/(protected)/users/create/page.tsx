@@ -56,29 +56,43 @@ const UserCreatedPage = () => {
     },
   });
 
+
   const onSubmit = async (data: z.infer<typeof UserSchema>) => {
     try {
-      console.log("Submitting data:", data); // Log the form data
-      const res = await axios.post("/api/admin/user", data);
+      console.log("Submitting data:", data); // Debug log for payload
   
+      const res = await axios.post(
+        "/api/admin/user",
+        data,
+        {
+          withCredentials: true, // Ensure cookies are sent
+        }
+      );
+  
+      // Handle successful response
       if (res.status === 201) {
         toast({
           title: "User created successfully!",
         });
-      } else {
-        console.log(res);
-        toast({
-          title: res.data.message || "Unexpected error occurred.",
-        });
       }
     } catch (error: any) {
-      toast({
-        title:
-          error.response?.data?.message ||
-          "An error occurred while creating the user.",
-      });
+      // Handle 400 error specifically
+      if (error.response?.status === 400) {
+        toast({
+          title: "Error",
+          description: error.response?.data?.message || "Bad Request",
+        });
+      } else {
+        // Handle other errors
+        toast({
+          title: "Error",
+          description:
+            error.response?.data?.message || "An unexpected error occurred.",
+        });
+      }
     }
   };
+  
   
 
   const cancelButton = () => {

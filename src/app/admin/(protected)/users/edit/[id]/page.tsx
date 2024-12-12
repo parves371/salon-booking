@@ -23,18 +23,27 @@ import {
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { UserProps } from "../../page";
 import { useEffect, useState } from "react";
+interface UserProps {
+  id: number;
+  email: string;
+  name: string;
+  role: "superadmin" | "admin" | "manager" | "employee" | undefined; // Make role optional
+  created_at: string;
+}
 
 const UserEditedPage = () => {
-  const [users, setUsers] = useState<UserProps[]>([]);
+  const [user, setUser] = useState<UserProps>();
 
   const { toast } = useToast();
   const router = useRouter();
+  const params = useParams<Record<string, string>>();
+
+  console.log("username", user?.name);
   const UserSchema = z.object({
     name: z.string().min(1, {
       message: "Name is required",
@@ -45,8 +54,8 @@ const UserEditedPage = () => {
     password: z.string().min(1, {
       message: "Password is required",
     }),
-    role: z.string().min(1, {
-      message: "Role is required",
+    role: z.enum(["superadmin", "admin", "manager", "employee"], {
+      errorMap: () => ({ message: "Invalid role selected" }),
     }),
   });
 
@@ -56,10 +65,9 @@ const UserEditedPage = () => {
       name: "",
       email: "",
       password: "",
-      role: "",
+      role: undefined, // Allow undefined initially for role
     },
   });
-
   const onSubmit = async (data: z.infer<typeof UserSchema>) => {
     try {
       console.log("Submitting data:", data); // Debug log for payload
@@ -94,12 +102,18 @@ const UserEditedPage = () => {
 
   const fetchAllUsers = async () => {
     try {
-      const res = await axios.post(`/api/admin/users/edit/id:${1}`, {
-        withCredentials: true,
-      });
+      const res = await axios.post(
+        `/api/admin/edite`,
+        {
+          id: params.id,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (res.status === 200) {
-        setUsers(res.data.allUsers);
+        setUser(res?.data?.user);
       }
     } catch (error: any) {
       console.error(
@@ -110,8 +124,21 @@ const UserEditedPage = () => {
   };
 
   useEffect(() => {
-    fetchAllUsers();
-  }, []);
+    if (params.id) {
+      fetchAllUsers();
+    }
+  }, [params.id]);
+
+  useEffect(() => {
+    if (user) {
+      form.setValue("name", user.name ?? "");
+      form.setValue("email", user.email ?? "");
+      form.setValue("password", ""); // Empty password by default
+      form.setValue("role", user.role ?? "employee"); // Default to "Employee" if role is undefined
+    }
+  }, [user, form]);
+  console.log(user);
+
   const cancelButton = () => {
     router.push("/admin/users");
   };
@@ -200,20 +227,18 @@ const UserEditedPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select an option" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="SuperAdmin">Super Admin</SelectItem>
-                      <SelectItem value="Admin">Admin</SelectItem>
-                      <SelectItem value="Manager">Manager</SelectItem>
-                      <SelectItem value="Employee">Employee</SelectItem>
+                      {/* Ensure the values here match your role values exactly */}
+                      <SelectItem value="superadmin">Super Admin</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="employee">Employee</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

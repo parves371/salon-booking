@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 export interface UserProps {
-  id: string;
+  id: string | number;
   name: string;
   email: string;
   role: string;

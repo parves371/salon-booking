@@ -41,8 +41,8 @@ const UserCreatedPage = () => {
     password: z.string().min(1, {
       message: "Password is required",
     }),
-    role: z.string().min(1, {
-      message: "Role is required",
+    role: z.enum(["superadmin", "admin", "manager", "employee"], {
+      errorMap: () => ({ message: "Invalid role selected" }),
     }),
   });
 
@@ -52,23 +52,18 @@ const UserCreatedPage = () => {
       name: "",
       email: "",
       password: "",
-      role: "",
+      role: undefined,
     },
   });
-
 
   const onSubmit = async (data: z.infer<typeof UserSchema>) => {
     try {
       console.log("Submitting data:", data); // Debug log for payload
-  
-      const res = await axios.post(
-        "/api/admin/user",
-        data,
-        {
-          withCredentials: true, // Ensure cookies are sent
-        }
-      );
-  
+
+      const res = await axios.post("/api/admin/user", data, {
+        withCredentials: true, // Ensure cookies are sent
+      });
+
       // Handle successful response
       if (res.status === 201) {
         toast({
@@ -92,8 +87,6 @@ const UserCreatedPage = () => {
       }
     }
   };
-  
-  
 
   const cancelButton = () => {
     router.push("/admin/users");
@@ -193,10 +186,10 @@ const UserCreatedPage = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="SuperAdmin">Super Admin</SelectItem>
-                      <SelectItem value="Admin">Admin</SelectItem>
-                      <SelectItem value="Manager">Manager</SelectItem>
-                      <SelectItem value="Employee">Employee</SelectItem>
+                      <SelectItem value="superadmin">Super Admin</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="employee">Employee</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

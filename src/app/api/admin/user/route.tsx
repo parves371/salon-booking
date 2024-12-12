@@ -2,6 +2,7 @@ import { createConnection } from "@/lib/db/dbConnect";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 // Define the types for the request body and response
 interface LoginRequestBody {
@@ -43,9 +44,7 @@ export async function POST(request: Request) {
     let decoded: JwtPayload;
     try {
       decoded = jwt.verify(tokenValue, process.env.JWT_SECRET!) as JwtPayload;
-      console.log("Decoded Token:", decoded);
     } catch (error) {
-      console.error("Invalid token:", error);
       return new Response(
         JSON.stringify({ success: false, message: "Invalid token" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
@@ -104,18 +103,19 @@ export async function POST(request: Request) {
 
     // Hash the password for the new user
     const hashedPassword = await bcrypt.hash(password, 10);
+    const id = uuidv4();
+    console.log(id);
 
     // Insert the new user into the database
     const insertQuery =
-      "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
+      "INSERT INTO user (id,name, email, password, role) VALUES (?, ?, ?, ?, ?)";
     const [insertResult] = await db.query(insertQuery, [
+      id,
       name,
       email,
       hashedPassword,
       role,
     ]);
-
-    console.log("New User Insert Result:", insertResult);
 
     return new Response(
       JSON.stringify({ success: true, message: "User created successfully" }),
@@ -132,7 +132,6 @@ export async function POST(request: Request) {
     );
   }
 }
-
 export async function GET() {
   try {
     // Check for authentication token in cookies
@@ -150,7 +149,6 @@ export async function GET() {
     let decoded: JwtPayload;
     try {
       decoded = jwt.verify(tokenValue, process.env.JWT_SECRET!) as JwtPayload;
-      console.log("Decoded Token:", decoded);
     } catch (error) {
       console.error("Invalid token:", error);
       return new Response(
@@ -177,7 +175,8 @@ export async function GET() {
     }
 
     // Fetch all users in the database (excluding the password field)
-    const fetchAllUsersQuery = "SELECT id, email, name, role, created_at FROM user";
+    const fetchAllUsersQuery =
+      "SELECT id, email, name, role, created_at FROM user";
     const [allUsersRows] = await db.query(fetchAllUsersQuery);
 
     const allUsers = allUsersRows as {
@@ -227,9 +226,7 @@ export async function PUTE(request: Request) {
     let decoded: JwtPayload;
     try {
       decoded = jwt.verify(tokenValue, process.env.JWT_SECRET!) as JwtPayload;
-      console.log("Decoded Token:", decoded);
     } catch (error) {
-      console.error("Invalid token:", error);
       return new Response(
         JSON.stringify({ success: false, message: "Invalid token" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
@@ -248,7 +245,10 @@ export async function PUTE(request: Request) {
 
     if (!authenticatedUser || authenticatedUser.role !== "SuperAdmin") {
       return new Response(
-        JSON.stringify({ success: false, message: "Access denied. SuperAdmin only." }),
+        JSON.stringify({
+          success: false,
+          message: "Access denied. SuperAdmin only.",
+        }),
         { status: 403, headers: { "Content-Type": "application/json" } }
       );
     }
@@ -316,8 +316,6 @@ export async function PUTE(request: Request) {
     values.push(id); // Add ID as the last parameter
     const [updateResult] = await db.query(updateQuery, values);
 
-    console.log("Update Result:", updateResult);
-
     return new Response(
       JSON.stringify({
         success: true,
@@ -334,4 +332,3 @@ export async function PUTE(request: Request) {
     );
   }
 }
-

@@ -20,7 +20,6 @@ export async function POST(request: Request) {
     const reqBody: LoginRequestBody = await request.json();
     const { email, password } = reqBody;
 
-    console.log(email, password);
 
     const db = await createConnection();
 

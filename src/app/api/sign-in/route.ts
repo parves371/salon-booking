@@ -29,7 +29,6 @@ export async function POST(request: Request) {
       rows as { id: string; email: string; password: string; name: string }[]
     )[0];
 
-    console.log(user);
 
     if (!user) {
       return new Response(JSON.stringify({ message: "User not found" }), {

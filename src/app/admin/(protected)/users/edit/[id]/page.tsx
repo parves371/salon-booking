@@ -103,7 +103,7 @@ const UserEditedPage = () => {
   const fetchAllUsers = async () => {
     try {
       const res = await axios.post(
-        `/api/admin/edite`,
+        `/api/admin/edit`,
         {
           id: params.id,
         },
@@ -209,6 +209,7 @@ const UserEditedPage = () => {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <input
+                      autoComplete="current-password"
                       type="password"
                       placeholder="Your password"
                       className="border rounded-md px-3 py-2 w-full"

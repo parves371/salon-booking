@@ -1,3 +1,4 @@
+import { QueryResult } from "mysql2";
 import { createConnection } from "@/lib/db/dbConnect";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
@@ -69,8 +70,8 @@ export async function POST(request: Request) {
     }
 
     // Check if the new user already exists (by email and role)
-    const newUserQuery = "SELECT * FROM user WHERE email = ? AND role = ?";
-    const [existingUserRows] = await db.query(newUserQuery, [email, role]);
+    const newUserQuery = "SELECT * FROM user WHERE email = ?";
+    const [existingUserRows] = await db.query(newUserQuery, [email]);
     const existingUser = (
       existingUserRows as { id: string; email: string; role: string }[]
     )[0];
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: "User with this email and role already exists",
+          message: "User with this email already exist",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
@@ -209,9 +210,11 @@ export async function GET() {
   }
 }
 
+import { RowDataPacket } from 'mysql2';  // For correct typing
+
 export async function PUTE(request: Request) {
   try {
-    // Check for authentication token in cookies
+    // 1. Check for authentication token in cookies
     const userToken = cookies().get("salon-admin");
     if (!userToken) {
       return new Response(
@@ -222,7 +225,7 @@ export async function PUTE(request: Request) {
 
     const tokenValue = userToken.value;
 
-    // Verify and decode the JWT token
+    // 2. Verify and decode the JWT token
     let decoded: JwtPayload;
     try {
       decoded = jwt.verify(tokenValue, process.env.JWT_SECRET!) as JwtPayload;
@@ -233,31 +236,23 @@ export async function PUTE(request: Request) {
       );
     }
 
-    // Connect to the database
+    // 3. Connect to the database and fetch authenticated user
     const db = await createConnection();
-
-    // Check if the authenticated user is a SuperAdmin
     const userQuery = "SELECT id, email, role FROM user WHERE email = ?";
     const [authenticatedUserRows] = await db.query(userQuery, [decoded.email]);
-    const authenticatedUser = (
-      authenticatedUserRows as { id: string; email: string; role: string }[]
-    )[0];
+    const authenticatedUser = (authenticatedUserRows as RowDataPacket[])[0];
 
-    if (!authenticatedUser || authenticatedUser.role !== "SuperAdmin") {
+    if (!authenticatedUser) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          message: "Access denied. SuperAdmin only.",
-        }),
-        { status: 403, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ success: false, message: "User not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Parse the request body
+    // 4. Parse the request body
     const reqBody = await request.json();
-    const { id, name, email, role, password } = reqBody;
+    const { id, name, email, password } = reqBody;
 
-    // Ensure an ID is provided
     if (!id) {
       return new Response(
         JSON.stringify({ success: false, message: "User ID is required" }),
@@ -265,12 +260,10 @@ export async function PUTE(request: Request) {
       );
     }
 
-    // Fetch the user to update
+    // 5. Fetch the user by ID and exclude the current user from this check
     const findUserQuery = "SELECT * FROM user WHERE id = ?";
     const [userRows] = await db.query(findUserQuery, [id]);
-    const user = (
-      userRows as { id: string; email: string; name: string; role: string }[]
-    )[0];
+    const user = (userRows as RowDataPacket[])[0];
 
     if (!user) {
       return new Response(
@@ -279,21 +272,32 @@ export async function PUTE(request: Request) {
       );
     }
 
-    // Build the update query dynamically based on provided fields
+    // 6. Fetch all users except the current user to avoid duplicate email check
+    const excludeCurrentUserQuery = "SELECT * FROM user WHERE email = ? AND id != ?";
+    const [existingUserRows] = await db.query(excludeCurrentUserQuery, [email, id]);
+    const existingUser = (existingUserRows as RowDataPacket[])[0];
+
+    if (existingUser) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "User with this email already exists",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // 7. Identify if the data from the database doesn't match the user's given email
     const fieldsToUpdate: string[] = [];
     const values: any[] = [];
 
-    if (name) {
-      fieldsToUpdate.push("name = ?");
-      values.push(name);
-    }
-    if (email) {
+    if (email && email !== user.email) {
       fieldsToUpdate.push("email = ?");
       values.push(email);
     }
-    if (role) {
-      fieldsToUpdate.push("role = ?");
-      values.push(role);
+    if (name && name !== user.name) {
+      fieldsToUpdate.push("name = ?");
+      values.push(name);
     }
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -309,10 +313,8 @@ export async function PUTE(request: Request) {
       );
     }
 
-    // Execute the update query
-    const updateQuery = `UPDATE user SET ${fieldsToUpdate.join(
-      ", "
-    )} WHERE id = ?`;
+    // 8. Execute the update query
+    const updateQuery = `UPDATE user SET ${fieldsToUpdate.join(", ")} WHERE id = ?`;
     values.push(id); // Add ID as the last parameter
     const [updateResult] = await db.query(updateQuery, values);
 
@@ -320,7 +322,7 @@ export async function PUTE(request: Request) {
       JSON.stringify({
         success: true,
         message: "User updated successfully",
-        updatedFields: { name, email, role, password: !!password },
+        updatedFields: { name, email, password: !!password },
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
@@ -332,3 +334,4 @@ export async function PUTE(request: Request) {
     );
   }
 }
+

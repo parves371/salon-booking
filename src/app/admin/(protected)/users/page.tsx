@@ -38,6 +38,20 @@ const UsersPage = () => {
     }
   };
 
+  const deleteUser = async (id: string) => {
+    const response = await fetch(`/api/admin/delete-user?id=${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log(data.message);
+    } else {
+      console.error(data.message);
+    }
+  };
+
   useEffect(() => {
     fetchAllUsers();
   }, []);
@@ -102,7 +116,11 @@ const UsersPage = () => {
                   >
                     Edit
                   </Button>
-                  <Button variant="destructive" size="lg">
+                  <Button
+                    variant="destructive"
+                    size="lg"
+                    onClick={() => deleteUser(user?.id as string)}
+                  >
                     Delete
                   </Button>
                 </td>

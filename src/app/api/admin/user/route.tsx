@@ -1,8 +1,7 @@
-import { QueryResult } from "mysql2";
 import { createConnection } from "@/lib/db/dbConnect";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 
 // Define the types for the request body and response
@@ -210,7 +209,7 @@ export async function GET() {
   }
 }
 
-import { RowDataPacket } from 'mysql2';  // For correct typing
+import { RowDataPacket } from 'mysql2'; // For correct typing
 
 export async function PUTE(request: Request) {
   try {

@@ -93,7 +93,7 @@ const UsersPage = () => {
 
       <div className="flex justify-between mt-8 items-center">
         <h2 className="text-3xl font-semibold">Users</h2>
-        <Button variant={"coustom"} onClick={newUser}>
+        <Button variant={"default"} onClick={newUser}>
           new user
         </Button>
       </div>

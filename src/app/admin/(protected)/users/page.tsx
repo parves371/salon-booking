@@ -11,6 +11,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import moment from "moment";
+import { useToast } from "@/hooks/use-toast";
 
 export interface UserProps {
   id: string | number;
@@ -22,6 +23,7 @@ export interface UserProps {
 const UsersPage = () => {
   const [users, setUsers] = useState<UserProps[]>([]);
   const router = useRouter();
+  const { toast } = useToast();
 
   const fetchAllUsers = async () => {
     try {
@@ -31,10 +33,19 @@ const UsersPage = () => {
         setUsers(res.data.allUsers);
       }
     } catch (error: any) {
-      console.error(
-        "Error fetching users:",
-        error.response?.data || error.message
-      );
+      if (error.response?.status === 400) {
+        toast({
+          title: "Error",
+          description: error.response?.data?.message || "Bad Request",
+        });
+      } else {
+        // Handle other errors
+        toast({
+          title: "Error",
+          description:
+            error.response?.data?.message || "An unexpected error occurred.",
+        });
+      }
     }
   };
 
@@ -46,7 +57,9 @@ const UsersPage = () => {
     const data = await response.json();
 
     if (response.ok) {
-      console.log(data.message);
+      toast({
+        title: data.message,
+      });
     } else {
       console.error(data.message);
     }

@@ -49,6 +49,7 @@ export default function Add() {
       setNewCategory('');
     }
   }
+  
 
   async function handleAddService() {
     const response = await fetch('/api/services', {

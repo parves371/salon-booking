@@ -118,3 +118,24 @@ CREATE TABLE categories (
     name VARCHAR(255) NOT NULL
 );
 
+
+CREATE TABLE services (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    time VARCHAR(50),
+    price DECIMAL(10, 2),
+    option BOOLEAN DEFAULT 0,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE options (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    service_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    time VARCHAR(50),
+    price DECIMAL(10, 2),
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+);

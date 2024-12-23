@@ -15,14 +15,14 @@ const page = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/category">category</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/services">services</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
         </BreadcrumbList>
       </Breadcrumb>
 
       <Button>
-        <Link href={"/admin/category/create"}>add</Link>
+        <Link href={"/admin/services/create"}>add</Link>
       </Button>
     </div>
   );

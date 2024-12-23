@@ -8,7 +8,7 @@ export const createConnection = async (): Promise<Connection> => {
   // If there is no existing connection, create a new one
   if (!connection) {
     try {
-      connection = await mysql.createPool({
+      connection = mysql.createPool({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,

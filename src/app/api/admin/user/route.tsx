@@ -103,14 +103,11 @@ export async function POST(request: Request) {
 
     // Hash the password for the new user
     const hashedPassword = await bcrypt.hash(password, 10);
-    const id = uuidv4();
-    console.log(id);
 
     // Insert the new user into the database
     const insertQuery =
-      "INSERT INTO user (id,name, email, password, role) VALUES (?, ?, ?, ?, ?)";
+      "INSERT INTO user (name, email, password, role) VALUES (?, ?, ?, ?)";
     const [insertResult] = await db.query(insertQuery, [
-      id,
       name,
       email,
       hashedPassword,
@@ -209,7 +206,7 @@ export async function GET() {
   }
 }
 
-import { RowDataPacket } from 'mysql2'; // For correct typing
+import { RowDataPacket } from "mysql2"; // For correct typing
 
 export async function PUTE(request: Request) {
   try {
@@ -272,8 +269,12 @@ export async function PUTE(request: Request) {
     }
 
     // 6. Fetch all users except the current user to avoid duplicate email check
-    const excludeCurrentUserQuery = "SELECT * FROM user WHERE email = ? AND id != ?";
-    const [existingUserRows] = await db.query(excludeCurrentUserQuery, [email, id]);
+    const excludeCurrentUserQuery =
+      "SELECT * FROM user WHERE email = ? AND id != ?";
+    const [existingUserRows] = await db.query(excludeCurrentUserQuery, [
+      email,
+      id,
+    ]);
     const existingUser = (existingUserRows as RowDataPacket[])[0];
 
     if (existingUser) {
@@ -313,7 +314,9 @@ export async function PUTE(request: Request) {
     }
 
     // 8. Execute the update query
-    const updateQuery = `UPDATE user SET ${fieldsToUpdate.join(", ")} WHERE id = ?`;
+    const updateQuery = `UPDATE user SET ${fieldsToUpdate.join(
+      ", "
+    )} WHERE id = ?`;
     values.push(id); // Add ID as the last parameter
     const [updateResult] = await db.query(updateQuery, values);
 
@@ -333,4 +336,3 @@ export async function PUTE(request: Request) {
     );
   }
 }
-

@@ -28,119 +28,158 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-interface UserProps {
+import { Switch } from "@/components/ui/switch";
+
+interface ServiceProps {
   id: number;
-  email: string;
-  name: string;
-  role: "superadmin" | "admin" | "manager" | "employee" | undefined; // Make role optional
-  created_at: string;
+  service_name: string;
+  price: number;
+  time: string;
+  option: boolean;
+  category_name: string;
 }
 
-const UserEditedPage = () => {
-  const [user, setUser] = useState<UserProps>();
+interface Category {
+  id: number;
+  name: string;
+}
 
+const ServicesEditedPage = () => {
+  const [service, setService] = useState<ServiceProps | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams<Record<string, string>>();
 
-  console.log("username", user?.name);
-  const UserSchema = z.object({
-    name: z.string().min(1, {
+  const ServiceSchema = z.object({
+    service_name: z.string().min(1, {
       message: "Name is required",
     }),
-    email: z.string().email({
-      message: "Please enter a valid email address",
+    price: z
+      .string()
+      .refine((value) => !isNaN(Number(value)), {
+        message: "Price must be a valid number",
+      })
+      .transform((value) => Number(value)),
+    time: z.string().min(1, {
+      message: "Time is required",
     }),
-    password: z.string().min(1, {
-      message: "Password is required",
-    }),
-    role: z.enum(["superadmin", "admin", "manager", "employee"], {
-      errorMap: () => ({ message: "Invalid role selected" }),
+    option: z.boolean(),
+    category_name: z.string().min(1, {
+      message: "Category name is required",
     }),
   });
+  
 
-  const form = useForm<z.infer<typeof UserSchema>>({
-    resolver: zodResolver(UserSchema),
+  const form = useForm<z.infer<typeof ServiceSchema>>({
+    resolver: zodResolver(ServiceSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      role: undefined, // Allow undefined initially for role
+      service_name: "",
+      price: 0,
+      time: "",
+      option: false,
+      category_name: "",
     },
   });
-  const onSubmit = async (data: z.infer<typeof UserSchema>) => {
-    try {
-      console.log("Submitting data:", data); // Debug log for payload
 
-      const res = await axios.post("/api/admin/user", data, {
-        withCredentials: true, // Ensure cookies are sent
+  const fetchServiceById = async () => {
+    try {
+      const res = await axios.get(`/api/product/services/edit/${params.id}`, {
+        withCredentials: true,
       });
 
-      // Handle successful response
-      if (res.status === 201) {
-        toast({
-          title: "User created successfully!",
-        });
-      }
-    } catch (error: any) {
-      // Handle 400 error specifically
-      if (error.response?.status === 400) {
-        toast({
-          title: "Error",
-          description: error.response?.data?.message || "Bad Request",
-        });
-      } else {
-        // Handle other errors
-        toast({
-          title: "Error",
-          description:
-            error.response?.data?.message || "An unexpected error occurred.",
-        });
-      }
-    }
-  };
-
-  const fetchAllUsers = async () => {
-    try {
-      const res = await axios.post(
-        `/api/admin/edit`,
-        {
-          id: params.id,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-
       if (res.status === 200) {
-        setUser(res?.data?.user);
+        setService(res.data.data); // Assuming response contains `data` key with service details
       }
     } catch (error: any) {
       console.error(
-        "Error fetching users:",
+        "Error fetching service:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get("/api/product/category", {
+        withCredentials: true,
+      });
+
+      if (res.status === 200) {
+        setCategories(res.data.data); // Assuming response contains `data` key with categories
+      }
+    } catch (error: any) {
+      console.error(
+        "Error fetching categories:",
         error.response?.data || error.message
       );
     }
   };
 
   useEffect(() => {
+    fetchCategories(); // Fetch categories on component mount
     if (params.id) {
-      fetchAllUsers();
+      fetchServiceById();
     }
   }, [params.id]);
 
   useEffect(() => {
-    if (user) {
-      form.setValue("name", user.name ?? "");
-      form.setValue("email", user.email ?? "");
-      form.setValue("password", ""); // Empty password by default
-      form.setValue("role", user.role ?? "employee"); // Default to "Employee" if role is undefined
+    if (service) {
+      form.setValue("service_name", service.service_name);
+      form.setValue("price", service.price);
+      form.setValue("time", service.time);
+      form.setValue("option", service.option ? true : false);
+      form.setValue("category_name", service.category_name);
     }
-  }, [user, form]);
-  console.log(user);
+  }, [service, form]);
+
+  const onSubmit = async (data: z.infer<typeof ServiceSchema>) => {
+    try {
+      // Prepare the payload
+      const payload = {
+        service_name: data.service_name,
+        price: data.price,
+        time: data.time,
+        option: data.option,
+        category_id: categories.find((cat) => cat.name === data.category_name)?.id,
+      };
+  
+      if (!payload.category_id) {
+        toast({
+          title: "Error",
+          description: "Selected category is invalid.",
+          variant: "destructive",
+        });
+        return;
+      }
+  
+      // Make API call to update the service
+      const response = await axios.put(`/api/product/services/edit/${params.id}`, payload, {
+        withCredentials: true,
+      });
+  
+      if (response.status === 200) {
+        toast({
+          title: "Success",
+          description: "Service updated successfully.",
+        });
+        router.push("/admin/services"); 
+      } else {
+        throw new Error(response.data.message || "Failed to update service.");
+      }
+    } catch (error: any) {
+      console.error("Error updating service:", error.response?.data || error.message);
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
 
   const cancelButton = () => {
-    router.push("/admin/users");
+    router.push("/admin/services");
   };
 
   return (
@@ -148,7 +187,7 @@ const UserEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/users">User</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/services">Services</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -157,12 +196,12 @@ const UserEditedPage = () => {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="p-6 max-w-2xl mx-auto border rounded-lg bg-white shadow mt-16">
-        <h2 className="text-2xl font-bold mb-4">Edit User</h2>
+        <h2 className="text-2xl font-bold mb-4">Edit Service</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Field */}
             <FormField
-              name="name"
+              name="service_name"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -170,7 +209,7 @@ const UserEditedPage = () => {
                   <FormControl>
                     <input
                       type="text"
-                      placeholder="John Doe"
+                      placeholder="Service Name"
                       className="border rounded-md px-3 py-2 w-full"
                       {...field}
                     />
@@ -179,18 +218,17 @@ const UserEditedPage = () => {
                 </FormItem>
               )}
             />
-
-            {/* Email Field */}
+            {/* Price Field */}
             <FormField
-              name="email"
+              name="price"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Price</FormLabel>
                   <FormControl>
                     <input
-                      type="email"
-                      placeholder="john.doe@example.com"
+                      type="number"
+                      placeholder="Price"
                       className="border rounded-md px-3 py-2 w-full"
                       {...field}
                     />
@@ -199,19 +237,17 @@ const UserEditedPage = () => {
                 </FormItem>
               )}
             />
-
-            {/* Password Field */}
+            {/* Time Field */}
             <FormField
-              name="password"
+              name="time"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Time</FormLabel>
                   <FormControl>
                     <input
-                      autoComplete="current-password"
-                      type="password"
-                      placeholder="Your password"
+                      type="text"
+                      placeholder="Duration (e.g., 30 minutes)"
                       className="border rounded-md px-3 py-2 w-full"
                       {...field}
                     />
@@ -220,46 +256,60 @@ const UserEditedPage = () => {
                 </FormItem>
               )}
             />
-
-            {/* Role Field */}
+            {/* Option Field */}
             <FormField
-              name="role"
+              name="option"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an option" />
+                  <FormLabel>Option</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center">
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className={`${
+                          field.value ? "bg-blue-600" : "bg-gray-200"
+                        } relative inline-flex items-center h-6 rounded-full w-11`}
+                      ></Switch>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Category Field */}
+            <FormField
+              name="category_name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="border rounded-md w-full">
+                        <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {/* Ensure the values here match your role values exactly */}
-                      <SelectItem value="superadmin">Super Admin</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="employee">Employee</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.name}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             {/* Submit Buttons */}
             <div className="flex gap-4">
               <button
                 type="submit"
                 className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600"
               >
-                Create
-              </button>
-              <button
-                type="button"
-                className="border px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-              >
-                Create & Create Another
+                Save
               </button>
               <button
                 type="button"
@@ -276,4 +326,4 @@ const UserEditedPage = () => {
   );
 };
 
-export default UserEditedPage;
+export default ServicesEditedPage;

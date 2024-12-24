@@ -9,18 +9,16 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import moment from "moment";
-import { useToast } from "@/hooks/use-toast";
 
 interface Service {
   id: number;
@@ -59,7 +57,7 @@ const UsersPage = () => {
   };
 
   const editService = (id: number) => {
-    window.location.href = `/services/edit/${id}`;
+    router.push(`/admin/services/edit/${id}`);
   };
   const deleteService = async (id: number) => {
     console.log(id);
@@ -142,7 +140,9 @@ const UsersPage = () => {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle className="py-4">Are you absolutely sure?</DialogTitle>
+                        <DialogTitle className="py-4">
+                          Are you absolutely sure?
+                        </DialogTitle>
 
                         <button
                           className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"

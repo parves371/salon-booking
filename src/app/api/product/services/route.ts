@@ -48,8 +48,22 @@ export async function GET(): Promise<Response> {
     // Establish database connection
     const db = await createConnection();
 
-    // Query to fetch all services
-    const [rows] = await db.query(`SELECT * FROM services`);
+    // Query to fetch services with category names
+    const [rows] = await db.query(`
+      SELECT 
+        services.id,
+        services.name AS service_name,
+        services.time,
+        services.price,
+        services.option,
+        categories.name AS category_name
+      FROM 
+        services
+      JOIN 
+        categories
+      ON 
+        services.category_id = categories.id
+    `);
 
     // Respond with the data
     return NextResponse.json(
@@ -58,50 +72,6 @@ export async function GET(): Promise<Response> {
     );
   } catch (error) {
     console.error('Error fetching services:', error);
-    return NextResponse.json(
-      { message: 'Internal Server Error' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(req: Request): Promise<Response> {
-  try {
-    const url = new URL(req.url);
-    const id = url.searchParams.get('id');
-
-    // Validate the ID parameter
-    if (!id) {
-      return NextResponse.json(
-        { message: 'Service ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Establish database connection
-    const db = await createConnection();
-
-    // Execute delete query
-    const [result]: any = await db.query(
-      `DELETE FROM services WHERE id = ?`,
-      [id]
-    );
-
-    // Check if a row was deleted
-    if (result.affectedRows === 0) {
-      return NextResponse.json(
-        { message: 'Service not found or already deleted' },
-        { status: 404 }
-      );
-    }
-
-    // Respond with success message
-    return NextResponse.json(
-      { message: 'Service deleted successfully' },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Error deleting service:', error);
     return NextResponse.json(
       { message: 'Internal Server Error' },
       { status: 500 }

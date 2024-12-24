@@ -6,6 +6,15 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -15,8 +24,8 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Service {
   id: number;
-  category_id: number;
-  name: string;
+  category_name: string;
+  service_name: string;
   time: string;
   price: string;
   option: boolean;
@@ -53,10 +62,14 @@ const UsersPage = () => {
     window.location.href = `/services/edit/${id}`;
   };
   const deleteService = async (id: number) => {
+    console.log(id);
+
     try {
-      await axios.delete(`/api/services/${id}`);
-      setServices(services.filter((service) => service.id !== id)); // Update state
-      alert("Service deleted successfully");
+      await axios.delete(`/api/product/services/${id}`);
+      setServices(services.filter((service) => service.id !== id));
+      toast({
+        title: "Service deleted successfully!",
+      });
     } catch (error) {
       console.error("Error deleting service:", error);
     }
@@ -85,9 +98,9 @@ const UsersPage = () => {
       </Breadcrumb>
 
       <div className="flex justify-between mt-8 items-center">
-        <h2 className="text-3xl font-semibold">Category</h2>
+        <h2 className="text-3xl font-semibold">services</h2>
         <Button variant={"default"} onClick={newUser}>
-          new Category
+          new services
         </Button>
       </div>
 
@@ -96,8 +109,8 @@ const UsersPage = () => {
           <thead>
             <tr className="bg-gray-100">
               <th className="border px-4 py-2">ID</th>
-              <th className="border px-4 py-2">Category ID</th>
-              <th className="border px-4 py-2">Name</th>
+              <th className="border px-4 py-2">Category Name</th>
+              <th className="border px-4 py-2">service name</th>
               <th className="border px-4 py-2">Time</th>
               <th className="border px-4 py-2">Price</th>
               <th className="border px-4 py-2">Option</th>
@@ -108,8 +121,8 @@ const UsersPage = () => {
             {services.map((service) => (
               <tr key={service.id} className="hover:bg-gray-50">
                 <td className="border px-4 py-2">{service.id}</td>
-                <td className="border px-4 py-2">{service.category_id}</td>
-                <td className="border px-4 py-2">{service.name}</td>
+                <td className="border px-4 py-2">{service.category_name}</td>
+                <td className="border px-4 py-2">{service.service_name}</td>
                 <td className="border px-4 py-2">{service.time}</td>
                 <td className="border px-4 py-2">{service.price}</td>
                 <td className="border px-4 py-2">
@@ -122,12 +135,24 @@ const UsersPage = () => {
                   >
                     Edit
                   </button>
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    onClick={() => deleteService(service.id)}
-                  >
-                    Delete
-                  </button>
+
+                  <Dialog>
+                    <DialogTrigger className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ">
+                      Delete
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle className="py-4">Are you absolutely sure?</DialogTitle>
+
+                        <button
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          onClick={() => deleteService(service.id)}
+                        >
+                          onfirm
+                        </button>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
                 </td>
               </tr>
             ))}

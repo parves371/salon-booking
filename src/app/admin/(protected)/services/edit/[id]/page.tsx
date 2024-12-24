@@ -131,7 +131,7 @@ const ServicesEditedPage = () => {
       form.setValue("option", service.option ? true : false);
       form.setValue("category_name", service.category_name);
     }
-  }, [service, form]);
+  }, [service]);
 
   const onSubmit = async (data: z.infer<typeof ServiceSchema>) => {
     try {

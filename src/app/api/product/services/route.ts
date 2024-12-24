@@ -11,8 +11,9 @@ interface AddServiceRequest {
 }
 
 export async function POST(req: Request): Promise<Response> {
+  const { categoryId, name, time, price, option }: AddServiceRequest = await req.json();
+  console.log(option );
   try {
-    const { categoryId, name, time, price, option }: AddServiceRequest = await req.json();
 
     // Validate required fields
     if (!categoryId || !name || !time || !price) {

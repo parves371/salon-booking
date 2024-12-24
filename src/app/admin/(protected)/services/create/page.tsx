@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/breadcrumb";
 
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+
 import {
   Card,
   CardContent,
@@ -59,7 +61,7 @@ const page = () => {
       name: "",
       price: "",
       time: "",
-      Option: false,
+      option: false,
     },
   });
 
@@ -94,28 +96,27 @@ const page = () => {
   }, []);
 
   const onSubmit = async (data: z.infer<typeof ServicesSchema>) => {
-    try {
-      console.log(data);
-      const res = await axios.post("/api/product/services", {
-        ...data,
-        categoryId: selectedCategoryId,
-      });
+    const formData = {
+      ...data,
+      categoryId: selectedCategoryId,
+    };
 
-      // Handle successful response
+    console.log(data);
+
+    try {
+      const res = await axios.post("/api/product/services", formData);
       if (res.status === 200) {
         toast({
-          title: "User created successfully!",
+          title: "Service created successfully!",
         });
       }
     } catch (error: any) {
-      // Handle 400 error specifically
       if (error.response?.status === 400) {
         toast({
           title: "Error",
           description: error.response?.data?.message || "Bad Request",
         });
       } else {
-        // Handle other errors
         toast({
           title: "Error",
           description:
@@ -228,27 +229,28 @@ const page = () => {
                 )}
               />
               <FormField
-                name="Option"
+                name="option"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Option</FormLabel>
-                    <Select
-                      onValueChange={(value) =>
-                        field.onChange(value === "true")
-                      }
-                      value={field.value ? "true" : "false"}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an option" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="true">true</SelectItem>
-                        <SelectItem value="false">false</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <div className="flex items-center">
+                        <Switch
+                          checked={field.value} // Make sure it's a boolean (default to false if undefined)
+                          onCheckedChange={field.onChange} // This ensures the form state updates
+                          className={`${
+                            field.value ? "bg-blue-600" : "bg-gray-200"
+                          } relative inline-flex items-center h-6 rounded-full w-11`}
+                        >
+                          <span
+                            className={`${
+                              field.value ? "translate-x-6" : "translate-x-1"
+                            } inline-block w-4 h-4 transform bg-white rounded-full transition`}
+                          />
+                        </Switch>
+                      </div>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

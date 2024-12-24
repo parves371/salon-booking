@@ -15,5 +15,5 @@ export const ServicesSchema = z.object({
   time: z.string().min(1, {
     message: "Time is required",
   }),
-  Option: z.boolean().default(false),
+  option: z.optional(z.boolean().default(false)),
 });

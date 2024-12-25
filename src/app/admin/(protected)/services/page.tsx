@@ -60,7 +60,6 @@ const UsersPage = () => {
     router.push(`/admin/services/edit/${id}`);
   };
   const deleteService = async (id: number) => {
-    console.log(id);
 
     try {
       await axios.delete(`/api/product/services/${id}`);
@@ -122,7 +121,7 @@ const UsersPage = () => {
                 <td className="border px-4 py-2">{service.category_name}</td>
                 <td className="border px-4 py-2">{service.service_name}</td>
                 <td className="border px-4 py-2">{service.time}</td>
-                <td className="border px-4 py-2">{service.price}</td>
+                <td className="border px-4 py-2">${service.price}</td>
                 <td className="border px-4 py-2">
                   {service.option ? "Yes" : "No"}
                 </td>
@@ -148,7 +147,7 @@ const UsersPage = () => {
                           className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                           onClick={() => deleteService(service.id)}
                         >
-                          onfirm
+                          Confirm
                         </button>
                       </DialogHeader>
                     </DialogContent>

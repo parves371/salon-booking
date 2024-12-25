@@ -69,7 +69,6 @@ const ServicesEditedPage = () => {
       message: "Category name is required",
     }),
   });
-  
 
   const form = useForm<z.infer<typeof ServiceSchema>>({
     resolver: zodResolver(ServiceSchema),
@@ -117,7 +116,7 @@ const ServicesEditedPage = () => {
   };
 
   useEffect(() => {
-    fetchCategories(); // Fetch categories on component mount
+    fetchCategories(); 
     if (params.id) {
       fetchServiceById();
     }
@@ -131,19 +130,19 @@ const ServicesEditedPage = () => {
       form.setValue("option", service.option ? true : false);
       form.setValue("category_name", service.category_name);
     }
-  }, [service,params.id]);
+  }, [service, params.id]);
 
   const onSubmit = async (data: z.infer<typeof ServiceSchema>) => {
     try {
-      // Prepare the payload
       const payload = {
         service_name: data.service_name,
         price: data.price,
         time: data.time,
         option: data.option,
-        category_id: categories.find((cat) => cat.name === data.category_name)?.id,
+        category_id: categories.find((cat) => cat.name === data.category_name)
+          ?.id,
       };
-  
+
       if (!payload.category_id) {
         toast({
           title: "Error",
@@ -152,31 +151,38 @@ const ServicesEditedPage = () => {
         });
         return;
       }
-  
-      // Make API call to update the service
-      const response = await axios.put(`/api/product/services/edit/${params.id}`, payload, {
-        withCredentials: true,
-      });
-  
+
+      const response = await axios.put(
+        `/api/product/services/edit/${params.id}`,
+        payload,
+        {
+          withCredentials: true,
+        }
+      );
+
       if (response.status === 200) {
         toast({
           title: "Success",
           description: "Service updated successfully.",
         });
-        router.push("/admin/services"); 
+        router.push("/admin/services");
       } else {
         throw new Error(response.data.message || "Failed to update service.");
       }
     } catch (error: any) {
-      console.error("Error updating service:", error.response?.data || error.message);
+      console.error(
+        "Error updating service:",
+        error.response?.data || error.message
+      );
       toast({
         title: "Error",
-        description: error.response?.data?.message || "An error occurred. Please try again.",
+        description:
+          error.response?.data?.message ||
+          "An error occurred. Please try again.",
         variant: "destructive",
       });
     }
   };
-  
 
   const cancelButton = () => {
     router.push("/admin/services");

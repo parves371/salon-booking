@@ -45,24 +45,19 @@ const CategoryAdd = () => {
   const onSubmitCategory = async (data: z.infer<typeof CategorySchema>) => {
     try {
       const res = await axios.post("/api/product/category", data, {
-        withCredentials: true, // Ensure cookies are sent
+        withCredentials: true,
       });
 
-      // Handle successful response
-      if (res.status === 201) {
-        toast({
-          title: "User created successfully!",
-        });
-      }
+      toast({
+        title: "User created successfully!",
+      });
     } catch (error: any) {
-      // Handle 400 error specifically
       if (error.response?.status === 400) {
         toast({
           title: "Error",
           description: error.response?.data?.message || "Bad Request",
         });
       } else {
-        // Handle other errors
         toast({
           title: "Error",
           description:

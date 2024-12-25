@@ -1,5 +1,6 @@
 import { createConnection } from "@/lib/db/dbConnect"; // Ensure this points to your DB helper
 import { CategorySchema } from "@/schemas/product";
+import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -34,7 +35,6 @@ export async function GET(req: Request) {
   try {
     const db = await createConnection();
 
-    // Query to fetch all categories
     const [categories]: any = await db.query("SELECT * FROM categories");
 
     return NextResponse.json(

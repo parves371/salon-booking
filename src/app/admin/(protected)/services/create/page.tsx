@@ -127,7 +127,6 @@ const page = () => {
   };
 
   const handleSelectChange = (value: string) => {
-    // Assuming the value is the category id, we can parse it to a number
     setSelectedCategoryId(parseInt(value));
   };
   const cancelButton = () => {

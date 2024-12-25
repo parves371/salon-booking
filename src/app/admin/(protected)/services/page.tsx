@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,6 @@ const UsersPage = () => {
     router.push(`/admin/services/edit/${id}`);
   };
   const deleteService = async (id: number) => {
-
     try {
       await axios.delete(`/api/product/services/${id}`);
       setServices(services.filter((service) => service.id !== id));
@@ -114,6 +113,7 @@ const UsersPage = () => {
               <th className="border px-4 py-2">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {services.map((service) => (
               <tr key={service.id} className="hover:bg-gray-50">

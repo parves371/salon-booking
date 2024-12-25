@@ -39,8 +39,6 @@ const UsersPage = () => {
       const res = await axios.get("/api/product/options", {
         withCredentials: true,
       });
-      console.log(res.data.data);
-
       setOption(res.data?.data || []);
     } catch (error: any) {
       if (error.response?.status === 400) {

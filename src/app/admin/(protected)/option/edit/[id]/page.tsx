@@ -14,45 +14,40 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
-import { Switch } from "@/components/ui/switch";
 
-interface ServiceProps {
-  id: number;
-  service_name: string;
-  price: number;
-  time: string;
-  option: boolean;
-  category_name: string;
+interface Option {
+  id: number; //
+  name: string; //
+  price: number; //
+  service_id: number; //
+  time: string; // Time required for the option
 }
 
-interface Category {
-  id: number;
-  name: string;
+interface ServiceOption {
+    category_name: string;
+    id: number;
+    option: number; // or boolean, depending on the context and usage
+    price: string;
+    service_name: string;
+    time: string;
 }
 
 const ServicesEditedPage = () => {
-  const [service, setService] = useState<ServiceProps | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [opton, setOpton] = useState<Option | null>(null);
+  const [services, setServices] = useState<ServiceOption[]>([]);
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams<Record<string, string>>();
 
-  const ServiceSchema = z.object({
-    service_name: z.string().min(1, {
+  const OptionSchema = z.object({
+    name: z.string().min(1, {
       message: "Name is required",
     }),
     price: z
@@ -64,31 +59,26 @@ const ServicesEditedPage = () => {
     time: z.string().min(1, {
       message: "Time is required",
     }),
-    option: z.boolean(),
-    category_name: z.string().min(1, {
-      message: "Category name is required",
-    }),
   });
 
-  const form = useForm<z.infer<typeof ServiceSchema>>({
-    resolver: zodResolver(ServiceSchema),
+  const form = useForm<z.infer<typeof OptionSchema>>({
+    resolver: zodResolver(OptionSchema),
     defaultValues: {
-      service_name: "",
+      name: "",
       price: 0,
       time: "",
-      option: false,
-      category_name: "",
     },
   });
 
-  const fetchServiceById = async () => {
+  const fetchOptionById = async () => {
     try {
-      const res = await axios.get(`/api/product/services/edit/${params.id}`, {
+      const res = await axios.get(`/api/product/options/edit/${params.id}`, {
         withCredentials: true,
       });
 
+
       if (res.status === 200) {
-        setService(res.data.data); // Assuming response contains `data` key with service details
+        setOpton(res.data.data);
       }
     } catch (error: any) {
       console.error(
@@ -98,14 +88,14 @@ const ServicesEditedPage = () => {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchServices = async () => {
     try {
-      const res = await axios.get("/api/product/category", {
+      const res = await axios.get("/api/product/services", {
         withCredentials: true,
       });
 
       if (res.status === 200) {
-        setCategories(res.data.data); // Assuming response contains `data` key with categories
+        setServices(res.data.data); // Assuming response contains `data` key with categories
       }
     } catch (error: any) {
       console.error(
@@ -116,44 +106,45 @@ const ServicesEditedPage = () => {
   };
 
   useEffect(() => {
-    fetchCategories(); 
+    fetchServices();
     if (params.id) {
-      fetchServiceById();
+      fetchOptionById();
     }
   }, [params.id]);
 
   useEffect(() => {
-    if (service) {
-      form.setValue("service_name", service.service_name);
-      form.setValue("price", service.price);
-      form.setValue("time", service.time);
-      form.setValue("option", service.option ? true : false);
-      form.setValue("category_name", service.category_name);
+    if (opton) {
+      form.setValue("name", opton.name);
+      form.setValue("price", opton.price);
+      form.setValue("time", opton.time);
     }
-  }, [service, params.id]);
+  }, [opton, params.id]);
 
-  const onSubmit = async (data: z.infer<typeof ServiceSchema>) => {
+  const onSubmit = async (data: z.infer<typeof OptionSchema>) => {
+
     try {
+
+
+
       const payload = {
-        service_name: data.service_name,
         price: data.price,
         time: data.time,
-        option: data.option,
-        category_id: categories.find((cat) => cat.name === data.category_name)
-          ?.id,
+        name: data.name,
+        services_id: services.find((opt) => opt.service_name === data.name)?.id,
       };
 
-      if (!payload.category_id) {
+      if (!payload.services_id) {
         toast({
           title: "Error",
-          description: "Selected category is invalid.",
+          description: "Selected Services is invalid.",
           variant: "destructive",
         });
         return;
       }
 
+
       const response = await axios.put(
-        `/api/product/services/edit/${params.id}`,
+        `/api/product/options/edit/${params.id}`,
         payload,
         {
           withCredentials: true,
@@ -185,7 +176,7 @@ const ServicesEditedPage = () => {
   };
 
   const cancelButton = () => {
-    router.push("/admin/services");
+    router.push("/admin/option");
   };
 
   return (
@@ -193,7 +184,7 @@ const ServicesEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/services">Services</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/option">Option</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -202,12 +193,12 @@ const ServicesEditedPage = () => {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="p-6 max-w-2xl mx-auto border rounded-lg bg-white shadow mt-16">
-        <h2 className="text-2xl font-bold mb-4">Edit Service</h2>
+        <h2 className="text-2xl font-bold mb-4">Edit Option</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Field */}
             <FormField
-              name="service_name"
+              name="name"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -215,7 +206,7 @@ const ServicesEditedPage = () => {
                   <FormControl>
                     <input
                       type="text"
-                      placeholder="Service Name"
+                      placeholder="Option Name"
                       className="border rounded-md px-3 py-2 w-full"
                       {...field}
                     />
@@ -262,53 +253,6 @@ const ServicesEditedPage = () => {
                 </FormItem>
               )}
             />
-            {/* Option Field */}
-            <FormField
-              name="option"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Option</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center">
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className={`${
-                          field.value ? "bg-blue-600" : "bg-gray-200"
-                        } relative inline-flex items-center h-6 rounded-full w-11`}
-                      ></Switch>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Category Field */}
-            <FormField
-              name="category_name"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="border rounded-md w-full">
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.name}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             {/* Submit Buttons */}
             <div className="flex gap-4">
               <button
@@ -317,6 +261,7 @@ const ServicesEditedPage = () => {
               >
                 Save
               </button>
+
               <button
                 type="button"
                 className="text-gray-500 px-4 py-2 rounded-md hover:bg-gray-200"

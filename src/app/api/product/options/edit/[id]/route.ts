@@ -1,16 +1,13 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { createConnection } from "@/lib/db/dbConnect";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
-
-
-// get Category by id ---- give you 1 response
+// get option by id ---- give you 1 response
 export async function GET(req: Request): Promise<Response> {
   const id = req.url.split("/").pop(); // Assuming URL pattern is like /api/product/catgory/{id}
 
   if (!id || isNaN(Number(id))) {
     return Response.json(
-      { message: "Category ID is required and must be a number" },
+      { message: "option ID is required and must be a number" },
       { status: 400 }
     );
   }
@@ -20,24 +17,24 @@ export async function GET(req: Request): Promise<Response> {
 
     // Query to fetch the category by ID
     const [rows] = await db.query<RowDataPacket[]>(
-      `SELECT id, name FROM categories WHERE id = ?`,
+      `SELECT * FROM options WHERE id = ?`,
       [id]
     );
 
     // If no category is found with the given ID
     if (rows.length === 0) {
-      return Response.json({ message: "Category not found" }, { status: 400 });
+      return Response.json({ message: "option not found" }, { status: 400 });
     }
 
     // If a category is found, respond with the category data
     const category = rows[0];
 
     return Response.json(
-      { message: "Category fetched successfully", data: category },
+      { message: "option fetched successfully", data: category },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error fetching category:", error);
+    console.error("Error fetching option:", error);
     return Response.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -53,13 +50,32 @@ export async function PUT(req: Request): Promise<Response> {
     );
   }
 
-  const body = await req.json();
-  const { name } = body;
+   const { name, price, time, services_id } = await req.json();
 
-  if (!name) {
-    return new Response(
-      JSON.stringify({ message: "New category name is required" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+  // Validate the input fields
+  if (!name || typeof name !== "string") {
+    return Response.json(
+      { message: "Valid service_name is required" },
+      { status: 400 }
+    );
+  }
+  if (!price || isNaN(Number(price))) {
+    return Response.json(
+      { message: "Valid price is required" },
+      { status: 400 }
+    );
+  }
+  if (!time || typeof time !== "string") {
+    return Response.json(
+      { message: "Valid time is required" },
+      { status: 400 }
+    );
+  }
+
+  if (!services_id || isNaN(Number(services_id))) {
+    return Response.json(
+      { message: "Valid category_id is required" },
+      { status: 400 }
     );
   }
 
@@ -68,8 +84,12 @@ export async function PUT(req: Request): Promise<Response> {
 
     // Update the category in the database
     const [result] = await db.query<ResultSetHeader>(
-      `UPDATE categories SET name = ? WHERE id = ?`,
-      [name, id]
+      `
+      UPDATE options
+      SET name = ?, price = ?, time = ?, services_id = ?
+      WHERE id = ?
+      `,
+      [name, price, time, services_id, id]
     );
 
     // Check if any rows were affected

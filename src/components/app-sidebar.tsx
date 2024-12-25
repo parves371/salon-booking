@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings, User } from "lucide-react"
+import { Calendar, Home, Inbox, OptionIcon, Search, Settings, User } from "lucide-react";
 
 import {
   Sidebar,
@@ -9,9 +9,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { MdCategory } from "react-icons/md"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { MdCategory } from "react-icons/md";
 
 // Menu items.
 const items = [
@@ -19,6 +19,11 @@ const items = [
     title: "Home",
     url: "#",
     icon: Home,
+  },
+  {
+    title: "options",
+    url: "/admin/options",
+    icon: OptionIcon,
   },
   {
     title: "services",
@@ -40,7 +45,7 @@ const items = [
     url: "#",
     icon: Settings,
   },
-]
+];
 
 export function AppSidebar() {
   return (
@@ -65,5 +70,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

@@ -1,6 +1,5 @@
 import { createConnection } from "@/lib/db/dbConnect"; // Ensure this points to your DB helper
 import { CategorySchema } from "@/schemas/product";
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

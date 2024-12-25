@@ -49,7 +49,7 @@ const CategoryAdd = () => {
       });
 
       toast({
-        title: "User created successfully!",
+        title: "Category created successfully!",
       });
     } catch (error: any) {
       if (error.response?.status === 400) {

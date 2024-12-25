@@ -52,7 +52,7 @@ const Page = () => {
       await axios.delete(`/api/product/category/${id}`);
       setCategories(categories.filter((service) => service.id !== id));
       toast({
-        title: "Service deleted successfully!",
+        title: "Category deleted successfully!",
       });
     } catch (error) {
       console.error("Error deleting service:", error);

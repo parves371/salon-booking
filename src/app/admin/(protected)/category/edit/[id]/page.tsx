@@ -158,7 +158,7 @@ const ServicesEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/services">Category</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/category">Category</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

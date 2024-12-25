@@ -105,14 +105,11 @@ const page = () => {
       ...data,
       serviceId: selectedServicesId,
     };
-
-    console.log(data);
-
     try {
       const res = await axios.post("/api/product/options", formData);
       if (res.status === 200) {
         toast({
-          title: "Service created successfully!",
+          title: "Options created successfully!",
         });
       }
     } catch (error: any) {
@@ -142,7 +139,7 @@ const page = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/services">Options</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/option">Options</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

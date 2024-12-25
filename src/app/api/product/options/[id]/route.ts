@@ -16,23 +16,23 @@ export async function DELETE(
 
     const db = await createConnection();
 
-    const [result]: any = await db.query("DELETE FROM categories WHERE id = ?", [
+    const [result]: any = await db.query("DELETE FROM options WHERE id = ?", [
       id,
     ]);
 
     if (result.affectedRows === 0) {
       return NextResponse.json(
-        { message: "Service not found" },
+        { message: "Option not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
-      { message: "Service deleted successfully" },
+      { message: "Option deleted successfully" },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error deleting service:", error);
+    console.error("Error deleting Option:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

@@ -129,8 +129,6 @@ CREATE TABLE services (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
-
-
 CREATE TABLE options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     service_id INT NOT NULL,
@@ -139,3 +137,4 @@ CREATE TABLE options (
     price DECIMAL(10, 2),
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
 );
+

@@ -22,7 +22,7 @@ const items = [
   },
   {
     title: "options",
-    url: "/admin/options",
+    url: "/admin/option",
     icon: OptionIcon,
   },
   {

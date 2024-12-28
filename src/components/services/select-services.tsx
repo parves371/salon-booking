@@ -13,6 +13,7 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { TreatmentCard } from "./treatment-card";
 import data from "../../../data/frisha.json";
+import { useProducts } from "@/hooks/useProducts";
 
 // Types for treatment options and treatments
 interface TreatmentOption {
@@ -44,6 +45,7 @@ interface CustomSliderProps {
 
 export const SelectServices: React.FC = () => {
   const [hydrated, setHydrated] = useState(false);
+  const [datas, setdatas] = useState<Treatment[]>([]);
   const dispatch = useAppDispatch();
   const selectedTreatments = useAppSelector(
     (state) => state.treatments.selectedTreatments // Redux state for selected treatments
@@ -53,7 +55,11 @@ export const SelectServices: React.FC = () => {
   ); // Fetch total price from Redux state
   const [activeSection, setActiveSection] = useState<number | null>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { data:shuvo, isError, isLoading } = useProducts();
 
+  console.log(shuvo);
+
+  
   const calculateTotalPrice = (treatments: Treatment[]) => {
     return treatments.reduce((sum, treatment) => {
       // Use optional chaining to access selectedOption safely

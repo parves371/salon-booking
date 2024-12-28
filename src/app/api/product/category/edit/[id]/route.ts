@@ -1,4 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { createConnection } from "@/lib/db/dbConnect";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 

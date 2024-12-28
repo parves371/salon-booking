@@ -6,6 +6,7 @@ import "./globals.css";
 
 import StoreProvider from "./StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
+import QueryStackProvider from "./QueryProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider>{children}</StoreProvider>
+        <QueryStackProvider>
+          <StoreProvider>{children}</StoreProvider>
+        </QueryStackProvider>
         <Toaster />
       </body>
     </html>

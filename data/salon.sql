@@ -110,14 +110,13 @@ COMMIT;
 
 -- coustom sql for category
 
-categories:
-
-
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
+
+-- coustom sql for services:
 
 CREATE TABLE services (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -129,6 +128,8 @@ CREATE TABLE services (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
+-- coustom sql for options:
+
 CREATE TABLE options (
     id INT AUTO_INCREMENT PRIMARY KEY,
     service_id INT NOT NULL,
@@ -137,4 +138,7 @@ CREATE TABLE options (
     price DECIMAL(10, 2),
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
 );
+
+
+
 

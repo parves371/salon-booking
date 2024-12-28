@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"; // Ensure you have the hooks set up for Redux
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import {
@@ -43,6 +43,7 @@ interface CustomSliderProps {
 }
 
 export const SelectServices: React.FC = () => {
+  const [hydrated, setHydrated] = useState(false);
   const dispatch = useAppDispatch();
   const selectedTreatments = useAppSelector(
     (state) => state.treatments.selectedTreatments // Redux state for selected treatments
@@ -85,12 +86,9 @@ export const SelectServices: React.FC = () => {
       // Manually recalculate the total price after loading the treatments
       const updatedTotalPrice = calculateTotalPrice(selectedTreatments); // Recalculate total price
       dispatch(updateTotalPrice(updatedTotalPrice)); // Dispatch the updated total price
-      console.log(treatments);
     }
   }, [dispatch, selectedTreatments]);
   // Ensure this effect runs after selectedTreatments is loaded
-
-  // Make sure the effect runs after selectedTreatments is loaded
 
   // Save selected treatments to localStorage when it changes
   useEffect(() => {
@@ -133,6 +131,14 @@ export const SelectServices: React.FC = () => {
       });
     };
   }, []);
+
+  useEffect(() => {
+    setHydrated(true); // Set hydrated to true after the data is loaded
+    setActiveSection(data.data[0]?.id); // Default to the first section
+  }, []);
+  if (!hydrated) {
+    return null; // or a loading spinner
+  }
 
   const handleTreatmentUpdate = (treatment: SelectedTreatment) => {
     const exists = selectedTreatments.find((item) => item.id === treatment.id);
@@ -185,16 +191,23 @@ export const SelectServices: React.FC = () => {
     }
   };
 
+  if (!selectedTreatments) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <section>
       <div className="container mx-auto mt-16 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 px-4 lg-px-0">
         <div className="w-full md:w-[60%]">
           {/* Slider for Categories */}
-          <CustomSlider
-            data={data.data}
-            activeSection={activeSection}
-            scrollToSection={scrollToSection}
-          />
+
+          <Suspense fallback={<div>Loading...</div>}>
+            <CustomSlider
+              data={data.data}
+              activeSection={activeSection}
+              scrollToSection={scrollToSection}
+            />
+          </Suspense>
 
           {/* Service Sections */}
           {data.data.map((category, index) => (
@@ -314,9 +327,12 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
 
   // Slider item container styles
   const sliderStyle = {
-    transform: `translateX(-${itemWidths
-      .slice(0, currentIndex)
-      .reduce((a, b) => a + b, 0)}px)`, // Adjust scroll position based on item widths
+    transform:
+      typeof window !== "undefined"
+        ? `translateX(-${itemWidths
+            .slice(0, currentIndex)
+            .reduce((a, b) => a + b, 0)}px)`
+        : "none",
     transition: "transform 0.5s ease-in-out",
   };
 

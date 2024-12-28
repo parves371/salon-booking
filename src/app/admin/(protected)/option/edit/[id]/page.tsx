@@ -20,7 +20,7 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 
 interface Option {
   id: number; //
@@ -31,17 +31,18 @@ interface Option {
 }
 
 interface ServiceOption {
-    category_name: string;
-    id: number;
-    option: number; // or boolean, depending on the context and usage
-    price: string;
-    service_name: string;
-    time: string;
+  category_name: string;
+  id: number;
+  option: number; // or boolean, depending on the context and usage
+  price: string;
+  service_name: string;
+  time: string;
 }
 
 const ServicesEditedPage = () => {
   const [opton, setOpton] = useState<Option | null>(null);
   const [services, setServices] = useState<ServiceOption[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams<Record<string, string>>();
@@ -76,7 +77,6 @@ const ServicesEditedPage = () => {
         withCredentials: true,
       });
 
-
       if (res.status === 200) {
         setOpton(res.data.data);
       }
@@ -90,6 +90,7 @@ const ServicesEditedPage = () => {
 
   const fetchServices = async () => {
     try {
+      setLoading(true);
       const res = await axios.get("/api/product/services", {
         withCredentials: true,
       });
@@ -97,11 +98,14 @@ const ServicesEditedPage = () => {
       if (res.status === 200) {
         setServices(res.data.data); // Assuming response contains `data` key with categories
       }
+      setLoading(false);
     } catch (error: any) {
       console.error(
         "Error fetching categories:",
         error.response?.data || error.message
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,16 +125,12 @@ const ServicesEditedPage = () => {
   }, [opton, params.id]);
 
   const onSubmit = async (data: z.infer<typeof OptionSchema>) => {
-
     try {
-
-
-
       const payload = {
         price: data.price,
         time: data.time,
         name: data.name,
-        services_id: services.find((opt) => opt.service_name === data.name)?.id,
+        services_id: services.find((opt) => opt.id === opton?.service_id)?.id,
       };
 
       if (!payload.services_id) {
@@ -141,7 +141,6 @@ const ServicesEditedPage = () => {
         });
         return;
       }
-
 
       const response = await axios.put(
         `/api/product/options/edit/${params.id}`,
@@ -156,7 +155,7 @@ const ServicesEditedPage = () => {
           title: "Success",
           description: "Service updated successfully.",
         });
-        router.push("/admin/services");
+        router.push("/admin/option");
       } else {
         throw new Error(response.data.message || "Failed to update service.");
       }
@@ -178,6 +177,10 @@ const ServicesEditedPage = () => {
   const cancelButton = () => {
     router.push("/admin/option");
   };
+
+  if (loading) {
+    return <div className="flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="px-16">

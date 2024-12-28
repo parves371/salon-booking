@@ -25,7 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
@@ -46,6 +46,7 @@ interface Category {
 
 const ServicesEditedPage = () => {
   const [service, setService] = useState<ServiceProps | null>(null);
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const { toast } = useToast();
   const router = useRouter();
@@ -100,6 +101,7 @@ const ServicesEditedPage = () => {
 
   const fetchCategories = async () => {
     try {
+      setLoading(true);
       const res = await axios.get("/api/product/category", {
         withCredentials: true,
       });
@@ -107,16 +109,20 @@ const ServicesEditedPage = () => {
       if (res.status === 200) {
         setCategories(res.data.data); // Assuming response contains `data` key with categories
       }
+      setLoading(false);
     } catch (error: any) {
       console.error(
         "Error fetching categories:",
         error.response?.data || error.message
       );
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchCategories(); 
+    fetchCategories();
     if (params.id) {
       fetchServiceById();
     }
@@ -187,6 +193,11 @@ const ServicesEditedPage = () => {
   const cancelButton = () => {
     router.push("/admin/services");
   };
+
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="px-16">

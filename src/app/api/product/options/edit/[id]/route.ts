@@ -50,7 +50,9 @@ export async function PUT(req: Request): Promise<Response> {
     );
   }
 
-   const { name, price, time, services_id } = await req.json();
+  const { name, price, time, services_id } = await req.json();
+
+  console.log("askdlasldj",{services_id})
 
   // Validate the input fields
   if (!name || typeof name !== "string") {
@@ -86,7 +88,7 @@ export async function PUT(req: Request): Promise<Response> {
     const [result] = await db.query<ResultSetHeader>(
       `
       UPDATE options
-      SET name = ?, price = ?, time = ?, services_id = ?
+      SET name = ?, price = ?, time = ?, service_id = ?
       WHERE id = ?
       `,
       [name, price, time, services_id, id]

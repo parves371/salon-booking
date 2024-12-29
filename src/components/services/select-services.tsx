@@ -1,7 +1,5 @@
 "use client";
-import React, { Suspense, useEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"; // Ensure you have the hooks set up for Redux
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { useProducts } from "@/hooks/useProducts";
 import {
   addTreatment,
   anyProfession,
@@ -9,12 +7,13 @@ import {
   updateTotalPrice,
   updateTreatment,
 } from "@/lib/features/SelectServices/treatmentSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"; // Ensure you have the hooks set up for Redux
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import data from "../../../data/frisha.json";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { TreatmentCard } from "./treatment-card";
-import data from "../../../data/frisha.json";
-import { useProducts } from "@/hooks/useProducts";
-import { set } from "zod";
 
 // Types for treatment options and treatments
 interface TreatmentOption {

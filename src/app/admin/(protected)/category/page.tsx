@@ -18,6 +18,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
+import { LoaderIcon } from "lucide-react";
+import { useCategory } from "@/hooks/product/use-catagory";
 
 interface Category {
   id: number;
@@ -29,26 +31,11 @@ const Page = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const { toast } = useToast();
 
-
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get("/api/product/category", {
-        withCredentials: true,
-      });
-
-      if (res.status === 200) {
-        setCategories(res.data.data);
-      }
-    } catch (error: any) {
-      console.error(
-        "Error fetching categories:",
-        error.response?.data || error.message
-      );
-    }
-  };
+  //fetching data from the server | all the categories
+  const { data, isLoading, isError, error } = useCategory();
 
   const handleDelete = async (id: number) => {
-      try {
+    try {
       await axios.delete(`/api/product/category/${id}`);
       setCategories(categories.filter((service) => service.id !== id));
       toast({
@@ -63,9 +50,16 @@ const Page = () => {
     router.push(`/admin/category/edit/${id}`);
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>{error.message}</div>;
+  }
 
   return (
     <div className="px-16">
@@ -90,7 +84,6 @@ const Page = () => {
 
       <div className="mt-8">
         <table className="table-auto w-full border-collapse border border-gray-300">
-
           <thead>
             <tr className="bg-gray-100">
               <th className="border border-gray-300 px-4 py-2">ID</th>
@@ -100,7 +93,7 @@ const Page = () => {
           </thead>
 
           <tbody>
-            {categories.map((category) => (
+            {data?.data?.map((category: Category) => (
               <tr key={category.id} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {category.id}
@@ -139,7 +132,6 @@ const Page = () => {
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
     </div>

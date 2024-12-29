@@ -19,6 +19,8 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useOption } from "@/hooks/product/use-options";
+import { LoaderIcon } from "lucide-react";
 
 interface OptionDetails {
   id: number; // Option ID
@@ -33,6 +35,9 @@ const UsersPage = () => {
   const [option, setOption] = useState<OptionDetails[]>([]);
   const router = useRouter();
   const { toast } = useToast();
+
+  // Fetching data from the server | all the options
+  const { data, isLoading, isError, error } = useOption();
 
   const fetchAllUsers = async () => {
     try {
@@ -78,6 +83,17 @@ const UsersPage = () => {
   const newOption = () => {
     router.push("/admin/option/create");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>{error.message}</div>;
+  }
   return (
     <div className="px-16">
       <Breadcrumb>
@@ -111,7 +127,7 @@ const UsersPage = () => {
           </thead>
 
           <tbody>
-            {option.map((service) => (
+            {data?.data?.map((service:OptionDetails) => (
               <tr key={service.id} className="hover:bg-gray-50">
                 <td className="border px-4 py-2">{service.id}</td>
                 <td className="border px-4 py-2">{service.category_name}</td>

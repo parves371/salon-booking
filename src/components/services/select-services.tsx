@@ -53,13 +53,26 @@ export const SelectServices: React.FC = () => {
     }
   }, [data, setActiveSection, setHydrated, activeSection]);
 
+  const calculateTotalPrice = () => {
+    return selectedTreatments.reduce((total, treatment) => {
+      console.log("total", treatment);
+
+      const price = treatment.selectedOption
+        ? treatment.selectedOption.price
+        : treatment.price;
+      return total + price;
+    }, 0);
+  };
+
   const onsubmit = () => {
-    const selectedData = selectedTreatments.map((treatment) => ({
-      id: treatment.id,
-      name: treatment.selectedOption?.name || treatment.name,
-      time: treatment.selectedOption?.time || treatment.time,
-      price: treatment.selectedOption?.price || treatment.price,
+    const selectedData = selectedTreatments.map((services) => ({
+      id: services.id,
+      name: services.selectedOption?.name || services.name,
+      time: services.selectedOption?.time || services.time,
+      price: services.selectedOption?.price || services.price,
     }));
+
+    console.log(selectedData);
   };
 
   if (isLoading) {
@@ -69,6 +82,7 @@ export const SelectServices: React.FC = () => {
     return <div>Error:{error.message}</div>;
   }
 
+  const totalPrice = calculateTotalPrice(); // Calculate total price on every render that could affect it
   return (
     <section>
       <div className="container mx-auto mt-16 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 px-4 lg-px-0">
@@ -128,7 +142,7 @@ export const SelectServices: React.FC = () => {
           </div>
           <div className="flex justify-between font-bold text-lg px-3">
             <h3>Total</h3>
-            <h3>AED {} price</h3>
+            <h3>AED {totalPrice} price</h3>
           </div>
           <Button className="w-full mt-16" onClick={onsubmit}>
             Continue

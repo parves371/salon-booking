@@ -1,11 +1,11 @@
 "use client";
 import { useProducts } from "@/hooks/useProducts";
-import { useAppDispatch } from "@/lib/hooks";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { TreatmentCard } from "./treatment-card";
+import { useProductStore } from "@/store/use-product-store";
 
 type Option = {
   id: number;
@@ -31,48 +31,27 @@ type Category = {
 };
 
 export const SelectServices: React.FC = () => {
-  const [hydrated, setHydrated] = useState(false);
-  const [activeSection, setActiveSection] = useState<number | null>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [selectedTreatments, setSelectedTreatments] = useState<Service[]>([]);
 
-  // Fetch products data
+  const {
+    selectedTreatments,
+    addOrUpdateTreatment,
+    removeTreatment,
+    setActiveSection,
+    setHydrated,
+    activeSection,
+    hydrated,
+  } = useProductStore();
+
+  //fetching data from the server | all the products
   const { data, isError, isLoading, error } = useProducts();
 
-  const handleAddOrUpdateTreatment = (treatment: Service) => {
-    const index = selectedTreatments.findIndex((t) => t.id === treatment.id);
-    const newTreatments = [...selectedTreatments];
-    if (index >= 0) {
-      // Update existing treatment
-      newTreatments[index] = { ...newTreatments[index], ...treatment };
-    } else {
-      // Add new treatment
-      newTreatments.push(treatment);
-    }
-    setSelectedTreatments(newTreatments);
-    localStorage.setItem("selectedTreatments", JSON.stringify(newTreatments));
-  };
-
-  const handleRemoveTreatment = (treatmentId: number) => {
-    const filteredTreatments = selectedTreatments.filter(
-      (t) => t.id !== treatmentId
-    );
-    setSelectedTreatments(filteredTreatments);
-    localStorage.setItem(
-      "selectedTreatments",
-      JSON.stringify(filteredTreatments)
-    );
-  };
-
   useEffect(() => {
-    // Load selected treatments from localStorage if they exist
-    const storedTreatments = localStorage.getItem("selectedTreatments");
-    if (storedTreatments) {
-      setSelectedTreatments(JSON.parse(storedTreatments));
+    if (data?.length > 0 && !activeSection) {
+      setActiveSection(data[0].id);
+      setHydrated(true);
     }
-    setHydrated(true);
-    setActiveSection(data?.[0]?.id); // Default to the first section if data is loaded
-  }, [data]);
+  }, [data, setActiveSection, setHydrated, activeSection]);
 
   const onsubmit = () => {
     const selectedData = selectedTreatments.map((treatment) => ({
@@ -83,7 +62,7 @@ export const SelectServices: React.FC = () => {
     }));
   };
 
-  if (!hydrated || isLoading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
   if (isError) {
@@ -116,10 +95,8 @@ export const SelectServices: React.FC = () => {
                   <TreatmentCard
                     key={services.id}
                     services={services}
-                    onTreatmentUpdate={() =>
-                      handleAddOrUpdateTreatment(services)
-                    }
-                    onTreatmentRemove={() => handleRemoveTreatment(services.id)}
+                    onTreatmentUpdate={() => addOrUpdateTreatment(services)}
+                    onTreatmentRemove={() => removeTreatment(services.id)}
                     isActive={selectedTreatments.some(
                       (t) => t.id === services.id
                     )}

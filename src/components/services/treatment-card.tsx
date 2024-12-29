@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useProductStore } from "@/store/use-product-store";
 import React, { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 
@@ -27,6 +28,7 @@ interface Services {
   price: number;
   option: boolean;
   options: ServicesOption[];
+  selectedOption?: ServicesOption;
 }
 
 interface TreatmentCardProps {
@@ -45,73 +47,37 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
   isActive,
 }) => {
   const [selectedOption, setSelectedOption] = useState<
-  ServicesOption | undefined
+    ServicesOption | undefined
   >(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasBeenSelected, setHasBeenSelected] = useState(false);
+  const { addOrUpdateTreatment, removeTreatment } = useProductStore();
 
   useEffect(() => {
-    const storedTreatments = localStorage.getItem("selectedTreatments");
-    if (storedTreatments) {
-      const treatments: (Services & { selectedOption?: ServicesOption })[] =
-        JSON.parse(storedTreatments);
-      const foundTreatment = treatments.find((t) => t.id === services.id);
-      if (foundTreatment && foundTreatment.selectedOption) {
-        setSelectedOption(foundTreatment.selectedOption);
-        setHasBeenSelected(true);
-      }
-    }
-  }, [services.id]);
+    // Assume Zustand might be handling part of the state or replace this if all state is centralized
+    setSelectedOption(services.selectedOption);
+  }, [services]);
 
   const handleOptionSelect = (option: ServicesOption) => {
     setSelectedOption(option);
   };
 
   const handleAddOrUpdate = () => {
-    const updatedTreatment = { ...services, selectedOption };
+    const updatedService = { ...services, selectedOption };
 
-    onTreatmentUpdate(updatedTreatment);
-    updateLocalStorage(updatedTreatment);
+    addOrUpdateTreatment(updatedService); // Zustand store update
+    onTreatmentUpdate(updatedService); // Prop callback
 
     setHasBeenSelected(true);
     setIsDialogOpen(false);
   };
 
   const handleRemove = () => {
-    onTreatmentRemove(services.id);
-    removeTreatmentFromLocalStorage(services.id);
+    removeTreatment(services.id); // Zustand store removal
+    onTreatmentRemove(services.id); // Prop callback
+    
     setHasBeenSelected(false);
     setIsDialogOpen(false);
-  };
-
-  const updateLocalStorage = (
-    updatedTreatment: Services & { selectedOption?: ServicesOption }
-  ) => {
-    const treatments = JSON.parse(
-      localStorage.getItem("selectedTreatments") || "[]"
-    );
-    const index = treatments.findIndex(
-      (t: Services) => t.id === updatedTreatment.id
-    );
-    if (index !== -1) {
-      treatments[index] = updatedTreatment;
-    } else {
-      treatments.push(updatedTreatment);
-    }
-    localStorage.setItem("selectedTreatments", JSON.stringify(treatments));
-  };
-
-  const removeTreatmentFromLocalStorage = (treatmentId: number) => {
-    const treatments = JSON.parse(
-      localStorage.getItem("selectedTreatments") || "[]"
-    );
-    const updatedTreatments = treatments.filter(
-      (t: Services) => t.id !== treatmentId
-    );
-    localStorage.setItem(
-      "selectedTreatments",
-      JSON.stringify(updatedTreatments)
-    );
   };
 
   return (

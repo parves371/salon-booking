@@ -14,22 +14,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  useCategoryById,
-  useDeleteCategory,
-} from "@/hooks/product/use-catagory";
+import { Switch } from "@/components/ui/switch";
+import { useRenameStaff, useStaffById } from "@/hooks/use-staff";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/hooks/use-user";
+import { StaffSchema } from "@/schemas/staff";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { LoaderIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-interface Category {
+interface UserAdminProps {
   id: number;
   name: string;
+  email: string;
+  role: "superadmin" | "admin" | "manager" | "employee";
+  created_at: string; // ISO string format for dates
 }
 
 const CategoryEditedPage = () => {
@@ -38,67 +40,47 @@ const CategoryEditedPage = () => {
   const params = useParams<Record<string, string>>();
 
   // Fetching data from the server | category by id
-  const { data, error, isLoading, isError } = useCategoryById(
-    params.id ? parseInt(params.id) : 0
-  );
+  const {
+    data: staff,
+    error,
+    isLoading,
+    isError,
+  } = useStaffById(params.id ? parseInt(params.id) : 0);
 
+  const { data: adminUserData } = useUser();
 
-  const CategorySchema = z.object({
-    name: z.string().min(1, {
-      message: "Name is required",
-    }),
-  });
+  // console.log("all userr", adminUserData?.allUsers);
+  // console.log("staff", staff?.data.name);
 
-  const form = useForm<z.infer<typeof CategorySchema>>({
-    resolver: zodResolver(CategorySchema),
+  const renameStaff = useRenameStaff();
+
+  const form = useForm<z.infer<typeof StaffSchema>>({
+    resolver: zodResolver(StaffSchema),
     defaultValues: {
-      name: "",
+      position: "",
+      available: false,
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof CategorySchema>) => {
-    try {
-      const payload = {
-        name: data.name,
-      };
+  const onSubmit = async (data: z.infer<typeof StaffSchema>) => {
+    const payload = {
+      id: params.id ? parseInt(params.id) : 0,
+      position: data.position,
+      available: data.available,
+      userId: adminUserData?.allUsers?.find(
+        (user: UserAdminProps) => user.name === staff?.data?.name
+      )?.id,
+    };
 
-      const response = await axios.put(
-        `/api/product/category/edit/${params.id}`,
-        payload,
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        toast({
-          title: "Success",
-          description: "Category updated successfully.",
-        });
-        router.push("/admin/category");
-      } else {
-        throw new Error(response.data.message || "Failed to update Category.");
-      }
-    } catch (error: any) {
-      console.error(
-        "Error updating Category:",
-        error.response?.data || error.message
-      );
-      toast({
-        title: "Error",
-        description:
-          error.response?.data?.message ||
-          "An error occurred. Please try again.",
-        variant: "destructive",
-      });
-    }
+    renameStaff.mutate(payload);
   };
 
   useEffect(() => {
-    if (data?.data) {
-      form.setValue("name", data?.data?.name);
+    if (staff?.data) {
+      form.setValue("available", staff?.data.available);
+      form.setValue("position", staff?.data.position);
     }
-  }, [data?.data, params.id]);
+  }, [staff?.data, params.id]);
 
   const cancelButton = () => {
     router.push("/admin/category");
@@ -134,11 +116,11 @@ const CategoryEditedPage = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Field */}
             <FormField
-              name="name"
+              name="position"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Positon</FormLabel>
                   <FormControl>
                     <input
                       type="text"
@@ -146,6 +128,33 @@ const CategoryEditedPage = () => {
                       className="border rounded-md px-3 py-2 w-full"
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="available"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Available</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center">
+                      <Switch
+                        checked={field.value} // Make sure it's a boolean (default to false if undefined)
+                        onCheckedChange={field.onChange} // This ensures the form state updates
+                        className={`${
+                          field.value ? "bg-blue-600" : "bg-gray-200"
+                        } relative inline-flex items-center h-6 rounded-full w-11`}
+                      >
+                        <span
+                          className={`${
+                            field.value ? "translate-x-6" : "translate-x-1"
+                          } inline-block w-4 h-4 transform bg-white rounded-full transition`}
+                        />
+                      </Switch>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

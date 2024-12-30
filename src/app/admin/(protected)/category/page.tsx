@@ -2,10 +2,10 @@
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,14 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useToast } from "@/hooks/use-toast";
-import { LoaderIcon } from "lucide-react";
 import { useCategory, useDeleteCategory } from "@/hooks/product/use-catagory";
+import { LoaderIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Category {
   id: number;
@@ -29,8 +25,6 @@ interface Category {
 
 const Page = () => {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const { toast } = useToast();
 
   //fetching data from the server | all the categories
   const { data, isLoading, isError, error } = useCategory();

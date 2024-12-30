@@ -3,7 +3,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,20 +14,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCategory, useDeleteCategory } from "@/hooks/product/use-catagory";
+import { useStaff } from "@/hooks/use-staff";
 import { LoaderIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-interface Category {
+interface StaffDetails {
+  available: boolean;
   id: number;
   name: string;
+  position: string;
+  role: "superadmin" | "admin" | "manager" | "employee"; // Enum-like structure for roles
+  skills: string | null; // Assuming skills could be a JSON string or null
 }
 
 const Page = () => {
   const router = useRouter();
 
-
   //fetching data from the server | all the categories
-  const { data, isLoading, isError, error } = useCategory();
+  const { data, isLoading, isError, error } = useStaff();
+
+  console.log(data);
 
   const deleteCategory = useDeleteCategory();
 
@@ -75,26 +81,38 @@ const Page = () => {
         <table className="table-auto w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2">ID</th>
+              <th className="border border-gray-300 px-4 py-2">Staf ID</th>
               <th className="border border-gray-300 px-4 py-2">Name</th>
+              <th className="border border-gray-300 px-4 py-2">Position</th>
+              <th className="border border-gray-300 px-4 py-2">Role</th>
+              <th className="border border-gray-300 px-4 py-2">Available</th>
               <th className="border border-gray-300 px-4 py-2">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {data?.data?.map((category: Category) => (
-              <tr key={category.id} className="hover:bg-gray-50">
+            {data?.data?.map((staff: StaffDetails) => (
+              <tr key={staff.id} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2 text-center">
-                  {category.id}
+                  {staff.id}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {category.name}
+                  {staff.name}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {staff.position}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {staff.role}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {staff.available ? "Yes" : "No"}{" "}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 flex gap-2 justify-center">
                   <Button
                     variant="outline"
                     className="text-blue-500"
-                    onClick={() => handleEdit(category.id)}
+                    onClick={() => handleEdit(staff.id)}
                   >
                     Edit
                   </Button>
@@ -110,7 +128,7 @@ const Page = () => {
 
                         <button
                           className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                          onClick={() => handleDelete(category.id)}
+                          onClick={() => handleDelete(staff.id)}
                         >
                           Confirm
                         </button>

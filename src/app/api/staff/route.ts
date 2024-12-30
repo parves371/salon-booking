@@ -39,7 +39,12 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const db = await createConnection();
-    const [result]: any = await db.query("SELECT * FROM staff");
+    const sql = `
+    SELECT Staff.id, Staff.position, Staff.available, user.name, user.role, user.skills
+    FROM Staff
+    JOIN user ON Staff.user_id = user.id;
+  `;
+    const [result]: any = await db.query(sql);
     return NextResponse.json({ data: result });
   } catch (error) {
     console.error("Error fetching staff:", error);

@@ -97,11 +97,11 @@ export const useRenameStaff = () => {
       // Local state update can also be handled here if using React Query everywhere
       toast({
         title: "Success",
-        description: "rename the staff successfully.",
+        description: "rename staff successfully.",
       });
     },
     onError: (error) => {
-      console.error("Error deleting staff:", error);
+      console.error("Error renaming staff:", error);
       toast({
         title: "Error",
         description: "Failed to rename the staff",
@@ -110,36 +110,34 @@ export const useRenameStaff = () => {
   });
 };
 
-export const useDeleteCategory = () => {
+export const useDeleteStaff = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (categoryId: number) => {
-      const response = await axios.delete(
-        `/api/product/category/${categoryId}`
-      );
+    mutationFn: async (staffId: number) => {
+      const response = await axios.delete(`/api/staff/${staffId}`);
       if (response.status !== 200) {
-        throw new Error("Failed to delete the category");
+        throw new Error("Failed to delete the Staff");
       }
-      return categoryId;
+      return staffId;
     },
-    onSuccess: (categoryId) => {
+    onSuccess: (staffId) => {
       // Optionally invalidate and refetch any queries if needed
       queryClient.invalidateQueries({
-        queryKey: ["category"],
+        queryKey: ["staff"],
       });
       // Local state update can also be handled here if using React Query everywhere
       toast({
         title: "Success",
-        description: "Category deleted successfully.",
+        description: "Staff deleted successfully.",
       });
     },
     onError: (error) => {
-      console.error("Error deleting category:", error);
+      console.error("Error deleting Staff:", error);
       toast({
         title: "Error",
-        description: "Failed to delete category.",
+        description: "Failed to delete Staff.",
       });
     },
   });

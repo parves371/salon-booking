@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useRenameStaff, useStaffById } from "@/hooks/use-staff";
-import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { StaffSchema } from "@/schemas/staff";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +24,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 interface UserAdminProps {
   id: number;
   name: string;
@@ -35,7 +33,6 @@ interface UserAdminProps {
 }
 
 const CategoryEditedPage = () => {
-  const { toast } = useToast();
   const router = useRouter();
   const params = useParams<Record<string, string>>();
 
@@ -48,10 +45,6 @@ const CategoryEditedPage = () => {
   } = useStaffById(params.id ? parseInt(params.id) : 0);
 
   const { data: adminUserData } = useUser();
-
-  // console.log("all userr", adminUserData?.allUsers);
-  // console.log("staff", staff?.data.name);
-
   const renameStaff = useRenameStaff();
 
   const form = useForm<z.infer<typeof StaffSchema>>({

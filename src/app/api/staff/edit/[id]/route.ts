@@ -3,7 +3,6 @@ import { StaffSchema } from "@/schemas/staff";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 // get Staff by id ---- give you 1 response
-
 export async function GET(req: Request): Promise<Response> {
   const id = req.url.split("/").pop(); // Assuming URL pattern is like /api/staff/{id}
 

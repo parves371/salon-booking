@@ -87,7 +87,7 @@ const CategoryAdd = () => {
     setSelectedUserId(parseInt(value));
 
   const cancelButton = () => {
-    router.push("/admin/category");
+    router.push("/admin/staff");
   };
 
   if (isLoading) {
@@ -119,27 +119,26 @@ const CategoryAdd = () => {
           <CardTitle>Add Staff</CardTitle>
         </CardHeader>
         <CardContent>
-          <CardContent>
-            <Select
-              // value={selectedCategoryId?.toString()}
-              onValueChange={handleSelectChange}
-            >
-              <span className="block my-2 text-xl font-semibold">
-                Selected User
-              </span>
-              <SelectTrigger className="w-[180px] my-4">
-                <SelectValue placeholder="Select User" />
-              </SelectTrigger>
-              <SelectContent>
-                {data?.allUsers?.map((user: UserProps) => (
-                  <SelectItem key={user.id} value={user.id.toString()}>
-                    {user.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-
+          <Select
+            // value={selectedCategoryId?.toString()}
+            onValueChange={handleSelectChange}
+          >
+            <span className="block my-2 text-xl font-semibold">
+              Selected User
+            </span>
+            <SelectTrigger className="w-[180px] my-4">
+              <SelectValue placeholder="Select User" />
+            </SelectTrigger>
+            <SelectContent>
+              {data?.allUsers?.map((user: UserProps) => (
+                <SelectItem key={user.id} value={user.id.toString()}>
+                  {user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+        <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Name Field */}

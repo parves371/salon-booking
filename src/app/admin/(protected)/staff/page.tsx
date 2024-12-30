@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCategory, useDeleteCategory } from "@/hooks/product/use-catagory";
-import { useStaff } from "@/hooks/use-staff";
+import { useDeleteStaff, useStaff } from "@/hooks/use-staff";
 import { LoaderIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,15 +30,13 @@ interface StaffDetails {
 const Page = () => {
   const router = useRouter();
 
-  //fetching data from the server | all the categories
+  //fetching data from the server | all the Staff
   const { data, isLoading, isError, error } = useStaff();
 
-  console.log(data);
-
-  const deleteCategory = useDeleteCategory();
+  const deleteStaff = useDeleteStaff();
 
   const handleDelete = async (id: number) => {
-    deleteCategory.mutate(id);
+    deleteStaff.mutate(id);
   };
 
   const handleEdit = (id: number) => {

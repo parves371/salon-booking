@@ -17,9 +17,7 @@ type User = {
   role: "superadmin" | "admin" | "manager" | "employee";
 };
 
-export async function getAdminUserByEmail(
-  email: string,
-): Promise<User | null> {
+export async function getAdminUserByEmail(email: string): Promise<User | null> {
   try {
     const db = await createConnection();
 
@@ -44,9 +42,13 @@ export async function getAdminUserByEmail(
     throw new Error("Database query failed");
   }
 }
-export async function getAdminUserByID(
-  id: string,
-): Promise<User | null> {
+
+/**
+ * Fetch user data by ID
+ * @param {string} id - The ID of the user to find
+ * @returns {Promise<Object|null>} - Returns the user object or null if not found
+ */
+export async function getAdminUserByID(id: string): Promise<User | null> {
   try {
     const db = await createConnection();
 

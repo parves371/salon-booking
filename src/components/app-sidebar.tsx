@@ -1,4 +1,11 @@
-import { Calendar, Home, Inbox, OptionIcon, Search, Settings, User } from "lucide-react";
+import {
+  Home,
+  Inbox,
+  OptionIcon,
+  Settings,
+  User,
+  User2Icon,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -19,6 +26,11 @@ const items = [
     title: "Home",
     url: "#",
     icon: Home,
+  },
+  {
+    title: "Staff",
+    url: "/admin/staff",
+    icon: User2Icon,
   },
   {
     title: "options",

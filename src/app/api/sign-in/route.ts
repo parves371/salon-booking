@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
     response.headers.set(
       "Set-Cookie",
-      `salon=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400`
+      `salon=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400`// 1 day
     );
 
     return response;

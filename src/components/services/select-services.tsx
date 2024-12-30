@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { TreatmentCard } from "./treatment-card";
 import { useProductStore } from "@/store/use-product-store";
+import { LoaderIcon } from "lucide-react";
 
 type Option = {
   id: number;
@@ -76,7 +77,11 @@ export const SelectServices: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
   }
   if (isError) {
     return <div>Error:{error.message}</div>;

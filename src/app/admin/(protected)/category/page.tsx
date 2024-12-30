@@ -19,7 +19,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { LoaderIcon } from "lucide-react";
-import { useCategory } from "@/hooks/product/use-catagory";
+import { useCategory, useDeleteCategory } from "@/hooks/product/use-catagory";
+import Link from "next/link";
 
 interface Category {
   id: number;
@@ -34,16 +35,10 @@ const Page = () => {
   //fetching data from the server | all the categories
   const { data, isLoading, isError, error } = useCategory();
 
+  const deleteCategory = useDeleteCategory();
+
   const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(`/api/product/category/${id}`);
-      setCategories(categories.filter((service) => service.id !== id));
-      toast({
-        title: "Category deleted successfully!",
-      });
-    } catch (error) {
-      console.error("Error deleting service:", error);
-    }
+    deleteCategory.mutate(id);
   };
 
   const handleEdit = (id: number) => {
@@ -66,7 +61,7 @@ const Page = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/category">Category</BreadcrumbLink>
+            <Link href="/admin/category">Category</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
         </BreadcrumbList>

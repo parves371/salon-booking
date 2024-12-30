@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useOption } from "@/hooks/product/use-options";
 import { LoaderIcon } from "lucide-react";
+import Link from "next/link";
 
 interface OptionDetails {
   id: number; // Option ID
@@ -99,7 +100,7 @@ const UsersPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/option">Options</BreadcrumbLink>
+            <Link href="/admin/option">Options</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
         </BreadcrumbList>
@@ -127,7 +128,7 @@ const UsersPage = () => {
           </thead>
 
           <tbody>
-            {data?.data?.map((service:OptionDetails) => (
+            {data?.data?.map((service: OptionDetails) => (
               <tr key={service.id} className="hover:bg-gray-50">
                 <td className="border px-4 py-2">{service.id}</td>
                 <td className="border px-4 py-2">{service.category_name}</td>

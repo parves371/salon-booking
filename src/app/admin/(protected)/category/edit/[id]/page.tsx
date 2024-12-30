@@ -15,97 +15,48 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  useCategoryById,
+  useDeleteCategory,
+} from "@/hooks/product/use-catagory";
+import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { LoaderIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
-import { Switch } from "@/components/ui/switch";
-
-interface ServiceProps {
-  id: number;
-  service_name: string;
-  price: number;
-  time: string;
-  option: boolean;
-  category_name: string;
-}
 
 interface Category {
   id: number;
   name: string;
 }
 
-const ServicesEditedPage = () => {
-  const [category, setCategory] = useState<Category | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+const CategoryEditedPage = () => {
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams<Record<string, string>>();
 
-  const ServiceSchema = z.object({
+  // Fetching data from the server | category by id
+  const { data, error, isLoading, isError } = useCategoryById(
+    params.id ? parseInt(params.id) : 0
+  );
+
+
+  const CategorySchema = z.object({
     name: z.string().min(1, {
       message: "Name is required",
     }),
   });
 
-  const form = useForm<z.infer<typeof ServiceSchema>>({
-    resolver: zodResolver(ServiceSchema),
+  const form = useForm<z.infer<typeof CategorySchema>>({
+    resolver: zodResolver(CategorySchema),
     defaultValues: {
       name: "",
     },
   });
 
-  const fetchServiceById = async () => {
-    try {
-      const res = await axios.get(`/api/product/category/edit/${params.id}`, {
-        withCredentials: true,
-      });
-
-      if (res.status === 200) {
-        setCategory(res.data.data); // Assuming response contains `data` key with service details
-      }
-    } catch (error: any) {
-      console.error(
-        "Error fetching service:",
-        error.response?.data || error.message
-      );
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get("/api/product/category", {
-        withCredentials: true,
-      });
-
-      if (res.status === 200) {
-        setCategories(res.data.data); // Assuming response contains `data` key with categories
-      }
-    } catch (error: any) {
-      console.error(
-        "Error fetching categories:",
-        error.response?.data || error.message
-      );
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-    if (params.id) {
-      fetchServiceById();
-    }
-  }, [params.id]);
-
-  const onSubmit = async (data: z.infer<typeof ServiceSchema>) => {
+  const onSubmit = async (data: z.infer<typeof CategorySchema>) => {
     try {
       const payload = {
         name: data.name,
@@ -144,14 +95,25 @@ const ServicesEditedPage = () => {
   };
 
   useEffect(() => {
-    if (category) {
-      form.setValue("name", category.name);
+    if (data?.data) {
+      form.setValue("name", data?.data?.name);
     }
-  }, [category, params.id]);
+  }, [data?.data, params.id]);
 
   const cancelButton = () => {
-    router.push("/admin/services");
+    router.push("/admin/category");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>{error.message}</div>;
+  }
 
   return (
     <div className="px-16">
@@ -213,4 +175,4 @@ const ServicesEditedPage = () => {
   );
 };
 
-export default ServicesEditedPage;
+export default CategoryEditedPage;

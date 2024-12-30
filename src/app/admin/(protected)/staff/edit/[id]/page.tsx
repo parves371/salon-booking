@@ -32,7 +32,7 @@ interface UserAdminProps {
   created_at: string; // ISO string format for dates
 }
 
-const CategoryEditedPage = () => {
+const StaffEditedPage = () => {
   const router = useRouter();
   const params = useParams<Record<string, string>>();
 
@@ -66,17 +66,18 @@ const CategoryEditedPage = () => {
     };
 
     renameStaff.mutate(payload);
+    router.push("/admin/staff");
   };
 
   useEffect(() => {
     if (staff?.data) {
-      form.setValue("available", staff?.data.available);
+      form.setValue("available", staff?.data.available ? true : false);
       form.setValue("position", staff?.data.position);
     }
-  }, [staff?.data, params.id]);
+  }, [staff?.data, form]);
 
   const cancelButton = () => {
-    router.push("/admin/category");
+    router.push("/admin/staff");
   };
 
   if (isLoading) {
@@ -95,7 +96,7 @@ const CategoryEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/category">Category</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/category">staff</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -104,7 +105,7 @@ const CategoryEditedPage = () => {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="p-6 max-w-2xl mx-auto border rounded-lg bg-white shadow mt-16">
-        <h2 className="text-2xl font-bold mb-4">Edit Category</h2>
+        <h2 className="text-2xl font-bold mb-4">Edit staff</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Field */}
@@ -177,4 +178,4 @@ const CategoryEditedPage = () => {
   );
 };
 
-export default CategoryEditedPage;
+export default StaffEditedPage;

@@ -27,7 +27,7 @@ const fetchStaffById = async (id: number) => {
 // Fetching data from the server | Staff by id
 export const useStaffById = (staffId: number) => {
   return useQuery({
-    queryKey: ["category", staffId], // A unique key for this query
+    queryKey: ["staff", staffId], // A unique key for this query
     queryFn: () => fetchStaffById(staffId), // The function to fetch data
     staleTime: 5 * 60 * 1000, // (Optional) Data remains fresh for 5 minutes
   });
@@ -97,7 +97,7 @@ export const useRenameStaff = () => {
       // Local state update can also be handled here if using React Query everywhere
       toast({
         title: "Success",
-        description: "rename staff successfully.",
+        description: "staff rename successfully.",
       });
     },
     onError: (error) => {

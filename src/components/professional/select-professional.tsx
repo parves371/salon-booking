@@ -10,7 +10,7 @@ import {
   anyProfession,
   updateAllProfession,
 } from "@/lib/features/SelectServices/treatmentSlice";
-import { Treatment } from "../services/select-services";
+import { useProductStore } from "@/store/use-product-store";
 
 // Defining the type for the professional data
 export interface ProfileCardProps {
@@ -24,6 +24,7 @@ export interface ProfileCardProps {
 
 export const SelectProfessional = () => {
   const dispatch = useAppDispatch();
+  const { selectedTreatments: selectedTreatment } = useProductStore();
 
   const [datas, setDatas] = useState<ProfileCardProps[]>(data.professional);
   const [selectedProfessional, setSelectedProfessional] =
@@ -69,7 +70,7 @@ export const SelectProfessional = () => {
 
       const storedTreatments = localStorage.getItem("selectedTreatments");
       if (storedTreatments) {
-        const treatments: Treatment[] = JSON.parse(storedTreatments);
+        const treatments = JSON.parse(storedTreatments);
 
         const selectedData = selectedTreatments.map((treatment) => ({
           id: treatment.id,
@@ -147,47 +148,28 @@ export const SelectProfessional = () => {
       </div>
 
       <div className="w-full md:w-[30%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
-        {finaldata?.length > 0
-          ? finaldata.map((treatment) => (
-              <div
-                key={treatment.id}
-                className="flex justify-between items-center mb-4 px-3"
-              >
-                <div className="w-[50%]">
-                  <h4>{treatment.name}</h4>
-                  <span>{treatment.time}</span>
-                  <span className="mx-2">with</span>
-                  <span className="text-[#7C6DD8] font-semibold text-sm">
-                    {treatment.professional?.name || "Any Professional"}
-                  </span>
-                </div>
-                <div>
-                  <span>AED {treatment.price}</span>
-                </div>
-              </div>
-            ))
-          : selectedTreatments.map((treatment) => (
-              <div
-                key={treatment.id}
-                className="flex justify-between items-center mb-4 px-3"
-              >
-                <div className="w-[50%]">
-                  <h4>{treatment.selectedOption?.name || treatment.name}</h4>
-                  <span>
-                    {treatment.selectedOption?.time || treatment.time}
-                  </span>
-                  <span className="mx-2">with</span>
-                  <span className="text-[#7C6DD8] font-semibold text-sm">
-                    {activeProfessional?.name || "Any Professional"}
-                  </span>
-                </div>
-                <div>
-                  <span>
-                    AED {treatment.selectedOption?.price || treatment.price}
-                  </span>
-                </div>
-              </div>
-            ))}
+        {selectedTreatment.map((treatment) => (
+          <div
+            key={treatment.id}
+            className="flex justify-between items-center mb-4 px-3"
+          >
+            <div className="w-[70%]">
+              <h4 className="">
+                {treatment.selectedOption?.name || treatment.name}
+              </h4>
+              <span>{treatment.selectedOption?.time || treatment.time}</span>
+              <span className="mx-2">with</span>
+              <span className="text-[#7C6DD8] font-semibold text-sm">
+                {activeProfessional?.name || "Any Professional"}
+              </span>
+            </div>
+            <div>
+              <span>
+                AED {treatment.selectedOption?.price || treatment.price}
+              </span>
+            </div>
+          </div>
+        ))}
 
         <div className="px-3">
           <Separator className="my-4 px-3" />

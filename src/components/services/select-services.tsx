@@ -7,6 +7,7 @@ import { Separator } from "../ui/separator";
 import { TreatmentCard } from "./treatment-card";
 import { useProductStore } from "@/store/use-product-store";
 import { LoaderIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Option = {
   id: number;
@@ -33,6 +34,7 @@ type Category = {
 
 export const SelectServices: React.FC = () => {
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const router = useRouter();
 
   const {
     selectedTreatments,
@@ -55,12 +57,17 @@ export const SelectServices: React.FC = () => {
   }, [data, setActiveSection, setHydrated, activeSection]);
 
   const calculateTotalPrice = () => {
-    return selectedTreatments.reduce((total, treatment) => {
-      console.log("total", treatment);
+    const selectedData = selectedTreatments.map((services) => ({
+      id: services.id,
+      name: services.selectedOption?.name || services.name,
+      time: services.selectedOption?.time || services.time,
+      price: services.selectedOption?.price || services.price,
+    }));
 
-      const price = treatment.selectedOption
-        ? treatment.selectedOption.price
-        : treatment.price;
+    return selectedData.reduce((total, services) => {
+      console.log("total", services);
+
+      const price = services.price;
       return total + price;
     }, 0);
   };
@@ -73,7 +80,9 @@ export const SelectServices: React.FC = () => {
       price: services.selectedOption?.price || services.price,
     }));
 
-    console.log(selectedData);
+    console.log("selectedData", selectedTreatments);
+
+    router.push("/professional");
   };
 
   if (isLoading) {

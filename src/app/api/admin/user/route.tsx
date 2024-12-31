@@ -2,7 +2,6 @@ import { createConnection } from "@/lib/db/dbConnect";
 import bcrypt from "bcryptjs";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { v4 as uuidv4 } from "uuid";
 
 // Define the types for the request body and response
 interface LoginRequestBody {
@@ -11,6 +10,28 @@ interface LoginRequestBody {
   name: string;
   role: "SuperAdmin" | "Admin" | "Manager" | "Employee";
 }
+
+import fs from "fs";
+import multer from "multer";
+import path from "path";
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const dir = "./public/professionals";
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    cb(null, dir);
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({ storage: storage });
 
 export async function POST(request: Request) {
   try {
@@ -37,7 +58,6 @@ export async function POST(request: Request) {
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
-
     const tokenValue = userToken.value;
 
     // Verify and decode the JWT token
@@ -55,47 +75,24 @@ export async function POST(request: Request) {
     const db = await createConnection();
 
     // Check if the authenticated user exists
-    const userQuery = "SELECT * FROM user WHERE email = ?";
-    const [authenticatedUserRows] = await db.query(userQuery, [decoded.email]);
-    const authenticatedUser = (
-      authenticatedUserRows as { id: string; email: string; role: string }[]
-    )[0];
-
-    if (!authenticatedUser) {
-      return new Response(
-        JSON.stringify({ success: false, message: "Unauthorized user" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Check if the new user already exists (by email and role)
-    const newUserQuery = "SELECT * FROM user WHERE email = ?";
-    const [existingUserRows] = await db.query(newUserQuery, [email]);
-    const existingUser = (
-      existingUserRows as { id: string; email: string; role: string }[]
-    )[0];
-
-    if (existingUser) {
+    const authenticatedUser = await authenticateUserByTokenEmail(decoded.email);
+    if (authenticatedUser.role !== "superadmin") {
       return new Response(
         JSON.stringify({
           success: false,
-          message: "User with this email already exist",
+          message: "Unauthorized user or user role has to be SuperAdmin",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const duplicateEmailQuery = "SELECT * FROM user WHERE email = ?";
-    const [duplicateEmailRows] = await db.query(duplicateEmailQuery, [email]);
-    const duplicateEmailUser = (
-      duplicateEmailRows as { id: string; email: string; role: string }[]
-    )[0];
-
-    if (duplicateEmailUser) {
+    // Check if the new user already exists (by email and role)
+    const existingUser = await existingUserByEmail(email);
+    if (existingUser) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: "User with this email already exists",
+          message: "User with this email already exist",
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
@@ -206,7 +203,12 @@ export async function GET() {
   }
 }
 
+import {
+  authenticateUserByTokenEmail,
+  existingUserByEmail,
+} from "@/lib/user/authenticate";
 import { RowDataPacket } from "mysql2"; // For correct typing
+import { multerMiddleware, runMiddleware } from "@/lib/user/helper";
 
 export async function PUTE(request: Request) {
   try {

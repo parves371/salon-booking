@@ -1,5 +1,4 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { cookies } from "next/headers";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
@@ -13,14 +12,3 @@ export const verifyToken = (token: string) => {
   }
 };
 
-export const getTokenFromCookies = (token: string) => {
-  const userToken = cookies().get(token);
-  if (!userToken) {
-    return new Response(
-      JSON.stringify({ success: false, message: "Unauthorized user" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  return userToken;
-};

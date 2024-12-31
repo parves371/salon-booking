@@ -58,7 +58,6 @@ const UserCreatedPage = () => {
 
   const onSubmit = async (data: z.infer<typeof UserSchema>) => {
     try {
-
       const res = await axios.post("/api/admin/user", data, {
         withCredentials: true, // Ensure cookies are sent
       });

@@ -50,7 +50,7 @@ INSERT INTO `customers` (`id`, `profile`, `name`, `email`, `password`, `number`)
 --
 
 CREATE TABLE `user` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) AUTO_INCREMENT PRIMARY KEY,
   `name` varchar(255) NOT NULL,
   `role` enum('superadmin','admin','manager','employee') NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -61,9 +61,9 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Creating the Staff table
-CREATE TABLE  Staff (
+CREATE TABLE  staff (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT UNSIGNED,
+    user_id BIGINT,
     position VARCHAR(255),
     available BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES user(id)

@@ -42,7 +42,10 @@ export const useAddStaff = () => {
       position: string;
       available: boolean;
       userId: number | null;
+      skills: string[];
     }) => {
+
+      console.log(data);
       const response = await axios.post(`/api/staff`, data);
       if (response.status !== 201) {
         throw new Error("Failed to creating staff");

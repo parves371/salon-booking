@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCategory, useDeleteCategory } from "@/hooks/product/use-catagory";
 import { useDeleteStaff, useStaff } from "@/hooks/use-staff";
 import { LoaderIcon } from "lucide-react";
 import Link from "next/link";

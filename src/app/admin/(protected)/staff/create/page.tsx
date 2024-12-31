@@ -82,14 +82,10 @@ const CategoryAdd = () => {
 
   const { data: optionData } = useOption();
   const { data: serviceData } = useServices();
-  const optionName = optionData?.data.map(
-    (option: OptionDetails) => option.option_name
-  ) || [];
-
-  console.log("services", serviceData?.data);
-  const ServicesName = serviceData?.data.map(
-    (option: Service) => option.service_name
-  ) || [];
+  const optionName =
+    optionData?.data.map((option: OptionDetails) => option.option_name) || [];
+  const ServicesName =
+    serviceData?.data.map((option: Service) => option.service_name) || [];
 
   const optionAndServiceName = [...optionName, ...ServicesName];
 
@@ -118,6 +114,7 @@ const CategoryAdd = () => {
     const payload = {
       ...data,
       userId: selectedUserId,
+      skills: tags,
     };
 
     addStaff.mutate(payload);

@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { position, available } = await StaffSchema.parseAsync(body);
-    const { userId }: { userId: number } = body;
+    const { userId, skills }: { userId: number; skills: string[] } = body;
     if (!userId) {
       return NextResponse.json(
         { message: "User ID is required" },
@@ -16,8 +16,8 @@ export async function POST(req: Request) {
     const db = await createConnection();
 
     const [result]: any = await db.query(
-      "INSERT INTO staff (position,available,user_id) VALUES (?,?,?)",
-      [position, available, userId]
+      "INSERT INTO staff (position,available,user_id,skills) VALUES (?,?,?,?)",
+      [position, available, userId,skills.toString()]
     );
 
     return NextResponse.json(

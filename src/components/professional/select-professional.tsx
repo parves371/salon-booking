@@ -2,105 +2,48 @@
 import { useState } from "react";
 import data from "../../../data/frisha.json"; // Assuming this is an array of professionals
 import ProfileCard from "./profile-card";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import {
-  addProfession,
-  anyProfession,
-  updateAllProfession,
-} from "@/lib/features/SelectServices/treatmentSlice";
+import { useStaff } from "@/hooks/use-staff";
 import { useProductStore } from "@/store/use-product-store";
 
 // Defining the type for the professional data
-export interface ProfileCardProps {
+interface StaffProps {
+  available: boolean;
   id: number;
   name: string;
-  professional: string;
-  img: string;
-  ratting: number;
-  skils: string[];
+  position: string;
+  role: string;
+  skills: string[] | null; // Assuming 'skills' could be an array of strings or null
 }
 
 export const SelectProfessional = () => {
-  const dispatch = useAppDispatch();
-  const { selectedTreatments: selectedTreatment } = useProductStore();
+  // const [selectedTreatments, setSelectedTreatments] = useState<any[]>([]);
+  const { selectedTreatments: selectedTreatments } = useProductStore();
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [activeProfessional, setActiveProfessional] = useState<StaffProps | null>(null);
 
-  const [datas, setDatas] = useState<ProfileCardProps[]>(data.professional);
-  const [selectedProfessional, setSelectedProfessional] =
-    useState<ProfileCardProps | null>(null);
+  const { data } = useStaff();
 
-  const { selectedTreatments, totalPrice, finaldata } = useAppSelector(
-    (state) => state.treatments
-  );
-
-  const finalDataPropessionalIds = finaldata.map(
-    (item) => item.professional?.id
-  );
-
-  const [activeProfessional, setActiveProfessional] =
-    useState<ProfileCardProps | null>(null);
-
-  const handleProfessionalSelect = (professional: ProfileCardProps) => {
+  const handleProfessionalSelect = (professional: StaffProps) => {
     setActiveProfessional(professional);
-    setSelectedProfessional(professional);
-    dispatch(updateAllProfession(professional));
+  };
+
+  const updateAnyProfessional = () => {
+    setActiveProfessional(null);
   };
 
   const onSubmit = () => {
-    if (selectedProfessional) {
-      localStorage.setItem(
-        "selectedTreatments",
-        JSON.stringify(selectedTreatments)
-      );
+    const selectedData = selectedTreatments.map((treatment) => ({
+      id: treatment.id,
+      name: treatment.selectedOption?.name || treatment.name,
+      time: treatment.selectedOption?.time || treatment.time,
+      price: treatment.selectedOption?.price || treatment.price,
+      professional: activeProfessional || { name: "Any Professional" },
+    }));
 
-      const selectedData = selectedTreatments.map((treatment) => ({
-        id: treatment.id,
-        name: treatment.selectedOption?.name || treatment.name,
-        time: treatment.selectedOption?.time || treatment.time,
-        price: treatment.selectedOption?.price || treatment.price,
-      }));
-
-      dispatch(addProfession({ selectedProfessional, data: selectedData }));
-    } else {
-      localStorage.setItem(
-        "selectedTreatments",
-        JSON.stringify(selectedTreatments)
-      );
-
-      const storedTreatments = localStorage.getItem("selectedTreatments");
-      if (storedTreatments) {
-        const treatments = JSON.parse(storedTreatments);
-
-        const selectedData = selectedTreatments.map((treatment) => ({
-          id: treatment.id,
-          name: treatment.selectedOption?.name || treatment.name,
-          time: treatment.selectedOption?.time || treatment.time,
-          price: treatment.selectedOption?.price || treatment.price,
-        }));
-
-        dispatch(
-          anyProfession({
-            anyProfession: true,
-            data: selectedData,
-          })
-        );
-      }
-    }
-  };
-
-  const updateAnyProfession = () => {
-    dispatch(
-      anyProfession({
-        anyProfession: true,
-        data: selectedTreatments.map((treatment) => ({
-          id: treatment.id,
-          name: treatment.selectedOption?.name || treatment.name,
-          time: treatment.selectedOption?.time || treatment.time,
-          price: treatment.selectedOption?.price || treatment.price,
-        })),
-      })
-    );
+    console.log("Submitted Data:", selectedData);
+    // You can handle the submitted data here (e.g., send to an API)
   };
 
   return (
@@ -116,39 +59,24 @@ export const SelectProfessional = () => {
             title="for maximum availability"
             professional="Any Professional"
             isActive={activeProfessional === null}
-            onClick={() => {
-              setActiveProfessional(null); // Deactivate any active professional
-              setSelectedProfessional(null); // Clear the selected professional
-              updateAnyProfession();
-            }}
+            onClick={updateAnyProfessional}
           />
 
           {/* Professional cards */}
-          {datas.length > 0 ? (
-            datas.map((i) => (
-              <ProfileCard
-                key={i.id}
-                title={i.name}
-                imageUrl={i.img}
-                professional={i.professional}
-                rating={i.ratting}
-                isActive={
-                  // Pre-selected professional
-                  activeProfessional?.id === i.id // Currently clicked professional
-                }
-                onClick={() => handleProfessionalSelect(i)} // Set the clicked card as active
-              />
-            ))
-          ) : (
-            <p className="w-full text-center text-gray-600">
-              No professionals available
-            </p>
-          )}
+          {data?.data?.map((i: StaffProps) => (
+            <ProfileCard
+              key={i.id}
+              title={i.name}
+              professional={i.position}
+              isActive={activeProfessional?.id === i.id}
+              onClick={() => handleProfessionalSelect(i)}
+            />
+          ))}
         </div>
       </div>
 
       <div className="w-full md:w-[30%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
-        {selectedTreatment.map((treatment) => (
+        {selectedTreatments.map((treatment) => (
           <div
             key={treatment.id}
             className="flex justify-between items-center mb-4 px-3"

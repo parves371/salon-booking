@@ -1,4 +1,5 @@
 "use client";
+import MultiSelectDropdown from "@/components/admin/MultiSelectDropdown";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -31,12 +32,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useOption } from "@/hooks/product/use-options";
+import { useServices } from "@/hooks/product/use-services";
 import { useAddStaff } from "@/hooks/use-staff";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { StaffSchema } from "@/schemas/staff";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { LoaderIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -48,7 +50,25 @@ interface UserProps {
   name: string;
   email: string;
 }
+interface OptionDetails {
+  id: number; // Option ID
+  option_name: string; // Name of the option
+  option_price: string; // Price of the option as a string
+  option_time: string; // Time required for the option
+  service_name: string; // Associated service name
+  category_name: string; // Associated category name
+}
 
+interface Service {
+  id: number;
+  category_name: string;
+  service_name: string;
+  time: string;
+  price: string;
+  option: boolean;
+}
+
+const options = ["Tag1", "Tag2", "Tag3", "Tag4"];
 const CategoryAdd = () => {
   const { toast } = useToast();
   const router = useRouter();
@@ -57,7 +77,27 @@ const CategoryAdd = () => {
 
   // feacthing data from the server | admin user
   const { data, isLoading, isError, error } = useUser();
+  // add staff mutation
   const addStaff = useAddStaff();
+
+  const { data: optionData } = useOption();
+  const { data: serviceData } = useServices();
+  const optionName = optionData?.data.map(
+    (option: OptionDetails) => option.option_name
+  ) || [];
+
+  console.log("services", serviceData?.data);
+  const ServicesName = serviceData?.data.map(
+    (option: Service) => option.service_name
+  ) || [];
+
+  const optionAndServiceName = [...optionName, ...ServicesName];
+
+  const [tags, setTags] = useState<string[]>([]);
+  const handleTagChange = (selectedTags: string[]) => {
+    setTags(selectedTags);
+  };
+  console.log(tags);
 
   const form = useForm<z.infer<typeof StaffSchema>>({
     resolver: zodResolver(StaffSchema),
@@ -117,6 +157,10 @@ const CategoryAdd = () => {
       <Card className="mt-16 max-w-[1000px] w-full mx-auto">
         <CardHeader>
           <CardTitle>Add Staff</CardTitle>
+          <MultiSelectDropdown
+            options={optionAndServiceName}
+            onChange={handleTagChange}
+          />
         </CardHeader>
         <CardContent>
           <Select

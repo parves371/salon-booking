@@ -50,10 +50,10 @@ interface Service {
 
 interface OptionDetails {
   id: number; // Option ID
-  option_name: string; // Name of the option
-  option_price: string; // Price of the option as a string
-  option_time: string; // Time required for the option
-  service_name: string; // Associated service name
+  option_name: string;
+  option_price: string;
+  option_time: string;
+  service_name: string;
   category_name: string; // Associated category name
 }
 
@@ -69,6 +69,15 @@ const StaffEditedPage = () => {
     isLoading,
     isError,
   } = useStaffById(params.id ? parseInt(params.id) : 0);
+  // Effect to set the default tags when staff data is loaded
+  let defaultTags = staff?.data?.skills ? staff.data.skills.split(",") : [];
+
+  useEffect(() => {
+    if (staff?.data?.skills) {
+      // Update tags state when staff data is fetched
+      defaultTags = staff.data.skills.split(",");
+    }
+  }, [staff?.data]);
 
   const { data: allAdminUser } = useUser();
   const renameStaff = useRenameStaff();
@@ -148,7 +157,7 @@ const StaffEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/category">Staff</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/staff">Staff</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -165,7 +174,7 @@ const StaffEditedPage = () => {
         <MultiSelectDropdown
           options={optionAndServiceName}
           onChange={handleTagChange}
-          defaultValue={staff?.data?.skills?.split(",")} // Populate with existing skills
+          defaultValue={defaultTags} // Populate with existing skills
         />
 
         {/* Form for position and availability */}

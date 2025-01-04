@@ -88,22 +88,28 @@ export const useRenameStaff = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (paload: Staff) => {
-      const response = await axios.put(`/api/staff/edit/${paload.id}`, paload);
+    mutationFn: async (payload: Staff) => {
+      const response = await axios.put(
+        `/api/staff/edit/${payload.id}`,
+        payload
+      );
       if (response.status !== 200) {
         throw new Error("Failed to rename the staff");
       }
-      return;
+      return payload; // Return the payload to trigger updates with the new data
     },
-    onSuccess: () => {
-      // Optionally invalidate and refetch any queries if needed
-      queryClient.invalidateQueries({
-        queryKey: ["staff"],
-      });
-      // Local state update can also be handled here if using React Query everywhere
+    onSuccess: (data) => {
+      // Optionally, refetch the individual staff data by ID
+      queryClient.invalidateQueries({ queryKey: ["staff", data.id] });
+      console.log(data.id);
+
+      // Optionally, refetch the entire staff list
+      queryClient.invalidateQueries({ queryKey: ["staff"] });
+
+      // Toast notification for success
       toast({
         title: "Success",
-        description: "staff rename successfully.",
+        description: "Staff renamed successfully.",
       });
     },
     onError: (error) => {

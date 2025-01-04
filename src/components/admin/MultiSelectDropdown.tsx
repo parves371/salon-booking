@@ -15,33 +15,31 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   const normalizedDefaultValue = Array.isArray(defaultValue)
     ? defaultValue
     : [defaultValue];
-  const [selectedTags, setSelectedTags] = useState<string[]>(
-    normalizedDefaultValue
-  );
+  
+  const [selectedTags, setSelectedTags] = useState<string[]>(normalizedDefaultValue);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Only call onChange when selectedTags actually change
   useEffect(() => {
-    // Trigger the onChange callback when selectedTags change
     onChange(selectedTags);
   }, [selectedTags, onChange]);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleSelectTag = (tag: string) => {
+    // Avoid updating state if the tag is already selected
     if (!selectedTags.includes(tag)) {
       const updatedTags = [...selectedTags, tag];
-      setSelectedTags(updatedTags);
-      onChange(updatedTags);
+      setSelectedTags(updatedTags); // This triggers the useEffect
     }
   };
 
   const handleRemoveTag = (tag: string) => {
     const updatedTags = selectedTags.filter((t) => t !== tag);
-    setSelectedTags(updatedTags);
-    onChange(updatedTags);
+    setSelectedTags(updatedTags); // This triggers the useEffect
   };
 
-  const availableOptions = options?.filter(
+  const availableOptions = options.filter(
     (option) => !selectedTags.includes(option)
   );
 
@@ -76,7 +74,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               key={index}
               onClick={() => {
                 handleSelectTag(option);
-                setIsOpen(false);
+                setIsOpen(false); // Close the dropdown after selecting
               }}
               className="p-2 cursor-pointer hover:bg-blue-100"
             >

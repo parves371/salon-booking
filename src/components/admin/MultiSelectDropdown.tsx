@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 type MultiSelectDropdownProps = {
   options: string[];
   onChange: (selectedTags: string[]) => void;
-  defaultValue?: string[]; // Optional default value
+  defaultValue?: string | string[]; // defaultValue can be a string or an array
 };
 
 const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
@@ -11,11 +11,17 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   onChange,
   defaultValue = [], // Default to an empty array if not provided
 }) => {
-  const [selectedTags, setSelectedTags] = useState<string[]>(defaultValue);
+  // Normalize defaultValue to always be an array
+  const normalizedDefaultValue = Array.isArray(defaultValue)
+    ? defaultValue
+    : [defaultValue];
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    normalizedDefaultValue
+  );
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Trigger the onChange callback when defaultValue is provided
+    // Trigger the onChange callback when selectedTags change
     onChange(selectedTags);
   }, [selectedTags, onChange]);
 
@@ -35,7 +41,9 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
     onChange(updatedTags);
   };
 
-  const availableOptions = options?.filter((option) => !selectedTags.includes(option));
+  const availableOptions = options?.filter(
+    (option) => !selectedTags.includes(option)
+  );
 
   return (
     <div className="relative w-full max-w-md">
@@ -58,7 +66,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
           onClick={toggleDropdown}
           className="px-4 py-2 bg-gray-200 rounded-md"
         >
-          {isOpen ? 'Close' : 'Select Tags'}
+          {isOpen ? "Close" : "Select Tags"}
         </button>
       </div>
       {isOpen && (

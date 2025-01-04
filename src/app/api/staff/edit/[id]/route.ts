@@ -16,7 +16,7 @@ export async function GET(req: Request): Promise<Response> {
   try {
     const db = await createConnection();
     const sql = `
-      SELECT Staff.id, Staff.position, Staff.available, user.name, user.email, user.role, user.skills
+      SELECT Staff.id, Staff.position, Staff.available, user.name, user.email, user.role, Staff.skills
       FROM Staff
       JOIN user ON Staff.user_id = user.id
       WHERE Staff.id = ?;
@@ -58,7 +58,9 @@ export async function PUT(req: Request): Promise<Response> {
     userId,
     position,
     available,
-  }: { userId: number; position: string; available: boolean } = body;
+    skills,
+  }: { userId: number; position: string; available: boolean; skills: string } =
+    body;
 
   console.log("userId", userId);
   if (!userId) {
@@ -70,11 +72,12 @@ export async function PUT(req: Request): Promise<Response> {
 
   try {
     const db = await createConnection();
-    const sql = `UPDATE Staff SET position = ?, available = ?, user_id = ? WHERE id = ?`;
+    const sql = `UPDATE staff SET position = ?, available = ?, user_id = ?, skills = ? WHERE id = ?`;
     const [result] = await db.query<ResultSetHeader>(sql, [
       position,
       available,
       userId,
+      skills,
       id,
     ]);
 

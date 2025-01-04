@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import ProfileCard from "./profile-card";
+import { LoaderIcon } from "lucide-react";
 
 // Defining the type for the professional data
 interface StaffProps {
@@ -26,7 +27,7 @@ export const SelectProfessional = () => {
   const selectedTreatmentName = selectedTreatments
     .map((treatment) => treatment.selectedOption?.name.trim())
     .filter((name) => name !== undefined);
-  const { data } = useStaff(
+  const { data, isLoading, error, isError } = useStaff(
     selectedTreatmentName.length > 0 ? selectedTreatmentName : undefined
   );
 
@@ -52,6 +53,17 @@ export const SelectProfessional = () => {
     console.log("Submitted Data:", selectedData);
     // You can handle the submitted data here (e.g., send to an API)
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>{error.message}</div>;
+  }
 
   return (
     <section className="flex container mx-auto">

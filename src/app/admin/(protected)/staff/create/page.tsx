@@ -68,7 +68,6 @@ interface Service {
   option: boolean;
 }
 
-const options = ["Tag1", "Tag2", "Tag3", "Tag4"];
 const CategoryAdd = () => {
   const { toast } = useToast();
   const router = useRouter();

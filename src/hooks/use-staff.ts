@@ -3,7 +3,6 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
 const fetchStaff = async (skills?: string[]) => {
-  console.log("skills", skills);
   const url = skills
     ? `/api/staff?skills=${encodeURIComponent(skills.join(","))}`
     : "/api/staff";
@@ -82,6 +81,7 @@ interface Staff {
   position: string;
   available: boolean;
   userId: number;
+  skills: string;
 }
 export const useRenameStaff = () => {
   const queryClient = useQueryClient();

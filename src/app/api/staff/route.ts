@@ -61,9 +61,6 @@ export async function GET(req: Request) {
       values = filters.map((skill) => `%${skill}%`);
     }
 
-    console.log("SQL Query:", sql);
-    console.log("Values:", values);
-
     // Execute the query with or without filters
     const [result]: any = await db.query(sql, values);
 
@@ -76,4 +73,3 @@ export async function GET(req: Request) {
     );
   }
 }
-

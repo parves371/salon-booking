@@ -1,4 +1,6 @@
 "use client";
+
+import MultiSelectDropdown from "@/components/admin/MultiSelectDropdown";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,28 +17,52 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { useOption } from "@/hooks/product/use-options";
+import { useServices } from "@/hooks/product/use-services";
 import { useRenameStaff, useStaffById } from "@/hooks/use-staff";
 import { useUser } from "@/hooks/use-user";
 import { StaffSchema } from "@/schemas/staff";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+// Types for the data structures
 interface UserAdminProps {
   id: number;
   name: string;
   email: string;
   role: "superadmin" | "admin" | "manager" | "employee";
+  skills: string;
   created_at: string; // ISO string format for dates
+}
+
+interface Service {
+  id: number;
+  category_name: string;
+  service_name: string;
+  time: string;
+  price: string;
+  option: boolean;
+}
+
+interface OptionDetails {
+  id: number; // Option ID
+  option_name: string; // Name of the option
+  option_price: string; // Price of the option as a string
+  option_time: string; // Time required for the option
+  service_name: string; // Associated service name
+  category_name: string; // Associated category name
 }
 
 const StaffEditedPage = () => {
   const router = useRouter();
   const params = useParams<Record<string, string>>();
+  const [tags, setTags] = useState<string[]>([]);
 
-  // Fetching data from the server | category by id
+  // Fetching staff details by ID
   const {
     data: staff,
     error,
@@ -44,9 +70,26 @@ const StaffEditedPage = () => {
     isError,
   } = useStaffById(params.id ? parseInt(params.id) : 0);
 
-  const { data: adminUserData } = useUser();
+  const { data: allAdminUser } = useUser();
   const renameStaff = useRenameStaff();
 
+  // Fetching option and service data
+  const { data: optionData } = useOption();
+  const { data: serviceData } = useServices();
+
+  // Combining the options and services for the multi-select dropdown
+  const optionName =
+    optionData?.data.map((option: OptionDetails) => option.option_name) || [];
+  const ServicesName =
+    serviceData?.data.map((option: Service) => option.service_name) || [];
+  const optionAndServiceName = [...optionName, ...ServicesName];
+
+  // Handler for when tags are selected or changed
+  const handleTagChange = (selectedTags: string[]) => {
+    setTags(selectedTags);
+  };
+
+  // Setting up the form with validation schema
   const form = useForm<z.infer<typeof StaffSchema>>({
     resolver: zodResolver(StaffSchema),
     defaultValues: {
@@ -55,20 +98,24 @@ const StaffEditedPage = () => {
     },
   });
 
+  // Submit handler for the form
   const onSubmit = async (data: z.infer<typeof StaffSchema>) => {
     const payload = {
       id: params.id ? parseInt(params.id) : 0,
       position: data.position,
       available: data.available,
-      userId: adminUserData?.allUsers?.find(
+      userId: allAdminUser?.allUsers?.find(
         (user: UserAdminProps) => user.name === staff?.data?.name
       )?.id,
+      skills: tags.join(","), // Comma-separated string for selected skills
     };
 
+    // Send the update request
     renameStaff.mutate(payload);
-    router.push("/admin/staff");
+    router.push("/admin/staff"); // Navigate back to staff list
   };
 
+  // Effect to pre-fill the form with existing data when staff details are loaded
   useEffect(() => {
     if (staff?.data) {
       form.setValue("available", staff?.data.available ? true : false);
@@ -76,10 +123,12 @@ const StaffEditedPage = () => {
     }
   }, [staff?.data, form]);
 
+  // Cancel button handler to navigate back to staff list
   const cancelButton = () => {
     router.push("/admin/staff");
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -87,16 +136,19 @@ const StaffEditedPage = () => {
       </div>
     );
   }
+
+  // Error state
   if (isError) {
     return <div>{error.message}</div>;
   }
 
   return (
     <div className="px-16">
+      {/* Breadcrumb for navigation */}
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/category">staff</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/category">Staff</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -104,17 +156,28 @@ const StaffEditedPage = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      {/* Staff edit form container */}
       <div className="p-6 max-w-2xl mx-auto border rounded-lg bg-white shadow mt-16">
         <h2 className="text-2xl font-bold mb-4">Edit staff</h2>
+
+        {/* Multi-select dropdown for skills */}
+        <MultiSelectDropdown
+          options={optionAndServiceName}
+          onChange={handleTagChange}
+          defaultValue={staff?.data?.skills?.split(",")} // Populate with existing skills
+        />
+
+        {/* Form for position and availability */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Name Field */}
+            {/* Position Field */}
             <FormField
               name="position"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Positon</FormLabel>
+                  <FormLabel>Position</FormLabel>
                   <FormControl>
                     <input
                       type="text"
@@ -127,6 +190,8 @@ const StaffEditedPage = () => {
                 </FormItem>
               )}
             />
+
+            {/* Availability Toggle */}
             <FormField
               name="available"
               control={form.control}
@@ -136,8 +201,8 @@ const StaffEditedPage = () => {
                   <FormControl>
                     <div className="flex items-center">
                       <Switch
-                        checked={field.value} // Make sure it's a boolean (default to false if undefined)
-                        onCheckedChange={field.onChange} // This ensures the form state updates
+                        checked={field.value} // Ensure it's a boolean value
+                        onCheckedChange={field.onChange}
                         className={`${
                           field.value ? "bg-blue-600" : "bg-gray-200"
                         } relative inline-flex items-center h-6 rounded-full w-11`}
@@ -155,7 +220,7 @@ const StaffEditedPage = () => {
               )}
             />
 
-            {/* Submit Buttons */}
+            {/* Submit and Cancel buttons */}
             <div className="flex gap-4">
               <button
                 type="submit"

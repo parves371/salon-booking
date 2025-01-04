@@ -2,18 +2,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
-const fetchStaff = async () => {
-  const response = await fetch("/api/staff");
+const fetchStaff = async (skills?: string[]) => {
+  console.log("skills", skills);
+  const url = skills
+    ? `/api/staff?skills=${encodeURIComponent(skills.join(","))}`
+    : "/api/staff";
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch staff");
   }
   return response.json(); // Assuming the response is in JSON format
 };
 //fetching data from the server | all the Staff
-export const useStaff = () => {
+export const useStaff = (skills?: string[]) => {
   return useQuery({
-    queryKey: ["staff"], // A unique key for this query
-    queryFn: fetchStaff, // The function to fetch data
+    queryKey: ["staff", skills], // A unique key for this query
+    queryFn: () => fetchStaff(skills), // The function to fetch data
     staleTime: 5 * 60 * 1000, // (Optional) Data remains fresh for 5 minutes
   });
 };
@@ -44,7 +48,6 @@ export const useAddStaff = () => {
       userId: number | null;
       skills: string[];
     }) => {
-
       console.log(data);
       const response = await axios.post(`/api/staff`, data);
       if (response.status !== 201) {

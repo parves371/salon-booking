@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     const [result]: any = await db.query(
       "INSERT INTO staff (position,available,user_id,skills) VALUES (?,?,?,?)",
-      [position, available, userId,skills.toString()]
+      [position, available, userId, skills.toString()]
     );
 
     return NextResponse.json(
@@ -38,13 +38,35 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    // Parse the query parameters
+    const url = new URL(req.url);
+    const filterSkills = url.searchParams.get("skills"); // E.g., "style 1,style 2"
+
+    console.log("filterSkills:", filterSkills);
+
     const db = await createConnection();
-    const sql = `
-    SELECT Staff.id, Staff.position, Staff.available, user.name, user.role, user.skills
-    FROM Staff
-    JOIN user ON Staff.user_id = user.id;
-  `;
-    const [result]: any = await db.query(sql);
+    let sql = `
+      SELECT Staff.id, Staff.position, Staff.available, Staff.skills, user.name, user.role
+      FROM Staff
+      JOIN user ON Staff.user_id = user.id
+    `;
+
+    let values: string[] = [];
+
+    // Add filtering conditions if `skills` is provided
+    if (filterSkills) {
+      const filters = filterSkills.split(",").map((skill) => skill.trim());
+      const conditions = filters.map(() => "Staff.skills LIKE ?").join(" OR ");
+      sql += ` WHERE ${conditions}`;
+      values = filters.map((skill) => `%${skill}%`);
+    }
+
+    console.log("SQL Query:", sql);
+    console.log("Values:", values);
+
+    // Execute the query with or without filters
+    const [result]: any = await db.query(sql, values);
+
     return NextResponse.json({ data: result });
   } catch (error) {
     console.error("Error fetching staff:", error);
@@ -54,3 +76,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

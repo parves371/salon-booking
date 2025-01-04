@@ -93,7 +93,6 @@ const CategoryAdd = () => {
   const handleTagChange = (selectedTags: string[]) => {
     setTags(selectedTags);
   };
-  console.log(tags);
 
   const form = useForm<z.infer<typeof StaffSchema>>({
     resolver: zodResolver(StaffSchema),

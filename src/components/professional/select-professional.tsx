@@ -1,11 +1,10 @@
 "use client";
-import { useState } from "react";
-import data from "../../../data/frisha.json"; // Assuming this is an array of professionals
-import ProfileCard from "./profile-card";
-import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
 import { useStaff } from "@/hooks/use-staff";
 import { useProductStore } from "@/store/use-product-store";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
+import ProfileCard from "./profile-card";
 
 // Defining the type for the professional data
 interface StaffProps {
@@ -21,13 +20,21 @@ export const SelectProfessional = () => {
   // const [selectedTreatments, setSelectedTreatments] = useState<any[]>([]);
   const { selectedTreatments: selectedTreatments } = useProductStore();
   const [totalPrice, setTotalPrice] = useState(0);
-  const [activeProfessional, setActiveProfessional] = useState<StaffProps | null>(null);
+  const [activeProfessional, setActiveProfessional] =
+    useState<StaffProps | null>(null);
 
-  const { data } = useStaff();
+  const selectedTreatmentName = selectedTreatments
+    .map((treatment) => treatment.selectedOption?.name.trim())
+    .filter((name) => name !== undefined);
+  const { data } = useStaff(
+    selectedTreatmentName.length > 0 ? selectedTreatmentName : undefined
+  );
 
   const handleProfessionalSelect = (professional: StaffProps) => {
     setActiveProfessional(professional);
   };
+
+  console.log("data", data);
 
   const updateAnyProfessional = () => {
     setActiveProfessional(null);

@@ -61,12 +61,24 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Creating the Staff table
-CREATE TABLE  staff (
+CREATE TABLE staff (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT,
+    user_id BIGINT UNSIGNED,
     position VARCHAR(255),
     available BOOLEAN,
+    skills VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+
+CREATE TABLE `Work_Schedule` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `staff_id` INT NOT NULL,
+    `work_date` DATE NOT NULL,
+    `slot_start` TIME NOT NULL,
+    `slot_end` TIME NOT NULL,
+    `status` ENUM('free', 'booked', 'off') NOT NULL DEFAULT 'free',
+    CONSTRAINT `work_schedule_staff_id_foreign` FOREIGN KEY (`staff_id`) REFERENCES `Staff`(`id`)
 );
 
 

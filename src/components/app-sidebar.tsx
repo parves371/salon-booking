@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { MdCategory } from "react-icons/md";
+import { MdCategory, MdWorkspaces } from "react-icons/md";
 
 // Menu items.
 const items = [
@@ -26,6 +26,11 @@ const items = [
     title: "Home",
     url: "#",
     icon: Home,
+  },
+  {
+    title: "works",
+    url: "/admin/works",
+    icon: MdWorkspaces,
   },
   {
     title: "Staff",

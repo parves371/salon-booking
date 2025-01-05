@@ -6,6 +6,7 @@ import { RxAvatar } from "react-icons/rx";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { useServicesStore } from "@/store/use-professional-store";
 
 interface StaffDetails {
   available: boolean;
@@ -17,7 +18,8 @@ interface StaffDetails {
 }
 
 const SelectTime = () => {
-  const [datas, setDatas] = useState<StaffDetails[]>();
+  // Get services from the store with the profetional details
+  const { services } = useServicesStore.getState();
 
   const { selectedTreatments, totalPrice, finaldata } = useAppSelector(
     (state) => state.treatments // Redux state for selected treatments
@@ -118,23 +120,21 @@ const SelectTime = () => {
           )}
         </div>
         <div className="w-full md:w-[40%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
-          {selectedTreatments.map((treatment) => (
+          {services.map((treatment) => (
             <div
               key={treatment.id}
               className="flex justify-between items-center mb-4 px-3"
             >
               <div className="w-[50%]">
-                <h4>{treatment.selectedOption?.name || treatment.name}</h4>
-                <span>{treatment.selectedOption?.time || treatment.time}</span>
+                <h4>{treatment.name}</h4>
+                <span>{treatment.time}</span>
                 <span className="mx-2">with</span>
                 <span className="text-[#7C6DD8] font-semibold text-sm">
-                  {activeProfessional?.name || "Any Professional"}
+                  {treatment?.professional.name || "Any Professional"}
                 </span>
               </div>
               <div>
-                <span>
-                  AED {treatment.selectedOption?.price || treatment.price}
-                </span>
+                <span>AED {treatment.price}</span>
               </div>
             </div>
           ))}

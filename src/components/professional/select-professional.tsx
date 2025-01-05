@@ -7,6 +7,7 @@ import { Separator } from "../ui/separator";
 import ProfileCard from "./profile-card";
 import { LoaderIcon } from "lucide-react";
 import { useServicesStore } from "@/store/use-professional-store";
+import { useRouter } from "next/navigation";
 
 // Defining the type for the professional data
 export interface StaffProps {
@@ -26,6 +27,7 @@ interface Services {
 }
 
 export const SelectProfessional = () => {
+  const router = useRouter();
   const { selectedTreatments } = useProductStore();
   const [totalPrice, setTotalPrice] = useState(0);
   const [activeProfessional, setActiveProfessional] =
@@ -92,10 +94,9 @@ export const SelectProfessional = () => {
         addTreatment(treatment);
       }
     });
-  };
-  const { services } = useServicesStore.getState();
 
-  console.log(services);
+    router.push("/times");
+  };
 
   if (isLoading) {
     return (

@@ -20,7 +20,10 @@ interface Services {
 interface Store {
   services: Services[];
   addTreatment: (treatment: Services) => void;
-  updateProfessional: (serviceId: number, newProfessional: Professional) => void;
+  updateProfessional: (
+    serviceId: number,
+    newProfessional: Professional
+  ) => void;
 }
 
 export const useServicesStore = create<Store>((set) => ({

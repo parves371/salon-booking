@@ -1,16 +1,12 @@
-// File: pages/api/slots/[staffId].ts
 import { createConnection } from "@/lib/db/dbConnect";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const { staffId } = req.query;
-  const { date } = req.body;
+export async function POST(req: Request, { params }: { params: { staffId: string } }) {
+  const { staffId } = params; // Access the dynamic route parameter
+  const { date }: { date: string } = await req.json(); // Parse the request body
 
   if (!staffId || !date) {
-    return res.status(400).json({ error: "Staff ID and date are required" });
+    return NextResponse.json({ error: "Staff ID and date are required" }, { status: 400 });
   }
 
   try {
@@ -31,10 +27,10 @@ export default async function handler(
     // Fetch booked slots
     const [rows] = await dbConnection.query(
       `
-            SELECT TIME(start_time) AS slot
-            FROM bookings
-            WHERE staff_id = ? AND DATE(start_time) = ?
-            `,
+        SELECT TIME(start_time) AS slot
+        FROM bookings
+        WHERE staff_id = ? AND DATE(start_time) = ?
+      `,
       [staffId, date]
     );
 
@@ -43,12 +39,12 @@ export default async function handler(
 
     // Filter out booked slots
     const availableSlots = allSlots.filter(
-      (slot) => !bookedSlots.map((b: any) => b.slot).includes(slot)
+      (slot) => !bookedSlots.some((b) => b.slot === slot)
     );
 
-    res.status(200).json({ availableSlots });
+    return NextResponse.json({ availableSlots });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Error fetching available slots:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

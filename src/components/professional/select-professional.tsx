@@ -1,14 +1,15 @@
 "use client";
 import { useStaff } from "@/hooks/use-staff";
 import { useProductStore } from "@/store/use-product-store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import ProfileCard from "./profile-card";
 import { LoaderIcon } from "lucide-react";
+import { useServicesStore } from "@/store/use-professional-store";
 
 // Defining the type for the professional data
-interface StaffProps {
+export interface StaffProps {
   available: boolean;
   id: number;
   name: string;
@@ -17,16 +18,23 @@ interface StaffProps {
   skills: string[] | null; // Assuming 'skills' could be an array of strings or null
 }
 
+interface Services {
+  id: number;
+  name: string;
+  time: string;
+  price: number; // Ensure price is treated as a number here as well
+}
+
 export const SelectProfessional = () => {
-  const { selectedTreatments: selectedTreatments } = useProductStore();
+  const { selectedTreatments } = useProductStore();
   const [totalPrice, setTotalPrice] = useState(0);
   const [activeProfessional, setActiveProfessional] =
     useState<StaffProps | null>(null);
 
-  // Skils is an array of strings or null
   const selectedTreatmentName = selectedTreatments
     .map((treatment) => treatment.selectedOption?.name.trim())
     .filter((name) => name !== undefined);
+
   const { data, isLoading, error, isError } = useStaff(
     selectedTreatmentName.length > 0 ? selectedTreatmentName : undefined
   );
@@ -39,18 +47,55 @@ export const SelectProfessional = () => {
     setActiveProfessional(null);
   };
 
+  useEffect(() => {
+    // Update total price when selected treatments or active professional changes
+    const total = selectedTreatments.reduce((acc, treatment) => {
+      const price = treatment.selectedOption?.price || treatment.price;
+      return acc + price; // price is already a number now
+    }, 0);
+    setTotalPrice(total);
+  }, [selectedTreatments, activeProfessional]);
+
   const onSubmit = () => {
     const selectedData = selectedTreatments.map((treatment) => ({
       id: treatment.id,
       name: treatment.selectedOption?.name || treatment.name,
       time: treatment.selectedOption?.time || treatment.time,
       price: treatment.selectedOption?.price || treatment.price,
-      professional: activeProfessional || { name: "Any Professional" },
+      professional: activeProfessional
+        ? activeProfessional
+        : {
+            id: -1, // Placeholder ID
+            name: "Any Professional",
+            position: "N/A",
+            available: true,
+            skills: [],
+            role: "N/A", // Default role
+          },
     }));
 
-    console.log("Submitted Data:", selectedData);
-    // You can handle the submitted data here (e.g., send to an API)
+    // Access the addTreatment function from Zustand store
+    const { addTreatment, updateProfessional } = useServicesStore.getState();
+
+    // Save the selected data to Zustand store
+    selectedData.forEach((treatment) => {
+      // If the treatment already exists in the store, update its professional
+      const existingTreatment = useServicesStore
+        .getState()
+        .services.find((service) => service.id === treatment.id);
+
+      if (existingTreatment) {
+        // If the treatment exists, update the professional for that treatment
+        updateProfessional(treatment.id, treatment.professional);
+      } else {
+        // If the treatment doesn't exist, add a new one
+        addTreatment(treatment);
+      }
+    });
   };
+  const { services } = useServicesStore.getState();
+
+  console.log(services);
 
   if (isLoading) {
     return (
@@ -59,6 +104,7 @@ export const SelectProfessional = () => {
       </div>
     );
   }
+
   if (isError) {
     return <div>{error.message}</div>;
   }

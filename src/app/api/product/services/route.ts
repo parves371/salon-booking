@@ -1,5 +1,5 @@
-import { createConnection } from '@/lib/db/dbConnect';
-import { NextResponse } from 'next/server';
+import { createConnection } from "@/lib/db/dbConnect";
+import { NextResponse } from "next/server";
 
 // Define the type for the incoming request body
 interface AddServiceRequest {
@@ -11,14 +11,14 @@ interface AddServiceRequest {
 }
 
 export async function POST(req: Request): Promise<Response> {
-  const { categoryId, name, time, price, option }: AddServiceRequest = await req.json();
-  console.log(option );
-  try {
+  const { categoryId, name, time, price, option }: AddServiceRequest =
+    await req.json();
 
+  try {
     // Validate required fields
     if (!categoryId || !name || !time || !price) {
       return NextResponse.json(
-        { message: 'All fields are required' },
+        { message: "All fields are required" },
         { status: 400 }
       );
     }
@@ -33,11 +33,11 @@ export async function POST(req: Request): Promise<Response> {
     );
 
     // Respond with success message
-    return NextResponse.json({ message: 'Service added successfully' });
+    return NextResponse.json({ message: "Service added successfully" });
   } catch (error) {
-    console.error('Error adding service:', error);
+    console.error("Error adding service:", error);
     return NextResponse.json(
-      { message: 'Internal Server Error' },
+      { message: "Internal Server Error" },
       { status: 500 }
     );
   }
@@ -66,14 +66,11 @@ export async function GET(): Promise<Response> {
     `);
 
     // Respond with the data
-    return NextResponse.json(
-      { data: rows },
-      { status: 200 }
-    );
+    return NextResponse.json({ data: rows }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching services:', error);
+    console.error("Error fetching services:", error);
     return NextResponse.json(
-      { message: 'Internal Server Error' },
+      { message: "Internal Server Error" },
       { status: 500 }
     );
   }

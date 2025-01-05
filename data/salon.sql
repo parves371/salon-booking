@@ -71,14 +71,15 @@ CREATE TABLE staff (
 );
 
 
-CREATE TABLE `Work_Schedule` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `staff_id` INT NOT NULL,
-    `work_date` DATE NOT NULL,
-    `slot_start` TIME NOT NULL,
-    `slot_end` TIME NOT NULL,
-    `status` ENUM('free', 'booked', 'off') NOT NULL DEFAULT 'free',
-    CONSTRAINT `work_schedule_staff_id_foreign` FOREIGN KEY (`staff_id`) REFERENCES `Staff`(`id`)
+-- Bookings table
+CREATE TABLE bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_id INT,
+    user_id BIGINT UNSIGNED,
+    start_time DATETIME,
+    end_time DATETIME,
+    FOREIGN KEY (staff_id) REFERENCES staff(id),
+    FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
 

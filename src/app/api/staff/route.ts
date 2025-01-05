@@ -42,8 +42,6 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const filterSkills = url.searchParams.get("skills"); // E.g., "style 1,style 2"
 
-    console.log("filterSkills:", filterSkills);
-
     const db = await createConnection();
     let sql = `
       SELECT Staff.id, Staff.position, Staff.available, Staff.skills, user.name, user.role
@@ -56,8 +54,11 @@ export async function GET(req: Request) {
     // Add filtering conditions if `skills` is provided
     if (filterSkills) {
       const filters = filterSkills.split(",").map((skill) => skill.trim());
+      // WHERE Staff.skills LIKE ? OR Staff.skills LIKE ? OR Staff.skills LIKE ?
       const conditions = filters.map(() => "Staff.skills LIKE ?").join(" OR ");
       sql += ` WHERE ${conditions}`;
+      
+      // if the skill is "Python", the value becomes "%Python%", allowing partial matches in the database.
       values = filters.map((skill) => `%${skill}%`);
     }
 

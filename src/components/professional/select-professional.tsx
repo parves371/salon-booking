@@ -18,12 +18,12 @@ interface StaffProps {
 }
 
 export const SelectProfessional = () => {
-  // const [selectedTreatments, setSelectedTreatments] = useState<any[]>([]);
   const { selectedTreatments: selectedTreatments } = useProductStore();
   const [totalPrice, setTotalPrice] = useState(0);
   const [activeProfessional, setActiveProfessional] =
     useState<StaffProps | null>(null);
 
+  // Skils is an array of strings or null
   const selectedTreatmentName = selectedTreatments
     .map((treatment) => treatment.selectedOption?.name.trim())
     .filter((name) => name !== undefined);
@@ -34,8 +34,6 @@ export const SelectProfessional = () => {
   const handleProfessionalSelect = (professional: StaffProps) => {
     setActiveProfessional(professional);
   };
-
-  console.log("data", data);
 
   const updateAnyProfessional = () => {
     setActiveProfessional(null);

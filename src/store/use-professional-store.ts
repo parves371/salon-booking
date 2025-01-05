@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+// Define the interfaces
 interface Professional {
   id: number;
   position: string;
@@ -26,29 +27,51 @@ interface Store {
   ) => void;
 }
 
+const loadFromLocalStorage = (): Services[] => {
+  try {
+    const savedServices = localStorage.getItem("services");
+    if (savedServices) {
+      return JSON.parse(savedServices);
+    }
+    return [];
+  } catch (error) {
+    console.error("Error loading from localStorage", error);
+    return [];
+  }
+};
+
+const saveToLocalStorage = (services: Services[]) => {
+  try {
+    localStorage.setItem("services", JSON.stringify(services));
+  } catch (error) {
+    console.error("Error saving to localStorage", error);
+  }
+};
+
 export const useServicesStore = create<Store>((set) => ({
-  services: [],
+  services: loadFromLocalStorage(), // Initialize services from localStorage
   addTreatment: (service) =>
     set((state) => {
-      // Check if the service already exists in the store
       const isDuplicate = state.services.some(
         (existingService) => existingService.id === service.id
       );
 
       if (isDuplicate) {
-        // If it's a duplicate, don't add it again
         return state;
       }
 
-      // If it's not a duplicate, add it to the store
-      return { services: [...state.services, service] };
+      const updatedServices = [...state.services, service];
+      saveToLocalStorage(updatedServices); // Save to localStorage when adding a service
+      return { services: updatedServices };
     }),
   updateProfessional: (serviceId: number, newProfessional: Professional) =>
-    set((state) => ({
-      services: state.services.map((service) =>
+    set((state) => {
+      const updatedServices = state.services.map((service) =>
         service.id === serviceId
-          ? { ...service, professional: newProfessional } // Update the professional for the selected service
+          ? { ...service, professional: newProfessional }
           : service
-      ),
-    })),
+      );
+      saveToLocalStorage(updatedServices); // Save to localStorage when updating a service
+      return { services: updatedServices };
+    }),
 }));

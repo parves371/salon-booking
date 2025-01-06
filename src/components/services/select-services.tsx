@@ -65,8 +65,6 @@ export const SelectServices: React.FC = () => {
     }));
 
     return selectedData.reduce((total, services) => {
-      console.log("total", services);
-
       const price = services.price;
       return total + price;
     }, 0);

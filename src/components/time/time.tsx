@@ -1,81 +1,97 @@
 "use client";
+
 import { useBookSlot, useSlots } from "@/hooks/product/use-slot";
 import { useServicesStore } from "@/store/use-professional-store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoChevronDown } from "react-icons/io5";
 import { RxAvatar } from "react-icons/rx";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 
-const Booking = () => {
-  const [date, setDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
-  const { services } = useServicesStore.getState();
+const Times = () => {
+  const [date, setDate] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedProfessional, setSelectedProfessional] = useState<any | null>(
     null
-  ); // Track selected professional
+  );
 
+  const { services } = useServicesStore.getState();
   const staffIds = services?.map(
     (professional) => professional.professional.id
-  ); // Example staff ID
-  const staffId = 3; // Example user ID
-  const userId = 1; // Example user ID
+  );
+  const servicesIdsAndTime = services?.map((service) => ({
+    id: service.id,
+    time: service.time,
+  }));
 
-  const { data: slotsData } = useSlots(staffIds, date); // Fetch available slots based on the selected staff and date
+  const userId = 1;
+
+  const { data: slotsData } = useSlots(staffIds, date, servicesIdsAndTime);
   const mutation = useBookSlot();
 
-  console.log(services);
+  console.log("slotsData", services);
 
-  // Calculate the end time for a selected slot
-  const getEndTime = (
-    startTime: string,
-    durationMinutes: number = 15
-  ): string => {
-    const [hours, minutes] = startTime.split(":").map(Number);
+  useEffect(() => {
+    setDate(new Date().toISOString().split("T")[0]);
+  }, []);
+
+  const getEndTime = (startTime: string, durationMinutes: string): string => {
+    // Convert duration "00.30" to total minutes
+    const [hours, minutes] = durationMinutes.split(":").map(Number);
+    const totalMinutes = hours * 60 + minutes;
+
+    const [startHours, startMinutes] = startTime.split(":").map(Number);
     const startDate = new Date();
-    startDate.setHours(hours, minutes, 0, 0);
-    startDate.setMinutes(startDate.getMinutes() + durationMinutes);
+    startDate.setHours(startHours, startMinutes, 0, 0);
+    startDate.setMinutes(startDate.getMinutes() + totalMinutes);
+
     const endHours = String(startDate.getHours()).padStart(2, "0");
     const endMinutes = String(startDate.getMinutes()).padStart(2, "0");
+
     return `${endHours}:${endMinutes}`;
   };
 
-  // Handle the booking logic
   const handleBooking = async () => {
-    if (!selectedSlot || !selectedProfessional) return;
+    if (!selectedSlot) return;
 
-    const startTime = `${date} ${selectedSlot}`;
-    const endTime = `${date} ${getEndTime(selectedSlot)}`; // Calculate end time
+    const payload = services.map((service) => ({
+      staffId: service.professional.id,
+      userId,
+      startTime: `${date}T${selectedSlot}`,
+      endTime: `${date}T${getEndTime(selectedSlot, service.time)}`,
+      serviceId: service.id,
+    }));
 
     try {
-      mutation.mutate(
-        { staffId, userId, startTime, endTime },
-        {
-          onSuccess: () => {
-            alert("Slot booked successfully!");
-          },
-          onError: (error) => {
-            alert(`Booking failed: ${error.message}`);
-          },
-        }
-      );
-    } catch (error: any) {
-      alert(error.message);
+      const response = await fetch("/api/product/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message);
+      } else {
+        alert(`Error: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Error submitting bookings:", error);
+      alert("An error occurred while submitting bookings.");
     }
   };
 
-  // Professional selection handler
-  const handleProfessionalSelect = (professional: any) => {
-    setSelectedProfessional(professional); // Set the clicked professional as active
-  };
+  if (!date) {
+    // Render nothing while initializing state
+    return null;
+  }
 
   return (
     <div className="mt-12">
       <div className="container mx-auto flex gap-16">
-        {/* Left Panel for Selecting Professional and Date/Time */}
+        {/* Left Panel */}
         <div className="w-1/2">
           <h1 className="text-4xl font-bold bg-white sticky top-0">
             Book a Slot
@@ -113,29 +129,28 @@ const Booking = () => {
           </div>
 
           {/* Time Slot Selection */}
-          {selectedProfessional && (
-            <div className="mt-6">
-              <h2 className="text-xl font-bold mb-4">Available Times</h2>
-              <div className="flex gap-4 flex-wrap">
-                {slotsData?.map((slot) => (
-                  <button
+          <div className="mt-6">
+            <h2 className="text-xl font-bold mb-4">Available Times</h2>
+            <div className="flex gap-4 flex-wrap">
+              {slotsData &&
+                slotsData.map((slot) => (
+                  <div
                     key={slot}
-                    onClick={() => setSelectedSlot(slot)}
-                    className={`w-full p-4 border border-[#d3d3d3] rounded-lg hover:bg-[#F5F5F5] text-lg font-semibold text-start ${
+                    className={`w-full p-4 border border-[#d3d3d3] rounded-lg hover:bg-[#5847c7] hover:text-white text-lg font-semibold text-start ${
                       selectedSlot === slot
                         ? "bg-[#5847c7] text-white"
                         : "bg-white text-gray-600"
                     }`}
+                    onClick={() => setSelectedSlot(slot)}
                   >
                     {slot}
-                  </button>
+                  </div>
                 ))}
-              </div>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Right Panel for Selected Treatments and Summary */}
+        {/* Right Panel */}
         <div className="w-full md:w-[40%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
           {services.map((treatment) => (
             <div
@@ -169,7 +184,7 @@ const Booking = () => {
           <Button
             className="w-full mt-16"
             onClick={handleBooking}
-            disabled={!selectedSlot || !selectedProfessional} // Disable if no slot or professional is selected
+            disabled={!selectedSlot} // Disable if no slot or professional is selected
           >
             Confirm Booking
           </Button>
@@ -179,4 +194,4 @@ const Booking = () => {
   );
 };
 
-export default Booking;
+export default Times;

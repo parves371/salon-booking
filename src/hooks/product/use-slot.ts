@@ -3,14 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 // Function to fetch available slots for a staff member on a specific date
 const fetchSlots = async (
   staffId: number[],
-  date: string
+  date: string,
+  services: { id: number; time: string }[]
 ): Promise<string[]> => {
   const response = await fetch(`/api/product/slots`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ date, staffIds: staffId }),
+    body: JSON.stringify({ date, staffIds: staffId, services }),
   });
 
   if (!response.ok) {
@@ -22,10 +23,14 @@ const fetchSlots = async (
 };
 
 // React Query hook to fetch available slots for a specific staff member and date
-export const useSlots = (staffIds: number[], date: string) => {
+export const useSlots = (
+  staffIds: number[],
+  date: string,
+  services: { id: number; time: string }[]
+) => {
   return useQuery({
     queryKey: ["slots", staffIds, date], // Unique key for the query
-    queryFn: () => fetchSlots(staffIds, date), // Function to fetch data
+    queryFn: () => fetchSlots(staffIds, date, services), // Function to fetch data
     staleTime: 5 * 60 * 1000, // Data remains fresh for 5 minutes
     enabled: !!staffIds && !!date, // Ensures the query runs only when staffId and date are provided
   });

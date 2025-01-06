@@ -1,71 +1,49 @@
 import { createConnection } from "@/lib/db/dbConnect";
-import { NextResponse } from "next/server";
 
-interface BookSlotRequest {
-  staffId: number;
-  userId: number;
-  startTime: string;
-  endTime: string;
-}
-
-export async function POST(req: Request): Promise<Response> {
+export async function POST(req: Request, res: Response) {
   try {
-    // Parse and validate the incoming request body
-    const body: BookSlotRequest = await req.json();
-    const { staffId, userId, startTime, endTime } = body;
+    const bookings = await req.json();
 
-    // Validate required fields
-    if (!staffId || !userId || !startTime || !endTime) {
-      return NextResponse.json(
-        { message: "All required fields (staffId, userId, startTime, endTime) must be provided." },
-        { status: 400 }
+    // Validate bookings data
+    if (!Array.isArray(bookings) || bookings.length === 0) {
+      return new Response(
+        JSON.stringify({ message: "Invalid bookings data" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Establish a database connection
     const db = await createConnection();
 
-    // Check for overlapping bookings
-    const [rows] = await db.query(
-      `
-        SELECT id
-        FROM bookings
-        WHERE staff_id = ?
-          AND (
-            (start_time < ? AND end_time > ?)
-          )
-      `,
-      [staffId, endTime, startTime]
+    // Prepare bulk insert values
+    const values = bookings.map(
+      ({ serviceId, staffId, userId, startTime, endTime }) => [
+        serviceId,
+        staffId,
+        userId,
+        startTime,
+        endTime,
+      ]
     );
 
-    // Cast rows to the expected type
-    const overlapping = rows as { id: number }[];
+    // SQL query for bulk insert
+    const query = `
+      INSERT INTO bookings (service_id, staff_id, user_id, start_time, end_time)
+      VALUES ?
+    `;
 
-    if (overlapping.length > 0) {
-      return NextResponse.json(
-        { message: "The selected slot is already booked." },
-        { status: 409 }
-      );
-    }
+    // Execute bulk insert
+    await db.query(query, [values]);
 
-    // Insert the booking into the database
-    await db.query(
-      `
-        INSERT INTO bookings (staff_id, user_id, start_time, end_time)
-        VALUES (?, ?, ?, ?)
-      `,
-      [staffId, userId, startTime, endTime]
+    return new Response(
+      JSON.stringify({ message: "Bookings inserted successfully" }),
+      { status: 201, headers: { "Content-Type": "application/json" } }
     );
-
-    // Respond with a success message
-    return NextResponse.json({ message: "Slot booked successfully." }, { status: 201 });
   } catch (error) {
-    console.error("Error while booking slot:", error);
+    console.error("Error inserting bookings:", error);
 
-    // Handle unexpected errors
-    return NextResponse.json(
-      { message: "An internal server error occurred." },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ message: "Internal server error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }

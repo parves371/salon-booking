@@ -78,6 +78,7 @@ CREATE TABLE bookings (
     user_id BIGINT UNSIGNED,
     start_time DATETIME,
     end_time DATETIME,
+    service_id INT,
     FOREIGN KEY (staff_id) REFERENCES staff(id),
     FOREIGN KEY (user_id) REFERENCES user(id)
 );

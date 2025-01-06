@@ -1,13 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Function to fetch available slots for a staff member on a specific date
-const fetchSlots = async (staffId: number, date: string): Promise<string[]> => {
-  const response = await fetch(`/api/product/slots/${staffId}`, {
+const fetchSlots = async (
+  staffId: number[],
+  date: string
+): Promise<string[]> => {
+  const response = await fetch(`/api/product/slots`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ date }),
+    body: JSON.stringify({ date, staffIds: staffId }),
   });
 
   if (!response.ok) {
@@ -19,12 +22,12 @@ const fetchSlots = async (staffId: number, date: string): Promise<string[]> => {
 };
 
 // React Query hook to fetch available slots for a specific staff member and date
-export const useSlots = (staffId: number, date: string) => {
+export const useSlots = (staffIds: number[], date: string) => {
   return useQuery({
-    queryKey: ["slots", staffId, date], // Unique key for the query
-    queryFn: () => fetchSlots(staffId, date), // Function to fetch data
+    queryKey: ["slots", staffIds, date], // Unique key for the query
+    queryFn: () => fetchSlots(staffIds, date), // Function to fetch data
     staleTime: 5 * 60 * 1000, // Data remains fresh for 5 minutes
-    enabled: !!staffId && !!date, // Ensures the query runs only when staffId and date are provided
+    enabled: !!staffIds && !!date, // Ensures the query runs only when staffId and date are provided
   });
 };
 

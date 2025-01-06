@@ -1,12 +1,18 @@
 import { createConnection } from "@/lib/db/dbConnect";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request, { params }: { params: { staffId: string } }) {
-  const { staffId } = params; // Access the dynamic route parameter
-  const { date }: { date: string } = await req.json(); // Parse the request body
+export async function POST(req: Request) {
+  const { staffIds, date }: { staffIds: number[]; date: string } =
+    await req.json(); // Parse the request body
 
-  if (!staffId || !date) {
-    return NextResponse.json({ error: "Staff ID and date are required" }, { status: 400 });
+  console.log(staffIds);
+  console.log("aslkjdaskljd", date);
+
+  if (!staffIds || staffIds.length === 0 || !date) {
+    return NextResponse.json(
+      { error: "Staff IDs and date are required!" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -24,22 +30,27 @@ export async function POST(req: Request, { params }: { params: { staffId: string
 
     const dbConnection = await createConnection();
 
-    // Fetch booked slots
+    // Fetch booked slots for all provided staff IDs
     const [rows] = await dbConnection.query(
       `
         SELECT TIME(start_time) AS slot
         FROM bookings
-        WHERE staff_id = ? AND DATE(start_time) = ?
+        WHERE staff_id IN (?) AND DATE(start_time) = ?
       `,
-      [staffId, date]
+      [staffIds, date]
     );
 
     // Safely cast rows to the expected type
     const bookedSlots = rows as { slot: string }[];
 
+    // Get unique booked slots across all staff IDs
+    const uniqueBookedSlots = Array.from(
+      new Set(bookedSlots.map((b) => b.slot))
+    );
+
     // Filter out booked slots
     const availableSlots = allSlots.filter(
-      (slot) => !bookedSlots.some((b) => b.slot === slot)
+      (slot) => !uniqueBookedSlots.includes(slot)
     );
 
     return NextResponse.json({ availableSlots });

@@ -18,13 +18,16 @@ const Booking = () => {
     null
   ); // Track selected professional
 
-  
-  const staffIds = services?.map((professional) => professional.professional.id); // Example staff ID
+  const staffIds = services?.map(
+    (professional) => professional.professional.id
+  ); // Example staff ID
   const staffId = 3; // Example user ID
-  const userId = 3; // Example user ID
+  const userId = 1; // Example user ID
 
-  const { data: slotsData } = useSlots(staffId, date); // Fetch available slots based on the selected staff and date
+  const { data: slotsData } = useSlots(staffIds, date); // Fetch available slots based on the selected staff and date
   const mutation = useBookSlot();
+
+  console.log(services);
 
   // Calculate the end time for a selected slot
   const getEndTime = (
@@ -97,28 +100,6 @@ const Booking = () => {
                 <IoChevronDown />
               </>
             )}
-          </div>
-
-          {/* Professional List (Display staff options to choose from) */}
-          <div className="mt-6 flex gap-4">
-            {services.map((professional) => (
-              <div
-                key={professional.id}
-                onClick={() =>
-                  handleProfessionalSelect(professional.professional.id)
-                }
-                className={`cursor-pointer flex flex-col items-center ${
-                  selectedProfessional?.id === professional.id
-                    ? "text-blue-600"
-                    : ""
-                }`}
-              >
-                <Avatar>
-                  {/* <AvatarImage src={professional.img} alt={professional.name} /> */}
-                </Avatar>
-                <span>{professional.name}</span>
-              </div>
-            ))}
           </div>
 
           {/* Date Selection */}

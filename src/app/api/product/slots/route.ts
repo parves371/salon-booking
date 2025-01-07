@@ -63,25 +63,22 @@ export async function POST(req: Request) {
 
     const combinedAvailableSlots = new Set<string>();
 
-    console.log("bookedSlots", bookedSlots);
-    console.log("bookedSet", bookedSet);
-    console.log("combinedAvailableSlots", combinedAvailableSlots);
-    console.log("services", services);
-
     services.forEach((service) => {
       const [hours, minutes] = service.time.split(":").map(Number);
       const duration = hours * 60 + minutes;
       console.log(`Evaluating service with duration: ${duration} minutes`);
-    
+
       allSlots.forEach((slot) => {
         const start = new Date(`1970-01-01T${slot}`);
         const end = new Date(start.getTime() + duration * 60000);
-    
-        console.log(`Checking slot: ${slot}, Start: ${start.toTimeString()}, End: ${end.toTimeString()}`);
-    
+
+        console.log(
+          `Checking slot: ${slot}, Start: ${start.toTimeString()}, End: ${end.toTimeString()}`
+        );
+
         let isAvailable = true;
         let current = new Date(start);
-    
+
         while (current < end) {
           const time = current.toTimeString().split(" ")[0];
           console.log(`Checking time: ${time}`);
@@ -92,7 +89,7 @@ export async function POST(req: Request) {
           }
           current.setMinutes(current.getMinutes() + 15);
         }
-    
+
         if (isAvailable) {
           console.log(`Slot ${slot} is available for service`);
           combinedAvailableSlots.add(slot);
@@ -101,7 +98,6 @@ export async function POST(req: Request) {
         }
       });
     });
-    
 
     return NextResponse.json({
       availableSlots: Array.from(combinedAvailableSlots),

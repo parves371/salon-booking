@@ -30,8 +30,6 @@ const Times = () => {
   const { data: slotsData } = useSlots(staffIds, date, servicesIdsAndTime);
   const mutation = useBookSlot();
 
-  console.log("slotsData", services);
-
   useEffect(() => {
     setDate(new Date().toISOString().split("T")[0]);
   }, []);
@@ -62,6 +60,8 @@ const Times = () => {
       endTime: `${date}T${getEndTime(selectedSlot, service.time)}`,
       serviceId: service.id,
     }));
+
+    console.log(payload);
 
     try {
       const response = await fetch("/api/product/bookings", {

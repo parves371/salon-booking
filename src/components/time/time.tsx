@@ -9,6 +9,31 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 
+interface Professional {
+  id: number;
+  position: string;
+  available: boolean;
+  skills: string[] | null;
+  name: string;
+  role: string; // Add 'role' to the Professional interface
+}
+
+interface Service {
+  id: number;
+  name: string;
+  time: string;
+  price: number; // Changed price to number to match SelectProfessional
+  professional: Professional;
+}
+
+interface Payload {
+  staffId: number;
+  userId: number;
+  startTime: string;
+  endTime: string;
+  serviceId: number;
+}
+
 const Times = () => {
   const [date, setDate] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -34,8 +59,8 @@ const Times = () => {
     setDate(new Date().toISOString().split("T")[0]);
   }, []);
 
-  const getEndTime = (startTime: string, durationMinutes: string): string => {
-    // Convert duration "00.30" to total minutes
+  const getEndTime = (startTime: string, durationMinutes: string) => {
+    // Convert duration "00:30" to total minutes
     const [hours, minutes] = durationMinutes.split(":").map(Number);
     const totalMinutes = hours * 60 + minutes;
 
@@ -50,16 +75,47 @@ const Times = () => {
     return `${endHours}:${endMinutes}`;
   };
 
+  console.log(services);
+
+  // Generate payload with cascading times
+  const generatePayload = (
+    services: Service[],
+    userId: number,
+    date: string,
+    selectedSlot: string
+  ): Payload[] => {
+    let currentStartTime = selectedSlot;
+
+    const payload = services.map((service) => {
+      const endTime = getEndTime(currentStartTime, service.time);
+      const servicePayload: Payload = {
+        staffId: service.professional.id,
+        userId,
+        startTime: `${date}T${currentStartTime}`,
+        endTime: `${date}T${endTime}`,
+        serviceId: service.id,
+      };
+
+      currentStartTime = endTime;
+
+      return servicePayload;
+    });
+
+    return payload;
+  };
+
   const handleBooking = async () => {
     if (!selectedSlot) return;
+    // let currentStartTime = selectedSlot; // Initialize with the first selected slot
 
-    const payload = services.map((service) => ({
-      staffId: service.professional.id,
-      userId,
-      startTime: `${date}T${selectedSlot}`,
-      endTime: `${date}T${getEndTime(selectedSlot, service.time)}`,
-      serviceId: service.id,
-    }));
+    // const payload = services.map((service) => ({
+    //   staffId: service.professional.id,
+    //   userId,
+    //   startTime: `${date}T${selectedSlot}`,
+    //   endTime: `${date}T${getEndTime(selectedSlot, service.time)}`,
+    //   serviceId: service.id,
+    // }));
+    const payload = generatePayload(services, userId, date, selectedSlot);
 
     console.log(payload);
 

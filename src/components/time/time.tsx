@@ -34,7 +34,7 @@ interface Payload {
   serviceId: number;
 }
 
-const Times = () => {
+export const SelectTime = () => {
   const [date, setDate] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedProfessional, setSelectedProfessional] = useState<any | null>(
@@ -75,8 +75,6 @@ const Times = () => {
     return `${endHours}:${endMinutes}`;
   };
 
-  console.log(services);
-
   // Generate payload with cascading times
   const generatePayload = (
     services: Service[],
@@ -106,15 +104,7 @@ const Times = () => {
 
   const handleBooking = async () => {
     if (!selectedSlot) return;
-    // let currentStartTime = selectedSlot; // Initialize with the first selected slot
 
-    // const payload = services.map((service) => ({
-    //   staffId: service.professional.id,
-    //   userId,
-    //   startTime: `${date}T${selectedSlot}`,
-    //   endTime: `${date}T${getEndTime(selectedSlot, service.time)}`,
-    //   serviceId: service.id,
-    // }));
     const payload = generatePayload(services, userId, date, selectedSlot);
 
     console.log(payload);
@@ -250,4 +240,4 @@ const Times = () => {
   );
 };
 
-export default Times;
+

@@ -1,8 +1,7 @@
-import Booking from "@/components/time/select-time";
-import React from "react";
+import { SelectTime } from "@/components/time/time";
 
 const page = () => {
-  return <Booking />;
+  return <SelectTime />;
 };
 
 export default page;

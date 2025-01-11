@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    console.log(services);
+
     // Define salon operating hours
     const salonStartTime = "10:00:00";
     const salonEndTime = "22:00:00";
@@ -137,26 +137,4 @@ const getCombinedAvailableSlots = (
   });
 
   return Array.from(combinedAvailableSlots);
-};
-
-// Utility to calculate service duration in minutes
-const calculateDuration = (time: string): number => {
-  const [hours, minutes] = time.split(":").map(Number);
-  return hours * 60 + minutes;
-};
-
-// Utility to check if a slot is available
-const isSlotAvailable = (
-  start: Date,
-  end: Date,
-  bookedSet: Set<string>
-): boolean => {
-  let current = new Date(start);
-  while (current < end) {
-    if (bookedSet.has(current.toTimeString().split(" ")[0])) {
-      return false;
-    }
-    current.setMinutes(current.getMinutes() + 15);
-  }
-  return true;
 };

@@ -107,26 +107,9 @@ export const SelectTime = () => {
 
     const payload = generatePayload(services, userId, date, selectedSlot);
 
-    console.log(payload);
+    mutation.mutate(payload);
 
-    try {
-      const response = await fetch("/api/product/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(result.message);
-      } else {
-        alert(`Error: ${result.message}`);
-      }
-    } catch (error) {
-      console.error("Error submitting bookings:", error);
-      alert("An error occurred while submitting bookings.");
-    }
+   
   };
 
   if (!date) {
@@ -239,5 +222,3 @@ export const SelectTime = () => {
     </div>
   );
 };
-
-

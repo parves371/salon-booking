@@ -37,12 +37,14 @@ export const useSlots = (
 };
 
 // Function to book a slot
+
 const bookSlot = async (bookingDetails: {
   staffId: number;
   userId: number;
   startTime: string;
   endTime: string;
-}): Promise<void> => {
+  serviceId: number;
+}[]): Promise<void> => {
   const response = await fetch("/api/product/bookings", {
     method: "POST",
     headers: {

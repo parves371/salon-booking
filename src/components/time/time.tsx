@@ -123,6 +123,7 @@ export const SelectTime = () => {
     if (!selectedSlot) return;
 
     const payload = generatePayload(services, userId, date, selectedSlot);
+    console.log(payload)
 
     if (user) {
       mutation.mutate(payload);

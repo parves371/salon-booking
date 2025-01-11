@@ -11,7 +11,7 @@ export async function POST(req: Request, res: Response) {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-
+    console.log(bookings);
     const db = await createConnection();
 
     // Prepare bulk insert values

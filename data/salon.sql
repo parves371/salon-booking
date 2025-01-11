@@ -28,12 +28,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `customers` (
-  `id` bigint(20) NOT NULL,
-  `profile` varchar(255) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `number` varchar(255) DEFAULT NULL
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `profile` VARCHAR(255) DEFAULT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `number` VARCHAR(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -63,7 +63,7 @@ CREATE TABLE `user` (
 -- Creating the Staff table
 CREATE TABLE staff (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT UNSIGNED,
+    user_id BIGINT UNSIGNED,  
     position VARCHAR(255),
     available BOOLEAN,
     skills VARCHAR(255),
@@ -71,17 +71,19 @@ CREATE TABLE staff (
 );
 
 
+
 -- Bookings table
 CREATE TABLE bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     staff_id INT,
-    user_id BIGINT UNSIGNED,
+    user_id BIGINT UNSIGNED,  
     start_time DATETIME,
     end_time DATETIME,
     service_id INT,
     FOREIGN KEY (staff_id) REFERENCES staff(id),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES customers(id)
 );
+
 
 
 --

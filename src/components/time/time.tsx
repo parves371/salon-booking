@@ -9,7 +9,8 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { useUser } from "@/hooks/use-user";
-import { useRouter } from "next/navigation";
+
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Professional {
   id: number;
@@ -43,6 +44,9 @@ export const SelectTime = () => {
     null
   );
   const router = useRouter();
+  const pathname = usePathname(); // Gets the current path
+  const searchParams = useSearchParams(); // Gets the query params (e.g., ?callbackUrl=/path)
+  const callbackUrl = searchParams.get("callbackUrl") || pathname;
 
   const { services } = useServicesStore.getState();
   const staffIds = services?.map(
@@ -53,12 +57,11 @@ export const SelectTime = () => {
     time: service.time,
   }));
 
-  const userId = 1;
-
   const { data: slotsData } = useSlots(staffIds, date, servicesIdsAndTime);
   const mutation = useBookSlot();
 
   const { data: user } = useUser();
+  const userId = user?.user?.id;
 
   useEffect(() => {
     setDate(new Date().toISOString().split("T")[0]);
@@ -115,7 +118,8 @@ export const SelectTime = () => {
     if (user) {
       mutation.mutate(payload);
     } else {
-      router.push("/login");
+      // Pass the current URL as the callbackUrl to redirect the user after login
+      router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }
   };
 

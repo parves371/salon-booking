@@ -25,7 +25,7 @@ import axios from "axios";
 
 export const LoginForm = () => {
   const param = useSearchParams();
-  const route = useRouter();
+  const router = useRouter();
 
   const callbackUrl = param.get("callbackUrl");
   const urlErrorr =
@@ -57,7 +57,8 @@ export const LoginForm = () => {
 
       if (res.status === 200) {
         setSuccess(res.data.message);
-        // route.push("/login");
+        // Redirect to the callback URL if exists, otherwise default to home
+        router.push(callbackUrl || "/");
       } else {
         setError("Something went wrong. Please try again.");
       }

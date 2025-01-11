@@ -95,7 +95,7 @@ export const SelectProfessional = () => {
       }
     });
 
-    router.push("/times");
+    router.push("/time");
   };
 
   if (isLoading) {

@@ -8,6 +8,8 @@ import { RxAvatar } from "react-icons/rx";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { useUser } from "@/hooks/use-user";
+import { useRouter } from "next/navigation";
 
 interface Professional {
   id: number;
@@ -40,6 +42,7 @@ export const SelectTime = () => {
   const [selectedProfessional, setSelectedProfessional] = useState<any | null>(
     null
   );
+  const router = useRouter();
 
   const { services } = useServicesStore.getState();
   const staffIds = services?.map(
@@ -54,6 +57,8 @@ export const SelectTime = () => {
 
   const { data: slotsData } = useSlots(staffIds, date, servicesIdsAndTime);
   const mutation = useBookSlot();
+
+  const { data: user } = useUser();
 
   useEffect(() => {
     setDate(new Date().toISOString().split("T")[0]);
@@ -107,9 +112,11 @@ export const SelectTime = () => {
 
     const payload = generatePayload(services, userId, date, selectedSlot);
 
-    mutation.mutate(payload);
-
-   
+    if (user) {
+      mutation.mutate(payload);
+    } else {
+      router.push("/login");
+    }
   };
 
   if (!date) {

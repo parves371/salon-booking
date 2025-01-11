@@ -29,7 +29,6 @@ export async function POST(request: Request) {
       rows as { id: string; email: string; password: string; name: string }[]
     )[0];
 
-
     if (!user) {
       return new Response(JSON.stringify({ message: "User not found" }), {
         status: 404,
@@ -63,7 +62,7 @@ export async function POST(request: Request) {
 
     response.headers.set(
       "Set-Cookie",
-      `salon=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400`// 1 day
+      `salon=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400` // 1 day
     );
 
     return response;

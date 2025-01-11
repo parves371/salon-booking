@@ -132,27 +132,27 @@ export const SelectTime = () => {
   };
 
   //dialog
-
+  const [isOpen, setIsOpen] = useState(false);
   const [activeProfessional, setActiveProfessional] =
     useState<StaffProps | null>(null);
   const [activeProfessionalSkills, setActiveProfessionalSkills] = useState<
     string[]
   >([]);
   // Fetch staff data based on selected professional skills
-  const { data: staff, refetch } = useStaff(activeProfessionalSkills);
+  const { data: staff } = useStaff(activeProfessionalSkills);
   const handleProfessionalSelect = (professional: StaffProps) => {
     setActiveProfessional(professional);
   };
 
+  const updatedProfessionalByid = (professional: StaffProps, id: number) => {
+    const { updateProfessional } = useServicesStore.getState();
+    updateProfessional(id, professional);
+    setIsOpen(false);
+  };
+
   const handleServicesName = (skills: string) => {
     setActiveProfessionalSkills([skills]);
-    refetch();
   };
-  useEffect(() => {
-    if (activeProfessionalSkills.length > 0) {
-      refetch();
-    }
-  }, [activeProfessionalSkills]); // Re-run when skills change
 
   if (!date) {
     return null;
@@ -235,7 +235,10 @@ export const SelectTime = () => {
                   <span className="text-[#7C6DD8] font-semibold text-sm">
                     {treatment?.professional.name || "Any Professional"}
                   </span>
-                  <Dialog>
+                  <Dialog
+                    open={isOpen}
+                    onOpenChange={() => setIsOpen((prev) => !prev)}
+                  >
                     <DialogTrigger
                       onClick={() => handleServicesName(treatment.name)}
                     >
@@ -252,7 +255,10 @@ export const SelectTime = () => {
                               title={i.name}
                               professional={i.position}
                               isActive={activeProfessional?.id === i.id}
-                              onClick={() => handleProfessionalSelect(i)}
+                              onClick={() => {
+                                handleProfessionalSelect(i);
+                                updatedProfessionalByid(i, treatment.id);
+                              }}
                             />
                           ))}
                         </DialogDescription>

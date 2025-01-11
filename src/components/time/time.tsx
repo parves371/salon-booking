@@ -1,5 +1,4 @@
 "use client";
-
 import { useBookSlot, useSlots } from "@/hooks/product/use-slot";
 import { useServicesStore } from "@/store/use-professional-store";
 import { useState, useEffect } from "react";
@@ -10,7 +9,19 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { useUser } from "@/hooks/use-user";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import ProfileCard from "../professional/profile-card";
+import { StaffProps } from "../professional/select-professional";
+import { useStaff } from "@/hooks/use-staff";
 
 interface Professional {
   id: number;
@@ -43,9 +54,10 @@ export const SelectTime = () => {
   const [selectedProfessional, setSelectedProfessional] = useState<any | null>(
     null
   );
+
   const router = useRouter();
-  const pathname = usePathname(); // Gets the current path
-  const searchParams = useSearchParams(); // Gets the query params (e.g., ?callbackUrl=/path)
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || pathname;
 
   const { services } = useServicesStore.getState();
@@ -68,10 +80,8 @@ export const SelectTime = () => {
   }, []);
 
   const getEndTime = (startTime: string, durationMinutes: string) => {
-    // Convert duration "00:30" to total minutes
     const [hours, minutes] = durationMinutes.split(":").map(Number);
     const totalMinutes = hours * 60 + minutes;
-
     const [startHours, startMinutes] = startTime.split(":").map(Number);
     const startDate = new Date();
     startDate.setHours(startHours, startMinutes, 0, 0);
@@ -83,7 +93,6 @@ export const SelectTime = () => {
     return `${endHours}:${endMinutes}`;
   };
 
-  // Generate payload with cascading times
   const generatePayload = (
     services: Service[],
     userId: number,
@@ -118,13 +127,34 @@ export const SelectTime = () => {
     if (user) {
       mutation.mutate(payload);
     } else {
-      // Pass the current URL as the callbackUrl to redirect the user after login
       router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }
   };
 
+  //dialog
+
+  const [activeProfessional, setActiveProfessional] =
+    useState<StaffProps | null>(null);
+  const [activeProfessionalSkills, setActiveProfessionalSkills] = useState<
+    string[]
+  >([]);
+  // Fetch staff data based on selected professional skills
+  const { data: staff, refetch } = useStaff(activeProfessionalSkills);
+  const handleProfessionalSelect = (professional: StaffProps) => {
+    setActiveProfessional(professional);
+  };
+
+  const handleServicesName = (skills: string) => {
+    setActiveProfessionalSkills([skills]);
+    refetch();
+  };
+  useEffect(() => {
+    if (activeProfessionalSkills.length > 0) {
+      refetch();
+    }
+  }, [activeProfessionalSkills]); // Re-run when skills change
+
   if (!date) {
-    // Render nothing while initializing state
     return null;
   }
 
@@ -205,6 +235,30 @@ export const SelectTime = () => {
                   <span className="text-[#7C6DD8] font-semibold text-sm">
                     {treatment?.professional.name || "Any Professional"}
                   </span>
+                  <Dialog>
+                    <DialogTrigger
+                      onClick={() => handleServicesName(treatment.name)}
+                    >
+                      Open
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Are you absolutely sure?</DialogTitle>
+                        <DialogDescription>
+                          {/* Check the staff data */}
+                          {staff?.data?.map((i: StaffProps) => (
+                            <ProfileCard
+                              key={i.id}
+                              title={i.name}
+                              professional={i.position}
+                              isActive={activeProfessional?.id === i.id}
+                              onClick={() => handleProfessionalSelect(i)}
+                            />
+                          ))}
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
                 </span>
               </div>
               <div>

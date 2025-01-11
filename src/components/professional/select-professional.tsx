@@ -76,25 +76,24 @@ export const SelectProfessional = () => {
           },
     }));
 
-    // Access the addTreatment function from Zustand store
-    const { addTreatment, updateProfessional } = useServicesStore.getState();
-
-    // Save the selected data to Zustand store
     selectedData.forEach((treatment) => {
-      // If the treatment already exists in the store, update its professional
+      // Update treatment with new professional and other details
+      const { addTreatment, updateTreatmentById } = useServicesStore.getState();
+
       const existingTreatment = useServicesStore
         .getState()
         .services.find((service) => service.id === treatment.id);
 
       if (existingTreatment) {
-        // If the treatment exists, update the professional for that treatment
-        updateProfessional(treatment.id, treatment.professional);
+        // If the treatment exists, update the whole treatment
+        updateTreatmentById(treatment.id, treatment); // Update everything (name, time, price, professional)
       } else {
-        // If the treatment doesn't exist, add a new one
-        addTreatment(treatment);
+        // If it doesn't exist, add a new treatment
+        addTreatment(treatment); // Add treatment if it doesn't exist
       }
     });
 
+    // After submitting, go to the next step (e.g., /time)
     router.push("/time");
   };
 

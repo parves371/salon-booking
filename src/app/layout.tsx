@@ -4,7 +4,6 @@ import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 import "./globals.css";
 
-import StoreProvider from "./StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
 import QueryStackProvider from "./QueryProvider";
 
@@ -34,9 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryStackProvider>
-          <StoreProvider>{children}</StoreProvider>
-        </QueryStackProvider>
+        <QueryStackProvider>{children}</QueryStackProvider>
         <Toaster />
       </body>
     </html>

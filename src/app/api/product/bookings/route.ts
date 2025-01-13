@@ -27,7 +27,7 @@ export async function POST(req: Request, res: Response) {
 
     // SQL query for bulk insert
     const query = `
-      INSERT INTO bookings (service_id, staff_id, user_id, start_time, end_time)
+      INSERT INTO bookings (service_id, staff_id, coustomer_id, start_time, end_time)
       VALUES ?
     `;
 
@@ -41,9 +41,11 @@ export async function POST(req: Request, res: Response) {
   } catch (error) {
     console.error("Error inserting bookings:", error);
 
-    return new Response(
-      JSON.stringify({ message: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ message: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
+
+

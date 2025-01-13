@@ -34,9 +34,12 @@ const UsersPage = () => {
   const router = useRouter();
   const { toast } = useToast();
 
+
+  console.log(workSchedules);
+
   const fetchWorkSchedules = async () => {
     try {
-      const res = await axios.get("/api/product/works", {
+      const res = await axios.get("/api/product/bookings", {
         withCredentials: true,
       });
       setWorkSchedules(res.data?.data || []);

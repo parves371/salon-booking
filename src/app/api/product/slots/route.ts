@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       `
         SELECT TIME(start_time) AS start_time, TIME(end_time) AS end_time
         FROM bookings
-        WHERE staff_id IN (?) AND DATE(start_time) = ?
+        WHERE staff_id IN (?) AND DATE(start_time) = ? AND status = 'cancelled'
       `,
       [staffIds, date]
     );

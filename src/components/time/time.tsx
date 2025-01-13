@@ -22,6 +22,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProfileCard from "../professional/profile-card";
 import { StaffProps } from "../professional/select-professional";
 import { useStaff } from "@/hooks/use-staff";
+import { LoaderIcon } from "lucide-react";
 
 interface Professional {
   id: number;
@@ -69,7 +70,11 @@ export const SelectTime = () => {
     time: service.time,
   }));
 
-  const { data: slotsData } = useSlots(staffIds, date, servicesIdsAndTime);
+  const {
+    data: slotsData,
+    error,
+    isError,
+  } = useSlots(staffIds, date, servicesIdsAndTime);
   const mutation = useBookSlot();
 
   const { data: user } = useUser();
@@ -123,7 +128,7 @@ export const SelectTime = () => {
     if (!selectedSlot) return;
 
     const payload = generatePayload(services, userId, date, selectedSlot);
-    console.log(payload)
+    console.log(payload);
 
     if (user) {
       mutation.mutate(payload);
@@ -156,7 +161,18 @@ export const SelectTime = () => {
   };
 
   if (!date) {
-    return null;
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <span className="text-2xl">{error?.message}</span>
+      </div>
+    );
   }
 
   return (
@@ -233,9 +249,6 @@ export const SelectTime = () => {
                 <span>{treatment.time}</span>
                 <span className="">
                   with{" "}
-                  <span className="text-[#7C6DD8] font-semibold text-sm">
-                    {treatment?.professional.name || "Any Professional"}
-                  </span>
                   <Dialog
                     open={isOpen}
                     onOpenChange={() => setIsOpen((prev) => !prev)}
@@ -243,14 +256,18 @@ export const SelectTime = () => {
                     <DialogTrigger
                       onClick={() => handleServicesName(treatment.name)}
                     >
-                      Open
+                      <span className="text-[#7C6DD8] font-semibold text-sm">
+                        {treatment?.professional.name || "Any Professional"}
+                      </span>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Are you absolutely sure?</DialogTitle>
                         <DialogDescription>
                           {/* Check the staff data */}
+
                           {staff?.data?.map((i: StaffProps) => (
+                            console.log(treatment),
                             <ProfileCard
                               key={i.id}
                               title={i.name}

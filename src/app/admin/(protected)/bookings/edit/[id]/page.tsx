@@ -21,21 +21,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useWorks } from "@/hooks/product/use-bookings";
+import {
+  useBookingsById,
+  useRenameBookings,
+} from "@/hooks/product/use-bookings";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams } from "next/navigation";
+import { LoaderIcon } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Booking } from "../../page";
+
+// Enum for status
+const BookingStatusEnum = [
+  "pending",
+  "processing",
+  "completed",
+  "cancelled",
+] as const;
 
 const BookingsEditedPage = () => {
   const params = useParams<Record<string, string>>();
+  const router = useRouter();
 
-  const { data, isError, isLoading, error } = useWorks();
+  const { data, isError, error, isLoading } = useBookingsById(
+    Number(params.id)
+  );
+  const { mutate } = useRenameBookings();
 
+  // Zod schema validation for status enum
   const BookingsSchema = z.object({
-    status: z.string().min(1, { message: "Status is required" }),
+    status: z.enum(BookingStatusEnum, { message: "Status is required" }),
   });
 
   const form = useForm<z.infer<typeof BookingsSchema>>({
@@ -46,31 +62,43 @@ const BookingsEditedPage = () => {
   });
 
   useEffect(() => {
-    if (params.id) {
-      const booking = data?.find(
-        (booking: Booking) => booking.booking_id === Number(params.id)
-      );
-      if (booking) {
-        form.setValue("status", booking.status);
-      }
+    if (data) {
+      form.setValue("status", data.status); // Set value if data is loaded
     }
-  }, [params.id]);
+  }, [data, isLoading, isError, form]);
 
-  const onSubmit = async (data: z.infer<typeof BookingsSchema>) => {
-    console.log("Selected status:", data.status);
-    // Handle your form submission logic here
+  const onSubmit = async (formData: z.infer<typeof BookingsSchema>) => {
+    mutate({
+      id: Number(params.id),
+      status: formData.status,
+    });
+    router.push("/admin/bookings");
   };
 
   const cancelButton = () => {
-    // Implement the cancel functionality
+    router.push("/admin/bookings");
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return <div>{error.message}</div>;
+  }
 
   return (
     <div className="px-16">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/services">Services</BreadcrumbLink>
+            <BreadcrumbLink href="/admin/services">Bookings</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -79,7 +107,7 @@ const BookingsEditedPage = () => {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="p-6 max-w-2xl mx-auto border rounded-lg bg-white shadow mt-16">
-        <h2 className="text-2xl font-bold mb-4">Edit Service</h2>
+        <h2 className="text-2xl font-bold mb-4">Edit Bookings</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Status Field */}

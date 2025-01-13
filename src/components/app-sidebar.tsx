@@ -28,8 +28,8 @@ const items = [
     icon: Home,
   },
   {
-    title: "works",
-    url: "/admin/works",
+    title: "Bookings",
+    url: "/admin/bookings",
     icon: MdWorkspaces,
   },
   {

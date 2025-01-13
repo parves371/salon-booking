@@ -76,14 +76,24 @@ CREATE TABLE staff (
 CREATE TABLE bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     staff_id INT,
-    user_id BIGINT UNSIGNED,  
+    coustomer_id  BIGINT UNSIGNED,  
     start_time DATETIME,
     end_time DATETIME,
     service_id INT,
     FOREIGN KEY (staff_id) REFERENCES staff(id),
     FOREIGN KEY (user_id) REFERENCES customers(id)
 );
-
+CREATE TABLE bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_id INT,
+    customer_id BIGINT ,  
+    start_time DATETIME,
+    end_time DATETIME,
+    service_id INT,
+    status ENUM('pending', 'processing', 'completed', 'cancelled') DEFAULT 'pending';
+    FOREIGN KEY (staff_id) REFERENCES staff(id),
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
 
 
 --

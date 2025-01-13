@@ -78,10 +78,6 @@ const UsersPage = () => {
     router.push("/admin/services/create");
   };
 
-  const onEdit = (user: Service) => {
-    router.push(`/admin/services/edit/${user.id}`);
-  };
-
   return (
     <div className="px-16">
       <Breadcrumb>

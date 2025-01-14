@@ -266,19 +266,23 @@ export const SelectTime = () => {
                         <DialogDescription>
                           {/* Check the staff data */}
 
-                          {staff?.data?.map((i: StaffProps) => (
-                            console.log(treatment),
-                            <ProfileCard
-                              key={i.id}
-                              title={i.name}
-                              professional={i.position}
-                              isActive={activeProfessional?.id === i.id}
-                              onClick={() => {
-                                handleProfessionalSelect(i);
-                                updatedProfessionalByid(i, treatment.id);
-                              }}
-                            />
-                          ))}
+                          {staff?.data?.map(
+                            (i: StaffProps) => (
+                              console.log(treatment),
+                              (
+                                <ProfileCard
+                                  key={i.id}
+                                  title={i.name}
+                                  professional={i.position}
+                                  isActive={activeProfessional?.id === i.id}
+                                  onClick={() => {
+                                    handleProfessionalSelect(i);
+                                    updatedProfessionalByid(i, treatment.id);
+                                  }}
+                                />
+                              )
+                            )
+                          )}
                         </DialogDescription>
                       </DialogHeader>
                     </DialogContent>

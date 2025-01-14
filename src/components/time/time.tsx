@@ -151,6 +151,8 @@ export const SelectTime = () => {
   };
 
   const updatedProfessionalByid = (professional: StaffProps, id: number) => {
+    console.log("Selected Professional:", professional);
+    console.log("Treatment ID:", id); // Should log the correct ID for each treatment
     const { updateProfessional } = useServicesStore.getState();
     updateProfessional(id, professional);
     setIsOpen(false);
@@ -199,8 +201,6 @@ export const SelectTime = () => {
             ) : (
               <>
                 <RxAvatar className="text-2xl" />
-                Select a Professional
-                <IoChevronDown />
               </>
             )}
           </div>
@@ -247,42 +247,13 @@ export const SelectTime = () => {
               <div className="w-[50%] flex flex-col">
                 <span>{treatment.name}</span>
                 <span>{treatment.time}</span>
-                <span className="">
-                  with{" "}
-                  <Dialog
-                    open={isOpen}
-                    onOpenChange={() => setIsOpen((prev) => !prev)}
-                  >
-                    <DialogTrigger
-                      onClick={() => handleServicesName(treatment.name)}
-                    >
-                      <span className="text-[#7C6DD8] font-semibold text-sm">
-                        {treatment?.professional.name || "Any Professional"}
-                      </span>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Are you absolutely sure?</DialogTitle>
-                        <DialogDescription>
-                          {/* Check the staff data */}
-
-                          {staff?.data?.map((i: StaffProps) => (
-                            console.log(treatment),
-                            <ProfileCard
-                              key={i.id}
-                              title={i.name}
-                              professional={i.position}
-                              isActive={activeProfessional?.id === i.id}
-                              onClick={() => {
-                                handleProfessionalSelect(i);
-                                updatedProfessionalByid(i, treatment.id);
-                              }}
-                            />
-                          ))}
-                        </DialogDescription>
-                      </DialogHeader>
-                    </DialogContent>
-                  </Dialog>
+                <span>
+                  with
+                  <SelectProfessionalDialog
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    treatmentId={treatment}
+                  />
                 </span>
               </div>
               <div>
@@ -290,6 +261,7 @@ export const SelectTime = () => {
               </div>
             </div>
           ))}
+
           <div className="px-3">
             <Separator className="my-4 px-3" />
           </div>
@@ -309,5 +281,106 @@ export const SelectTime = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+interface SelectProfessionalDialogProps {
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  treatmentId: number;
+  professionalName: string;
+  treatmentName: string[];
+  staff?: StaffProps[];
+  updateProfessionalById: (
+    professional: StaffProps,
+    treatmentId: number
+  ) => void;
+}
+
+const SelectProfessionalDialog: React.FC<SelectProfessionalDialogProps> = ({
+  isOpen,
+  setIsOpen,
+  treatmentId,
+  professionalName,
+  treatmentName,
+  updateProfessionalById,
+}) => {
+  const [selectedProfessional, setSelectedProfessional] =
+    useState<StaffProps | null>(null);
+
+  const [activeProfessionalSkills, setActiveProfessionalSkills] = useState<
+    string[]
+  >([]);
+  // Fetch staff data based on selected professional skills
+  const { data: staff } = useStaff(treatmentName);
+  console.log("Staff Data:", staff);
+
+  const handleProfessionalSelect = (professional: StaffProps) => {
+    console.log("Selected Professional Inside Dialog:", professional);
+    setSelectedProfessional(professional);
+  };
+
+  const handleUpdateProfessional = () => {
+    if (!selectedProfessional) {
+      console.log("No professional selected. Aborting update.");
+      return;
+    }
+
+    console.log("Updating Professional Inside Dialog:", {
+      selectedProfessional,
+      treatmentId,
+    });
+
+    updateProfessionalById(selectedProfessional, treatmentId);
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    if (treatmentId) {
+      // Reset selected professional if necessary when treatment changes
+      setSelectedProfessional(null);
+    }
+  }, [treatmentId]);
+
+  useEffect(() => {
+    console.log("Dialog Opened or Props Changed:", {
+      isOpen,
+      treatmentId,
+      treatmentName,
+      staff,
+      selectedProfessional,
+    });
+  }, [isOpen, treatmentId, treatmentName, staff, selectedProfessional]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger>
+        <span className="text-[#7C6DD8] font-semibold text-sm">
+          {professionalName || "Any Professional"}
+        </span>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Select a Professional</DialogTitle>
+          <DialogDescription>
+            {staff?.data?.map((professional: StaffProps) => (
+              <ProfileCard
+                key={professional.id}
+                title={professional.name}
+                professional={professional.position}
+                isActive={selectedProfessional?.id === professional.id}
+                onClick={() => handleProfessionalSelect(professional)}
+              />
+            ))}
+          </DialogDescription>
+        </DialogHeader>
+        <button
+          onClick={handleUpdateProfessional}
+          className="bg-[#5847c7] text-white px-4 py-2 rounded"
+        >
+          Confirm Selection
+        </button>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -24,6 +24,7 @@ export async function POST(req: Request, res: Response) {
         endTime,
       ]
     );
+    console.log("Values:", values);
 
     // SQL query for bulk insert
     const query = `

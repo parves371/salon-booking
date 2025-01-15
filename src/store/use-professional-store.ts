@@ -79,7 +79,7 @@ export const useServicesStore = create<Store>((set, get) => ({
       );
       saveToLocalStorage(updatedServices);
       return { services: updatedServices };
-    });
+    }); 
   },
   setServices: (services) => {
     set({ services });

@@ -28,8 +28,7 @@ interface Services {
 
 export const SelectProfessional = () => {
   const router = useRouter();
-  const { selectedTreatments } = useProductStore();
-  const [totalPrice, setTotalPrice] = useState(0);
+  const { selectedTreatments,getTotalPrice } = useProductStore();
   const [activeProfessional, setActiveProfessional] =
     useState<StaffProps | null>(null);
 
@@ -48,15 +47,6 @@ export const SelectProfessional = () => {
   const updateAnyProfessional = () => {
     setActiveProfessional(null);
   };
-
-  useEffect(() => {
-    // Update total price when selected treatments or active professional changes
-    const total = selectedTreatments.reduce((acc, treatment) => {
-      const price = treatment.selectedOption?.price || treatment.price;
-      return acc + price; // price is already a number now
-    }, 0);
-    setTotalPrice(total);
-  }, [selectedTreatments, activeProfessional]);
 
   const onSubmit = () => {
     const selectedData = selectedTreatments.map((treatment) => ({
@@ -96,7 +86,8 @@ export const SelectProfessional = () => {
     // After submitting, go to the next step (e.g., /time)
     router.push("/time");
   };
-
+// Calculate total price
+  const totalPrice = getTotalPrice(); // Calculate total price on every render that could affect it
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-96">

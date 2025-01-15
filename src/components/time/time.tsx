@@ -146,6 +146,9 @@ export const SelectTime = () => {
   const handleRefresh = () => {
     setRefreshFlag((prev) => !prev); // Toggle the flag to trigger re-render
   };
+  const { getTotalPrice } = useServicesStore.getState();
+
+  const totalPrice = getTotalPrice();
 
   if (!date) {
     return (
@@ -252,7 +255,7 @@ export const SelectTime = () => {
           </div>
           <div className="flex justify-between font-bold text-lg px-3">
             <h3>Total</h3>
-            {/* <h3>AED {totalPrice}</h3> Display total price */}
+            <h3>AED {totalPrice}</h3>
           </div>
 
           {/* Confirm Booking Button */}

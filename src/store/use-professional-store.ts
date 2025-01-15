@@ -1,6 +1,5 @@
 import { create } from "zustand";
 
-// Define the interfaces
 interface Professional {
   id: number;
   position: string;
@@ -14,7 +13,7 @@ interface Services {
   id: number;
   name: string;
   time: string;
-  price: number; // price is a number
+  price: number; // Price is a number
   professional: Professional;
 }
 
@@ -26,26 +25,21 @@ interface Store {
     serviceId: number,
     newProfessional: Professional
   ) => void;
-  setServices: (services: Services[]) => void; // A method to set the services directly
-  reset: () => void; // Add reset function to interface
-  
+  setServices: (services: Services[]) => void;
+  reset: () => void;
+  getTotalPrice: () => number; // Function to get the total price
 }
 
-// Load services from localStorage
 const loadFromLocalStorage = (): Services[] => {
   try {
     const savedServices = localStorage.getItem("services");
-    if (savedServices) {
-      return JSON.parse(savedServices);
-    }
-    return [];
+    return savedServices ? JSON.parse(savedServices) : [];
   } catch (error) {
     console.error("Error loading from localStorage", error);
     return [];
   }
 };
 
-// Save services to localStorage
 const saveToLocalStorage = (services: Services[]) => {
   try {
     localStorage.setItem("services", JSON.stringify(services));
@@ -54,53 +48,54 @@ const saveToLocalStorage = (services: Services[]) => {
   }
 };
 
-export const useServicesStore = create<Store>((set) => ({
-  services: loadFromLocalStorage(), // Initialize services from localStorage
-  addTreatment: (service) =>
+export const useServicesStore = create<Store>((set, get) => ({
+  services: loadFromLocalStorage(),
+  addTreatment: (service) => {
     set((state) => {
       const isDuplicate = state.services.some(
         (existingService) => existingService.id === service.id
       );
-
-      if (isDuplicate) {
-        return state; // Do nothing if the service already exists
-      }
-
+      if (isDuplicate) return state;
       const updatedServices = [...state.services, service];
-      saveToLocalStorage(updatedServices); // Save to localStorage when adding a service
+      saveToLocalStorage(updatedServices);
       return { services: updatedServices };
-    }),
-
-  // Update the entire treatment (name, time, price, professional)
-  updateTreatmentById: (serviceId: number, updatedTreatment: Services) =>
+    });
+  },
+  updateTreatmentById: (serviceId, updatedTreatment) => {
     set((state) => {
       const updatedServices = state.services.map((service) =>
         service.id === serviceId ? { ...service, ...updatedTreatment } : service
       );
-      saveToLocalStorage(updatedServices); // Save to localStorage after updating
+      saveToLocalStorage(updatedServices);
       return { services: updatedServices };
-    }),
-
-  // Update only the professional for a given service
-  updateProfessional: (serviceId: number, newProfessional: Professional) =>
+    });
+  },
+  updateProfessional: (serviceId, newProfessional) => {
     set((state) => {
       const updatedServices = state.services.map((service) =>
         service.id === serviceId
           ? { ...service, professional: newProfessional }
           : service
       );
-      saveToLocalStorage(updatedServices); // Save to localStorage after updating
+      saveToLocalStorage(updatedServices);
       return { services: updatedServices };
-    }),
-
-  setServices: (services: Services[]) => {
-    set({ services });
-    saveToLocalStorage(services); // Save updated services to localStorage
+    });
   },
-  reset: () =>
-    set(() => {
-      const clearedServices: Services[] = [];
-      saveToLocalStorage(clearedServices); // Clear localStorage
-      return { services: clearedServices }; // Reset store state
-    }),
+  setServices: (services) => {
+    set({ services });
+    saveToLocalStorage(services);
+  },
+  reset: () => {
+    const clearedServices: Services[] = [];
+    saveToLocalStorage(clearedServices);
+    set({ services: clearedServices });
+  },
+  getTotalPrice: () => {
+    const services = get().services;
+    const totalPrice = services.reduce((total, service) => {
+      const price = Number(service.price); // Ensure it's a number
+      return total + (isNaN(price) ? 0 : price); // Add to total if valid
+    }, 0);
+    return totalPrice; // Return the number directly, no need to use .toFixed()
+  },
 }));

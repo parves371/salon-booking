@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/hooks/use-user";
+import { LoaderIcon } from "lucide-react";
 function maskEmail(email: string): string {
   if (!email || typeof email !== "string") return "Please enter your email";
   const [username, domain] = email.split("@");
@@ -12,10 +13,21 @@ function maskEmail(email: string): string {
     visibleUsername + "*".repeat(Math.max(username.length - 3, 0)); // Mask the rest of the username
   return `${maskedUsername}@${domain}`;
 }
+
 const Page = () => {
-  const { data } = useUser();
+  const { data, isError, error, isLoading } = useUser();
   const user = data?.user;
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoaderIcon className="size-5 spin-in-1" />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>{error.message}</div>;
+  }
   return (
     <div className=" bg-gray-50 px-4 sm:px-6 lg:px-8 w-[350px] md:w-[450px] lg:w-[750px]">
       <Card className="mt-16 w-full mx-auto">

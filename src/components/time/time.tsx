@@ -23,6 +23,7 @@ import ProfileCard from "../professional/profile-card";
 import { StaffProps } from "../professional/select-professional";
 import { useStaff } from "@/hooks/use-staff";
 import { LoaderIcon } from "lucide-react";
+import { useProductStore } from "@/store/use-product-store";
 
 interface Professional {
   id: number;
@@ -132,6 +133,11 @@ export const SelectTime = () => {
 
     if (user) {
       mutation.mutate(payload);
+      const { reset } = useServicesStore.getState();
+      const { reset: resetProduct } = useProductStore.getState();
+      reset();
+      resetProduct();
+      router.push("/appointment");
     } else {
       router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }

@@ -1,7 +1,6 @@
-import {create} from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { createJSONStorage } from 'zustand/middleware'
-
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import { createJSONStorage } from "zustand/middleware";
 
 interface Option {
   id: number;
@@ -29,6 +28,7 @@ interface TreatmentsState {
   setHydrated: (hydrated: boolean) => void;
   addOrUpdateTreatment: (treatment: Service) => void;
   removeTreatment: (treatmentId: number) => void;
+  reset: () => void; // Add reset function to interface
 }
 
 export const useProductStore = create<TreatmentsState>()(
@@ -38,15 +38,16 @@ export const useProductStore = create<TreatmentsState>()(
         selectedTreatments: [],
         activeSection: null,
         hydrated: false,
-        setSelectedTreatments: (treatments: Service[]) => 
+        setSelectedTreatments: (treatments: Service[]) =>
           set({ selectedTreatments: treatments }),
-        setActiveSection: (sectionId: number | null) => 
+        setActiveSection: (sectionId: number | null) =>
           set({ activeSection: sectionId }),
-        setHydrated: (hydrated: boolean) => 
-          set({ hydrated }),
+        setHydrated: (hydrated: boolean) => set({ hydrated }),
         addOrUpdateTreatment: (treatment: Service) => {
           const treatments = [...get().selectedTreatments];
-          const index = treatments.findIndex((t: Service) => t.id === treatment.id);
+          const index = treatments.findIndex(
+            (t: Service) => t.id === treatment.id
+          );
           if (index >= 0) {
             treatments[index] = { ...treatments[index], ...treatment };
           } else {
@@ -60,11 +61,14 @@ export const useProductStore = create<TreatmentsState>()(
           );
           set({ selectedTreatments: filteredTreatments });
         },
+        reset: () => {
+          set({ selectedTreatments: [], activeSection: null, hydrated: false });
+        },
       }),
       {
-        name: 'treatment-storage',
+        name: "treatment-storage",
         storage: createJSONStorage(() => localStorage),
       }
     )
   )
-)
+);

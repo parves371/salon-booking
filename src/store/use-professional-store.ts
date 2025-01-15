@@ -27,6 +27,7 @@ interface Store {
     newProfessional: Professional
   ) => void;
   setServices: (services: Services[]) => void; // A method to set the services directly
+  reset: () => void; // Add reset function to interface
 }
 
 // Load services from localStorage
@@ -95,4 +96,10 @@ export const useServicesStore = create<Store>((set) => ({
     set({ services });
     saveToLocalStorage(services); // Save updated services to localStorage
   },
+  reset: () =>
+    set(() => {
+      const clearedServices: Services[] = [];
+      saveToLocalStorage(clearedServices); // Clear localStorage
+      return { services: clearedServices }; // Reset store state
+    }),
 }));

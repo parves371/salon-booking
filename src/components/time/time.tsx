@@ -50,6 +50,7 @@ interface Payload {
 }
 
 export const SelectTime = () => {
+  const [refreshFlag, setRefreshFlag] = useState(false); // New state for re-rendering
   const [date, setDate] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedProfessional, setSelectedProfessional] = useState<any | null>(
@@ -128,7 +129,6 @@ export const SelectTime = () => {
     if (!selectedSlot) return;
 
     const payload = generatePayload(services, userId, date, selectedSlot);
-    console.log(payload);
 
     if (user) {
       mutation.mutate(payload);
@@ -137,27 +137,8 @@ export const SelectTime = () => {
     }
   };
 
-  //dialog
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeProfessional, setActiveProfessional] =
-    useState<StaffProps | null>(null);
-  const [activeProfessionalSkills, setActiveProfessionalSkills] = useState<
-    string[]
-  >([]);
-  // Fetch staff data based on selected professional skills
-  const { data: staff } = useStaff(activeProfessionalSkills);
-  const handleProfessionalSelect = (professional: StaffProps) => {
-    setActiveProfessional(professional);
-  };
-
-  const updatedProfessionalByid = (professional: StaffProps, id: number) => {
-    const { updateProfessional } = useServicesStore.getState();
-    updateProfessional(id, professional);
-    setIsOpen(false);
-  };
-
-  const handleServicesName = (skills: string) => {
-    setActiveProfessionalSkills([skills]);
+  const handleRefresh = () => {
+    setRefreshFlag((prev) => !prev); // Toggle the flag to trigger re-render
   };
 
   if (!date) {
@@ -249,44 +230,10 @@ export const SelectTime = () => {
                 <span>{treatment.time}</span>
                 <span className="">
                   with{" "}
-                  <Dialog
-                    open={isOpen}
-                    onOpenChange={() => setIsOpen((prev) => !prev)}
-                  >
-                    <DialogTrigger
-                      onClick={() => handleServicesName(treatment.name)}
-                    >
-                      <span className="text-[#7C6DD8] font-semibold text-sm">
-                        {treatment?.professional.name || "Any Professional"}
-                      </span>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Are you absolutely sure?</DialogTitle>
-                        <DialogDescription>
-                          {/* Check the staff data */}
-
-                          {staff?.data?.map(
-                            (i: StaffProps) => (
-                              console.log(treatment),
-                              (
-                                <ProfileCard
-                                  key={i.id}
-                                  title={i.name}
-                                  professional={i.position}
-                                  isActive={activeProfessional?.id === i.id}
-                                  onClick={() => {
-                                    handleProfessionalSelect(i);
-                                    updatedProfessionalByid(i, treatment.id);
-                                  }}
-                                />
-                              )
-                            )
-                          )}
-                        </DialogDescription>
-                      </DialogHeader>
-                    </DialogContent>
-                  </Dialog>
+                  <DialogProfessional
+                    services={treatment}
+                    onRefresh={handleRefresh}
+                  />
                 </span>
               </div>
               <div>
@@ -313,5 +260,63 @@ export const SelectTime = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const DialogProfessional = ({
+  services,
+  onRefresh,
+}: {
+  services: Service;
+  onRefresh: () => void;
+}) => {
+  //dialog
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeProfessional, setActiveProfessional] =
+    useState<StaffProps | null>(null);
+
+  // Fetch staff data based on selected professional skills
+  const { data: staff } = useStaff([services.name]);
+  const handleProfessionalSelect = (professional: StaffProps) => {
+    setActiveProfessional(professional);
+  };
+
+  const updatedProfessionalByid = (professional: StaffProps, id: number) => {
+    if (!professional) return;
+    const { updateProfessional } = useServicesStore.getState();
+    updateProfessional(id, professional);
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={() => setIsOpen((prev) => !prev)}>
+        <DialogTrigger>
+          <span className="text-[#7C6DD8] font-semibold text-sm">
+            {services?.professional.name || "Any Professional"}
+          </span>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              {staff?.data?.map((i: StaffProps) => (
+                <ProfileCard
+                  key={i.id}
+                  title={i.name}
+                  professional={i.position}
+                  isActive={activeProfessional?.id === i.id}
+                  onClick={() => {
+                    handleProfessionalSelect(i);
+                    updatedProfessionalByid(i, services.id);
+                    onRefresh();
+                  }}
+                />
+              ))}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

@@ -73,16 +73,7 @@ CREATE TABLE staff (
 
 
 -- Bookings table
-CREATE TABLE bookings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    staff_id INT,
-    coustomer_id  BIGINT UNSIGNED,  
-    start_time DATETIME,
-    end_time DATETIME,
-    service_id INT,
-    FOREIGN KEY (staff_id) REFERENCES staff(id),
-    FOREIGN KEY (user_id) REFERENCES customers(id)
-);
+
 CREATE TABLE bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     staff_id INT,

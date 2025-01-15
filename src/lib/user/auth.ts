@@ -14,7 +14,10 @@ interface Customer {
 // Function to decode JWT token and authenticate user
 export const authenticate = async (req: Request) => {
   const cookies = req.headers.get("cookie");
-  const token = cookies?.split("; ").find((cookie) => cookie.startsWith("salon="))?.split("=")[1];
+  const token = cookies
+    ?.split("; ")
+    .find((cookie) => cookie.startsWith("salon="))
+    ?.split("=")[1];
 
   if (!token) {
     return { error: "No token provided" };
@@ -27,13 +30,14 @@ export const authenticate = async (req: Request) => {
 
     // Fetch the user profile from the database
     const db = await createConnection();
-    
+
     // Query the database, typing the result as RowDataPacket[]
     const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT id, email, name FROM customers WHERE id = ?", [userId]
+      "SELECT id, email, name, profile, number FROM customers WHERE id = ?",
+      [userId]
     );
 
-    const user = (rows[0] as Customer); // Cast the first row to a Customer
+    const user = rows[0] as Customer; // Cast the first row to a Customer
 
     if (!user) {
       return { error: "User not found" };

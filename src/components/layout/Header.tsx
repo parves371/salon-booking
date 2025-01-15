@@ -1,6 +1,15 @@
 import React from "react";
 import Link from "next/link";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export const Navbar: React.FC = () => {
   return (
     <header className="bg-gray-500 text-white">
@@ -15,10 +24,16 @@ export const Navbar: React.FC = () => {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex space-x-8 ">
-          <Link href="/"  className="hover:text-[#969CA3]">Home</Link>
-          <Link href="/appointment" className="hover:text-[#969CA3]">appointment</Link>
+          <Link href="/" className="hover:text-[#969CA3]">
+            Home
+          </Link>
+          <Link href="/appointment" className="hover:text-[#969CA3]">
+            appointment
+          </Link>
 
-          <Link href="/contact" className="hover:text-[#969CA3]">Contact</Link>
+          <Link href="/contact" className="hover:text-[#969CA3]">
+            Contact
+          </Link>
         </nav>
 
         {/* Contact Info */}
@@ -50,9 +65,30 @@ export const Navbar: React.FC = () => {
           <button className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded">
             Let&apos;s Talk
           </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href="/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>Billing</DropdownMenuItem>
+              <DropdownMenuItem>Team</DropdownMenuItem>
+              <DropdownMenuItem>Subscription</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
   );
 };
-

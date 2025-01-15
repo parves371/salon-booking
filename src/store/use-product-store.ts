@@ -29,6 +29,7 @@ interface TreatmentsState {
   addOrUpdateTreatment: (treatment: Service) => void;
   removeTreatment: (treatmentId: number) => void;
   reset: () => void; // Add reset function to interface
+  getTotalPrice: () => number; // Function to get the total price
 }
 
 export const useProductStore = create<TreatmentsState>()(
@@ -63,6 +64,14 @@ export const useProductStore = create<TreatmentsState>()(
         },
         reset: () => {
           set({ selectedTreatments: [], activeSection: null, hydrated: false });
+        },
+        getTotalPrice: () => {
+          return get().selectedTreatments.reduce((total, treatment) => {
+            const optionPrice = treatment.selectedOption
+              ? Number(treatment.selectedOption.price)
+              : 0; // Ensure selectedOption price is a number
+            return total + optionPrice;
+          }, 0);
         },
       }),
       {

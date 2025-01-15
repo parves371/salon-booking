@@ -28,6 +28,7 @@ interface Store {
   ) => void;
   setServices: (services: Services[]) => void; // A method to set the services directly
   reset: () => void; // Add reset function to interface
+  
 }
 
 // Load services from localStorage

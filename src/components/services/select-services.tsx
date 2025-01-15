@@ -43,7 +43,7 @@ export const SelectServices: React.FC = () => {
     setActiveSection,
     setHydrated,
     activeSection,
-    hydrated,
+    getTotalPrice,
   } = useProductStore();
 
   //fetching data from the server | all the products
@@ -56,20 +56,6 @@ export const SelectServices: React.FC = () => {
     }
   }, [data, setActiveSection, setHydrated, activeSection]);
 
-  const calculateTotalPrice = () => {
-    const selectedData = selectedTreatments.map((services) => ({
-      id: services.id,
-      name: services.selectedOption?.name || services.name,
-      time: services.selectedOption?.time || services.time,
-      price: services.selectedOption?.price || services.price,
-    }));
-
-    return selectedData.reduce((total, services) => {
-      const price = services.price;
-      return total + price;
-    }, 0);
-  };
-
   const onsubmit = () => {
     const selectedData = selectedTreatments.map((services) => ({
       id: services.id,
@@ -77,8 +63,6 @@ export const SelectServices: React.FC = () => {
       time: services.selectedOption?.time || services.time,
       price: services.selectedOption?.price || services.price,
     }));
-
-    console.log("selectedData", selectedTreatments);
 
     router.push("/professional");
   };
@@ -94,7 +78,7 @@ export const SelectServices: React.FC = () => {
     return <div>Error:{error.message}</div>;
   }
 
-  const totalPrice = calculateTotalPrice(); // Calculate total price on every render that could affect it
+  const totalPrice = getTotalPrice(); // Calculate total price on every render that could affect it
   return (
     <section>
       <div className="container mx-auto mt-16 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 px-4 lg-px-0">

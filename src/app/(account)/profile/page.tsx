@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/hooks/use-user";
-// Privacy utility function
 function maskEmail(email: string): string {
   if (!email || typeof email !== "string") return "Please enter your email";
   const [username, domain] = email.split("@");
@@ -67,9 +59,6 @@ const Page = () => {
             <p className="text-sm text-gray-500">No user data available</p>
           )}
         </CardContent>
-        <CardFooter className="bg-gray-50 text-center py-4">
-          <p className="text-sm text-gray-500">Card Footer</p>
-        </CardFooter>
       </Card>
     </div>
   );

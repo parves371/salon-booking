@@ -1,9 +1,7 @@
 import { createConnection } from "@/lib/db/dbConnect";
 import { Registerchema } from "@/schemas";
 import bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from "uuid";
 import { RowDataPacket } from "mysql2"; // Import RowDataPacket for typing query results
-
 interface RegisterRequestBody {
   email: string;
   password: string;
@@ -27,9 +25,8 @@ export async function POST(request: Request): Promise<Response> {
     const db = await createConnection();
 
     const validatedData = Registerchema.parse(reqBody);
-    const { email, password, name, number } = validatedData;
+    const { email, password, name, number, date } = validatedData;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const id = uuidv4(); // Generate UUID
 
     const emailCheckQuery = "SELECT email FROM customers WHERE email = ?";
     const [existingUser] = await db.query<RowDataPacket[]>(emailCheckQuery, [
@@ -43,9 +40,11 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
+    console.log();
+
     // Insert the new user with the generated UUID
-    const sql = `INSERT INTO customers (id, profile, email, name, number, password) VALUES (?, ?, ?, ?, ?, ?)`;
-    const values = [id, "", email, name, number, hashedPassword];
+    const sql = `INSERT INTO customers (profile, email, name, number, password,date_of_birth) VALUES (?, ?, ?, ?, ?, ?)`;
+    const values = ["", email, name, number, hashedPassword, date];
     await db.query(sql, values);
 
     const response: RegisterResponse = {

@@ -46,9 +46,10 @@ export const RegisterForm = () => {
         password: values.password,
         name: values.name,
         number: values.number,
+        date: values.date,
       });
 
-      if (res.status === 200) {
+      if (res.status === 201) {
         setSuccess(res.data.message);
         route.push("/login");
       } else {
@@ -101,6 +102,24 @@ export const RegisterForm = () => {
                   <FormLabel>Number</FormLabel>
                   <FormControl>
                     <Input
+                      disabled={isPending}
+                      placeholder="#####"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="date"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
                       disabled={isPending}
                       placeholder="#####"
                       {...field}

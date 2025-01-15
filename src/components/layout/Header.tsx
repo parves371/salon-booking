@@ -82,7 +82,12 @@ export const Navbar: React.FC = () => {
               <DropdownMenuItem>
                 <Link href="/profile">Profile</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/bookings">Bookings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/biling">Billing</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem>Team</DropdownMenuItem>
               <DropdownMenuItem>Subscription</DropdownMenuItem>
             </DropdownMenuContent>

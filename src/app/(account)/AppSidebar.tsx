@@ -1,11 +1,6 @@
 import {
-  Home,
-  Inbox,
-  OptionIcon,
-  Settings,
-  User,
-  User2,
-  User2Icon,
+  BookIcon,
+  User
 } from "lucide-react";
 
 import {
@@ -19,7 +14,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { MdCategory, MdWorkspaces } from "react-icons/md";
+import { FaMoneyBill1 } from "react-icons/fa6";
 
 // Menu items.
 const items = [
@@ -27,6 +22,11 @@ const items = [
     title: "Profile",
     url: "/profile",
     icon: User,
+  },
+  {
+    title: "Bookings",
+    url: "/bookings",
+    icon: BookIcon,
   },
 ];
 

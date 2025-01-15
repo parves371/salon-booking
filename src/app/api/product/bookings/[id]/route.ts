@@ -19,7 +19,10 @@ export async function DELETE(
     ]);
 
     if (result.affectedRows === 0) {
-      return NextResponse.json({ message: "bookings not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "bookings not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(
@@ -45,7 +48,7 @@ export async function GET(
     if (isNaN(id)) {
       return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
-    console.log(id);
+
     const db = await createConnection();
 
     // SQL query to select booking data with JOINs

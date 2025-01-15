@@ -24,6 +24,7 @@ const fetchBookingsById = async (id: number) => {
   }
   return response.json(); // Assuming the response is in JSON format
 };
+
 export const useBookingsById = (bookingsId: number) => {
   return useQuery({
     queryKey: ["bookings", bookingsId], // A unique key for this query
@@ -31,6 +32,28 @@ export const useBookingsById = (bookingsId: number) => {
     staleTime: 5 * 60 * 1000, // (Optional) Data remains fresh for 5 minutes
   });
 };
+
+const fetchBookingsByCustomerID = async (id: number) => {
+  const response = await fetch(`/api/product/bookings?customer_id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch staff");
+  }
+  return response.json();
+};
+
+export const useBookingsByCustomerID = (customer_id: number) => {
+  return useQuery({
+    queryKey: ["customerBookings", customer_id],
+    queryFn: () => fetchBookingsByCustomerID(customer_id),
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 export const useDeleteBookings = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -65,7 +88,6 @@ export const useDeleteBookings = () => {
     },
   });
 };
-
 export const useRenameBookings = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();

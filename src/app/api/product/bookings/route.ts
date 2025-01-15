@@ -49,8 +49,18 @@ export async function POST(req: Request, res: Response) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const url = new URL(req.url);
+    const customer_id = url.searchParams.get("customer_id"); // Retrieve the query parameter
+    console.log(customer_id);
+    if (!customer_id || isNaN(Number(customer_id))) {
+      return new Response(JSON.stringify({ message: "Invalid ID" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const db = await createConnection();
 
     // SQL query with joins
@@ -72,10 +82,11 @@ export async function GET() {
       LEFT JOIN services ON bookings.service_id = services.id
       LEFT JOIN staff ON bookings.staff_id = staff.id
       LEFT JOIN user AS users ON staff.user_id = users.id
+      WHERE customer_id = ?
     `;
 
     // Execute the query
-    const [results] = await db.query(query);
+    const [results] = await db.query(query, [customer_id]);
 
     // Return the results
     return new Response(JSON.stringify(results), {

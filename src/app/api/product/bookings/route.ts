@@ -1,4 +1,6 @@
 import { createConnection } from "@/lib/db/dbConnect";
+import stripe from "@/lib/stripe";
+import { NextApiRequest } from "next";
 
 export async function POST(req: Request, res: Response) {
   try {
@@ -24,7 +26,7 @@ export async function POST(req: Request, res: Response) {
         endTime,
       ]
     );
-    console.log("Values:", values);
+    console.log("Values:", bookings);
 
     // SQL query for bulk insert
     const query = `
@@ -100,5 +102,77 @@ export async function GET(req: Request) {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
+  }
+}
+
+// pages/api/booking.ts
+
+export async function PUT(req: Request) {
+  let connection: any;
+
+  try {
+    // Parse request body
+    const { customerId, services, totalPrice, paymentMethod } =
+      await req.json();
+
+    const pool = await createConnection();
+    connection = await pool.getConnection();
+
+    await connection.beginTransaction(); // Start a transaction
+
+    // Create a new booking
+    const [bookingResult] = await connection.execute(
+      `INSERT INTO bookings (customer_id, price) VALUES (?, ?)`,
+      [customerId, totalPrice]
+    );
+    const bookingId = (bookingResult as any).insertId;
+
+    // Add services to the booking
+    for (const service of services) {
+      await connection.execute(
+        `INSERT INTO booking_services (booking_id, staff_id, services_id, start_time, end_time, price) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          bookingId,
+          service.staffId,
+          service.serviceId,
+          service.startTime,
+          service.endTime,
+          service.price,
+        ]
+      );
+    }
+
+    // Create Stripe payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(totalPrice * 100), // Convert to cents
+      currency: "usd",
+      payment_method_types: [paymentMethod],
+    });
+
+    // Save payment details
+    await connection.execute(
+      `INSERT INTO payments (book_id, price, payment_method, status) VALUES (?, ?, ?, ?)`,
+      [bookingId, totalPrice, paymentMethod, "pending"]
+    );
+
+    await connection.commit(); // Commit transaction
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        clientSecret: paymentIntent.client_secret,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    if (connection) await connection.rollback(); // Rollback transaction in case of error
+    console.error("Error during booking:", error);
+    return new Response(
+      JSON.stringify({ success: false, error: "Something went wrong!" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  } finally {
+    if (connection) connection.release(); // Release the connection back to the pool
   }
 }

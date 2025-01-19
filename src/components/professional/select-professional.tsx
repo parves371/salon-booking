@@ -28,7 +28,7 @@ interface Services {
 
 export const SelectProfessional = () => {
   const router = useRouter();
-  const { selectedTreatments,getTotalPrice } = useProductStore();
+  const { selectedTreatments, getTotalPrice } = useProductStore();
   const [activeProfessional, setActiveProfessional] =
     useState<StaffProps | null>(null);
 
@@ -86,7 +86,7 @@ export const SelectProfessional = () => {
     // After submitting, go to the next step (e.g., /time)
     router.push("/time");
   };
-// Calculate total price
+  // Calculate total price
   const totalPrice = getTotalPrice(); // Calculate total price on every render that could affect it
   if (isLoading) {
     return (

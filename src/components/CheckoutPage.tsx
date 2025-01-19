@@ -7,8 +7,15 @@ import {
   PaymentElement,
 } from "@stripe/react-stripe-js";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
+import { Payload } from "./time/time";
 
-const CheckoutPage = ({ amount }: { amount: number }) => {
+const CheckoutPage = ({
+  amount,
+  payload,
+}: {
+  amount: number;
+  payload: Payload[];
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -26,6 +33,8 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       .then((res) => res.json())
       .then((data) => setClientSecret(data.clientSecret));
   }, [amount]);
+
+  console.log(payload);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -51,6 +60,8 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       },
       redirect: "if_required", // Prevent auto-redirect
     });
+
+    console.log("paymentIntent", paymentIntent);
 
     if (error) {
       // This point is only reached if there's an immediate error when

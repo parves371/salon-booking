@@ -42,12 +42,14 @@ interface Service {
   professional: Professional;
 }
 
-interface Payload {
+export interface Payload {
   staffId: number;
   userId: number;
   startTime: string;
   endTime: string;
   serviceId: number;
+  price?: string; // Optional if not always provided
+  time: string;
 }
 
 import CheckoutPage from "@/components/CheckoutPage";
@@ -76,6 +78,7 @@ export const SelectTime = () => {
   const callbackUrl = searchParams.get("callbackUrl") || pathname;
 
   const { services } = useServicesStore.getState();
+
   const staffIds = services?.map(
     (professional) => professional.professional.id
   );
@@ -89,7 +92,6 @@ export const SelectTime = () => {
     error,
     isError,
   } = useSlots(staffIds, date, servicesIdsAndTime);
-  const mutation = useBookings();
 
   const { data: user } = useUser();
   const userId = user?.user?.id;
@@ -128,6 +130,8 @@ export const SelectTime = () => {
         startTime: `${date}T${currentStartTime}`,
         endTime: `${date}T${endTime}`,
         serviceId: service.id,
+        time: service.time,
+        price: service.price.toString(),
       };
 
       currentStartTime = endTime;
@@ -138,18 +142,23 @@ export const SelectTime = () => {
     return payload;
   };
 
+  let payload: Payload[] = [];
+
+  if (selectedSlot) {
+    payload = generatePayload(services, userId, date, selectedSlot);
+  }
+
   const handleBooking = async () => {
     if (!selectedSlot) return;
 
-    const payload = generatePayload(services, userId, date, selectedSlot);
+    console.log(payload);
 
     if (user) {
-      mutation.mutate(payload);
-      const { reset } = useServicesStore.getState();
-      const { reset: resetProduct } = useProductStore.getState();
-      reset();
-      resetProduct();
-      router.push("/appointment");
+      // const { reset } = useServicesStore.getState();
+      // const { reset: resetProduct } = useProductStore.getState();
+      // reset();
+      // resetProduct();
+      // router.push("/appointment");
     } else {
       router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }
@@ -295,7 +304,7 @@ export const SelectTime = () => {
                 currency: "usd",
               }}
             >
-              <CheckoutPage amount={amount} />
+              <CheckoutPage amount={amount} payload={payload} />
             </Elements>
           </main>
         </div>

@@ -45,10 +45,12 @@ const bookings = async (
     startTime: string;
     endTime: string;
     serviceId: number;
-  }[]
+    price: string;
+  }[],
+  userId: number // This is unused but you may keep it if needed
 ): Promise<void> => {
   const response = await fetch("/api/product/bookings", {
-    method: "POST",
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
@@ -62,11 +64,28 @@ const bookings = async (
 };
 
 // React Query mutation hook for booking a slot
-export const useBookings = () => {
+export const useBookings = (
+  services: {
+    id: number;
+    staffId: number;
+    startTime: string;
+    endTime: string;
+    serviceId: number;
+    price: string;
+  }[],
+  userId: number
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bookings, // Function to book a slot
+    mutationFn: () =>
+      bookings(
+        services.map((service) => ({
+          ...service,
+          userId, // Add userId to each service object
+        })),
+        userId
+      ),
     onSuccess: () => {
       // Invalidate the slots query to fetch updated data
       queryClient.invalidateQueries({

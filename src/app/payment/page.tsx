@@ -31,7 +31,7 @@ export default function Home() {
           currency: "usd",
         }}
       >
-        <CheckoutPage amount={amount} />
+        {/* <CheckoutPage amount={amount} /> */}
       </Elements>
     </main>
   );

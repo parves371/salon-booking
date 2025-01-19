@@ -72,21 +72,6 @@ CREATE TABLE staff (
 
 
 
--- Bookings table
-
-CREATE TABLE bookings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    staff_id INT,
-    customer_id BIGINT ,  
-    start_time DATETIME,
-    end_time DATETIME,
-    service_id INT,
-    status ENUM('pending', 'processing', 'completed', 'cancelled') DEFAULT 'pending';
-    FOREIGN KEY (staff_id) REFERENCES staff(id),
-    FOREIGN KEY (customer_id) REFERENCES customers(id)
-);
-
-
 --
 -- Dumping data for table `user`
 --
@@ -170,15 +155,51 @@ CREATE TABLE options (
 
 
 
--- coustom sql for work_schedule:
-CREATE TABLE Work_Schedule (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `staff_id` BIGINT NOT NULL,
-    `work_date` DATE NOT NULL,
-    `slot_start` TIME NOT NULL,
-    `slot_end` TIME NOT NULL,
-    `status` ENUM('free', 'booked', 'off') NOT NULL DEFAULT 'free',
-    CONSTRAINT `work_schedule_staff_id_foreign` FOREIGN KEY (`staff_id`) REFERENCES `Staff`(`id`)
+-- bookings
+
+CREATE TABLE books (
+    id INT AUTO_INCREMENT PRIMARY KEY,           -- Auto-increment primary key
+    customer_id BIGINT(20) NOT NULL,              -- Foreign key referencing customers table
+    status ENUM('pending', 'processing', 'completed', 'cancelled', 'hold') DEFAULT 'pending', -- Status with default value
+    price DECIMAL(10, 2) NOT NULL,               -- Price with two decimal places
+    discount DECIMAL(10, 2) DEFAULT NULL,        -- Discount, can be NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Automatically set the creation time
+    
+    -- Define foreign key constraint
+    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 );
 
+
+
+CREATE TABLE booking_services (
+  id INT(11) AUTO_INCREMENT PRIMARY KEY,                  -- Auto-increment primary key
+  booking_id INT(11) NOT NULL,                             -- Foreign key for the booking ID
+  staff_id INT(11) DEFAULT NULL,                           -- Foreign key for the staff ID (allow NULL for SET NULL)
+  services_id INT(11) NOT NULL,                            -- Foreign key for the services (options ID)
+  start_time DATETIME NOT NULL,                            -- Start time for the service
+  end_time DATETIME NOT NULL,                              -- End time for the service
+  price DECIMAL(10, 2) NOT NULL,                           -- Price of the service
+  status ENUM('pending', 'processing', 'completed', 'cancelled', 'hold') DEFAULT 'pending', -- Status
+  discount DECIMAL(10, 2) DEFAULT NULL,                    -- Discount, can be NULL
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- Record creation time
+  
+  -- Define foreign key constraints
+  FOREIGN KEY (booking_id) REFERENCES books(id) ON DELETE CASCADE,  -- Booking ID reference
+  FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE SET NULL,   -- Staff reference, allow NULL if staff is deleted
+  FOREIGN KEY (services_id) REFERENCES options(id) ON DELETE CASCADE -- Services reference
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE payment (
+    id INT AUTO_INCREMENT PRIMARY KEY,                -- Auto-increment primary key
+    book_id INT NOT NULL,                             -- Foreign key referencing the `book` table
+    price DECIMAL(10, 2) NOT NULL,                    -- Price of the payment
+    payment_method VARCHAR(255) NOT NULL,              -- Payment method as a string (VARCHAR)
+    status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending', -- Payment status
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- Record creation timestamp
+    refund DECIMAL(10, 2) DEFAULT NULL,               -- Refund amount, if applicable
+
+    -- Define foreign key constraint
+    CONSTRAINT fk_book FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+);
 

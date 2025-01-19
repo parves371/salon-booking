@@ -43,12 +43,13 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       return;
     }
 
-    const { error } = await stripe.confirmPayment({
+    const { paymentIntent, error } = await stripe.confirmPayment({
       elements,
       clientSecret,
       confirmParams: {
         return_url: `http://www.localhost:3000/payment-success?amount=${amount}`,
       },
+      redirect: "if_required", // Prevent auto-redirect
     });
 
     if (error) {

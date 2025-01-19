@@ -38,7 +38,7 @@ export const useSlots = (
 
 // Function to book a slot
 
-const bookSlot = async (
+const bookings = async (
   bookingDetails: {
     staffId: number;
     userId: number;
@@ -62,11 +62,11 @@ const bookSlot = async (
 };
 
 // React Query mutation hook for booking a slot
-export const useBookSlot = () => {
+export const useBookings = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bookSlot, // Function to book a slot
+    mutationFn: bookings, // Function to book a slot
     onSuccess: () => {
       // Invalidate the slots query to fetch updated data
       queryClient.invalidateQueries({

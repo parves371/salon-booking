@@ -1,13 +1,13 @@
 "use client";
-import { useBookSlot, useSlots } from "@/hooks/product/use-slot";
+import { useBookings, useSlots } from "@/hooks/product/use-slot";
+import { useUser } from "@/hooks/use-user";
 import { useServicesStore } from "@/store/use-professional-store";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
 import { RxAvatar } from "react-icons/rx";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { useUser } from "@/hooks/use-user";
 
 import {
   Dialog,
@@ -18,12 +18,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+import { useStaff } from "@/hooks/use-staff";
+import { useProductStore } from "@/store/use-product-store";
+import { LoaderIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProfileCard from "../professional/profile-card";
 import { StaffProps } from "../professional/select-professional";
-import { useStaff } from "@/hooks/use-staff";
-import { LoaderIcon } from "lucide-react";
-import { useProductStore } from "@/store/use-product-store";
 
 interface Professional {
   id: number;
@@ -49,6 +49,18 @@ interface Payload {
   endTime: string;
   serviceId: number;
 }
+
+import CheckoutPage from "@/components/CheckoutPage";
+import convertToSubcurrency from "@/lib/convertToSubcurrency";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
+  throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
+}
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
+
+const amount = 49.99;
 
 export const SelectTime = () => {
   const [refreshFlag, setRefreshFlag] = useState(false); // New state for re-rendering
@@ -77,7 +89,7 @@ export const SelectTime = () => {
     error,
     isError,
   } = useSlots(staffIds, date, servicesIdsAndTime);
-  const mutation = useBookSlot();
+  const mutation = useBookings();
 
   const { data: user } = useUser();
   const userId = user?.user?.id;
@@ -266,6 +278,26 @@ export const SelectTime = () => {
           >
             Confirm Booking
           </Button>
+          <main className="max-w-6xl mx-auto p-10 text-white text-center border m-10 rounded-md bg-gradient-to-tr from-blue-500 to-purple-500">
+            <div className="mb-10">
+              <h1 className="text-4xl font-extrabold mb-2">Sonny</h1>
+              <h2 className="text-2xl">
+                has requested
+                <span className="font-bold"> ${amount}</span>
+              </h2>
+            </div>
+
+            <Elements
+              stripe={stripePromise}
+              options={{
+                mode: "payment",
+                amount: convertToSubcurrency(amount),
+                currency: "usd",
+              }}
+            >
+              <CheckoutPage amount={amount} />
+            </Elements>
+          </main>
         </div>
       </div>
     </div>

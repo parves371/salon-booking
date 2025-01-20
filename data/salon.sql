@@ -186,7 +186,7 @@ CREATE TABLE booking_services (
   -- Define foreign key constraints
   FOREIGN KEY (booking_id) REFERENCES books(id) ON DELETE CASCADE,  -- Booking ID reference
   FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE SET NULL,   -- Staff reference, allow NULL if staff is deleted
-  FOREIGN KEY (services_id) REFERENCES options(id) ON DELETE CASCADE -- Services reference
+  FOREIGN KEY (services_id) REFERENCES services(id) ON DELETE CASCADE -- Services reference
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 

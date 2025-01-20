@@ -71,6 +71,9 @@ export const SelectTime = () => {
   const [selectedProfessional, setSelectedProfessional] = useState<any | null>(
     null
   );
+  const [isPaymentTriggered, setIsPaymentTriggered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // To handle loading state during payment initiation
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -149,10 +152,9 @@ export const SelectTime = () => {
   }
 
   const handleBooking = async () => {
-    if (!selectedSlot) return;
-
-    console.log(payload);
-
+    if (!selectedSlot || isLoading) return;
+    setIsPaymentTriggered(true);
+    setIsModalOpen(true);
     if (user) {
       // const { reset } = useServicesStore.getState();
       // const { reset: resetProduct } = useProductStore.getState();
@@ -287,26 +289,47 @@ export const SelectTime = () => {
           >
             Confirm Booking
           </Button>
-          <main className="max-w-6xl mx-auto p-10 text-white text-center border m-10 rounded-md bg-gradient-to-tr from-blue-500 to-purple-500">
-            <div className="mb-10">
-              <h1 className="text-4xl font-extrabold mb-2">Sonny</h1>
-              <h2 className="text-2xl">
-                has requested
-                <span className="font-bold"> ${amount}</span>
-              </h2>
-            </div>
 
-            <Elements
-              stripe={stripePromise}
-              options={{
-                mode: "payment",
-                amount: convertToSubcurrency(amount),
-                currency: "usd",
-              }}
-            >
-              <CheckoutPage amount={amount} payload={payload} />
-            </Elements>
-          </main>
+          <Dialog
+            open={isModalOpen}
+            onOpenChange={() => setIsModalOpen((prev) => !prev)}
+          >
+            {/* <DialogTrigger>open</DialogTrigger> */}
+            <DialogContent>
+              <DialogTitle></DialogTitle>
+              <DialogHeader>
+                <DialogDescription>
+                  {isPaymentTriggered && (
+                    <main className="max-w-6xl mx-auto p-10 text-white text-center border m-10 rounded-md bg-gradient-to-tr from-blue-500 to-purple-500">
+                      <div className="mb-10">
+                        <h1 className="text-4xl font-extrabold mb-2">Sonny</h1>
+                        <h2 className="text-2xl">
+                          has requested
+                          <span className="font-bold"> ${amount}</span>
+                        </h2>
+                      </div>
+
+                      <Elements
+                        stripe={stripePromise}
+                        options={{
+                          mode: "payment",
+                          amount: convertToSubcurrency(totalPrice),
+                          currency: "usd",
+                        }}
+                      >
+                        <CheckoutPage
+                          customerId={userId}
+                          services={payload}
+                          totalPrice={totalPrice}
+                          // paymentMethod={paymentMethod}
+                        />
+                      </Elements>
+                    </main>
+                  )}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

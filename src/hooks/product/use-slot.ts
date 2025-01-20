@@ -37,24 +37,30 @@ export const useSlots = (
 };
 
 // Function to book a slot
+interface BookingDetail {
+  staffId: number;
+  startTime: string;
+  endTime: string;
+  serviceId: number;
+  price: string;
+}
 
 const bookings = async (
-  bookingDetails: {
-    staffId: number;
-    userId: number;
-    startTime: string;
-    endTime: string;
-    serviceId: number;
-    price: string;
-  }[],
-  userId: number // This is unused but you may keep it if needed
+  bookingDetails: BookingDetail[],
+  userId: number,
+  totalprice: number
 ): Promise<void> => {
   const response = await fetch("/api/product/bookings", {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(bookingDetails),
+    body: JSON.stringify({
+      services:bookingDetails,
+      customerId: userId,
+      totalprice,
+
+    }),
   });
 
   if (!response.ok) {
@@ -77,15 +83,14 @@ export const useBookings = (
 ) => {
   const queryClient = useQueryClient();
 
+  // Calculate total price from the services array
+  const totalprice = services.reduce(
+    (sum, service) => sum + parseFloat(service.price),
+    0
+  );
+
   return useMutation({
-    mutationFn: () =>
-      bookings(
-        services.map((service) => ({
-          ...service,
-          userId, // Add userId to each service object
-        })),
-        userId
-      ),
+    mutationFn: () => bookings(services, userId, totalprice),
     onSuccess: () => {
       // Invalidate the slots query to fetch updated data
       queryClient.invalidateQueries({
@@ -94,7 +99,8 @@ export const useBookings = (
     },
     onError: (error: any) => {
       // Handle error, e.g., show a toast notification
-      console.error("Error booking slot:", error);
+      console.error("Error booking slot:", error.message || "Unknown error");
     },
   });
 };
+

@@ -1,46 +1,71 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   useStripe,
   useElements,
   PaymentElement,
 } from "@stripe/react-stripe-js";
-import convertToSubcurrency from "@/lib/convertToSubcurrency";
-import { Payload } from "./time/time";
 
 const CheckoutPage = ({
-  amount,
-  payload,
+  customerId,
+  services,
+  totalPrice,
+  paymentMethod,
 }: {
-  amount: number;
-  payload: Payload[];
+  customerId: number;
+  services: any[];
+  totalPrice: number;
+  paymentMethod?: string;
 }) => {
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const [loading, setLoading] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  // Stripe hooks should be called directly within the component
   const stripe = useStripe();
   const elements = useElements();
-  const [errorMessage, setErrorMessage] = useState<string>();
-  const [clientSecret, setClientSecret] = useState("");
-  const [loading, setLoading] = useState(false);
 
+  // Function to initialize payment
+  const initializePayment = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/product/bookings", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerId,
+          services,
+          totalPrice,
+          paymentMethod,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setClientSecret(data.clientSecret); // Set clientSecret from API response
+      } else {
+        setErrorMessage(data.error || "Failed to initialize payment.");
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || "Unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Call initializePayment on component mount
   useEffect(() => {
-    fetch("/api/create-payment-intent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ amount: convertToSubcurrency(amount) }),
-    })
-      .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret));
-  }, [amount]);
-
-  console.log(payload);
+    if (clientSecret) return;
+    initializePayment();
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
 
-    if (!stripe || !elements) {
+    if (!stripe || !elements || !clientSecret) {
       return;
     }
 
@@ -56,12 +81,13 @@ const CheckoutPage = ({
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `http://www.localhost:3000/payment-success?amount=${amount}`,
+        return_url: `http://www.localhost:3000/payment-success?amount=${totalPrice}`,
       },
       redirect: "if_required", // Prevent auto-redirect
     });
 
     console.log("paymentIntent", paymentIntent);
+    
 
     if (error) {
       // This point is only reached if there's an immediate error when
@@ -75,7 +101,7 @@ const CheckoutPage = ({
     setLoading(false);
   };
 
-  if (!clientSecret || !stripe || !elements) {
+  if (!clientSecret) {
     return (
       <div className="flex items-center justify-center">
         <div
@@ -93,14 +119,12 @@ const CheckoutPage = ({
   return (
     <form onSubmit={handleSubmit} className="bg-white p-2 rounded-md">
       {clientSecret && <PaymentElement />}
-
-      {errorMessage && <div>{errorMessage}</div>}
-
+      {errorMessage && <div className="text-red-500 mt-2">{errorMessage}</div>}
       <button
-        disabled={!stripe || loading}
-        className="text-white w-full p-5 bg-black mt-2 rounded-md font-bold disabled:opacity-50 disabled:animate-pulse"
+        disabled={loading}
+        className="text-white w-full p-5 bg-black mt-2 rounded-md font-bold disabled:opacity-50"
       >
-        {!loading ? `Pay $${amount}` : "Processing..."}
+        {!loading ? `Pay $${totalPrice}` : "Processing..."}
       </button>
     </form>
   );

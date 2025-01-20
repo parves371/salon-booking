@@ -1,3 +1,4 @@
+import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { createConnection } from "@/lib/db/dbConnect";
 import stripe from "@/lib/stripe";
 import { NextApiRequest } from "next";
@@ -112,23 +113,67 @@ export async function PUT(req: Request) {
 
   try {
     // Parse request body
-    const { customerId, services, totalPrice, paymentMethod } =
-      await req.json();
+    const { customerId, services, totalPrice } = await req.json();
+    console.log("Received data:", { customerId, services, totalPrice });
+
+    if (
+      !services ||
+      (!Array.isArray(services) && typeof services !== "object")
+    ) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid services format." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Normalize services to an array if it's a single object
+    const normalizedServices = Array.isArray(services) ? services : [services];
+
+    if (normalizedServices.length === 0) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Services cannot be empty." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     const pool = await createConnection();
     connection = await pool.getConnection();
 
     await connection.beginTransaction(); // Start a transaction
 
-    // Create a new booking
-    const [bookingResult] = await connection.execute(
-      `INSERT INTO bookings (customer_id, price) VALUES (?, ?)`,
+    // Check if a booking already exists for this customer with the same total price
+    const [existingBooking] = await connection.execute(
+      `SELECT * FROM books WHERE customer_id = ? AND price = ? AND status = 'pending'`,
       [customerId, totalPrice]
     );
-    const bookingId = (bookingResult as any).insertId;
+
+    let bookingId;
+    if (existingBooking.length > 0) {
+      // Use the existing booking ID if found
+      bookingId = existingBooking[0].id;
+    } else {
+      // Create a new booking if no existing one
+      const [bookingResult] = await connection.execute(
+        `INSERT INTO books (customer_id, price) VALUES (?, ?)`,
+        [customerId, totalPrice]
+      );
+      bookingId = (bookingResult as any).insertId;
+    }
 
     // Add services to the booking
-    for (const service of services) {
+    for (const service of normalizedServices) {
+      const parsedPrice = parseFloat(service.price);
+      if (
+        !service.serviceId ||
+        !service.staffId ||
+        !service.startTime ||
+        !service.endTime ||
+        isNaN(parsedPrice)
+      ) {
+        throw new Error("Invalid service object.");
+      }
+
+      // Insert each service for the existing/new booking
       await connection.execute(
         `INSERT INTO booking_services (booking_id, staff_id, services_id, start_time, end_time, price) 
          VALUES (?, ?, ?, ?, ?, ?)`,
@@ -145,15 +190,23 @@ export async function PUT(req: Request) {
 
     // Create Stripe payment intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalPrice * 100), // Convert to cents
+      amount: convertToSubcurrency(totalPrice), // Convert to cents
       currency: "usd",
-      payment_method_types: [paymentMethod],
+      automatic_payment_methods: { enabled: true },
     });
+
+    console.log("paymentIntent", paymentIntent);
 
     // Save payment details
     await connection.execute(
-      `INSERT INTO payments (book_id, price, payment_method, status) VALUES (?, ?, ?, ?)`,
-      [bookingId, totalPrice, paymentMethod, "pending"]
+      `INSERT INTO payment (book_id, price, payment_method, status,payment_id) VALUES (?, ?, ?, ?,?)`,
+      [
+        bookingId,
+        totalPrice,
+        paymentIntent?.payment_method_configuration_details?.id,
+        "pending",
+        paymentIntent.id,
+      ]
     );
 
     await connection.commit(); // Commit transaction
@@ -165,11 +218,15 @@ export async function PUT(req: Request) {
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     if (connection) await connection.rollback(); // Rollback transaction in case of error
-    console.error("Error during booking:", error);
+    console.error("Error during booking:", error.message || error);
+
     return new Response(
-      JSON.stringify({ success: false, error: "Something went wrong!" }),
+      JSON.stringify({
+        success: false,
+        error: error.message || "Something went wrong!",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   } finally {

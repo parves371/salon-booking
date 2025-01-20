@@ -1,7 +1,6 @@
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { createConnection } from "@/lib/db/dbConnect";
 import stripe from "@/lib/stripe";
-import { NextApiRequest } from "next";
 
 export async function POST(req: Request, res: Response) {
   try {
@@ -215,6 +214,7 @@ export async function PUT(req: Request) {
       JSON.stringify({
         success: true,
         clientSecret: paymentIntent.client_secret,
+        bookingId,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );

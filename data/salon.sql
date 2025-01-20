@@ -191,7 +191,8 @@ CREATE TABLE booking_services (
 
 
 CREATE TABLE payment (
-    id INT AUTO_INCREMENT PRIMARY KEY,                -- Auto-increment primary key
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    payment_id varchar,                -- Auto-increment primary key
     book_id INT NOT NULL,                             -- Foreign key referencing the `book` table
     price DECIMAL(10, 2) NOT NULL,                    -- Price of the payment
     payment_method VARCHAR(255) NOT NULL,              -- Payment method as a string (VARCHAR)

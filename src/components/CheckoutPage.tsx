@@ -4,6 +4,7 @@ import {
   useElements,
   PaymentElement,
 } from "@stripe/react-stripe-js";
+import { useRouter } from "next/navigation";
 
 const CheckoutPage = ({
   customerId,
@@ -19,8 +20,10 @@ const CheckoutPage = ({
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [bookingId, setBookingId] = useState<string | null>(null);
 
-  // Stripe hooks should be called directly within the component
+  const router = useRouter();
+  // Stripe hooks
   const stripe = useStripe();
   const elements = useElements();
 
@@ -45,6 +48,7 @@ const CheckoutPage = ({
 
       if (data.success) {
         setClientSecret(data.clientSecret); // Set clientSecret from API response
+        setBookingId(data.bookingId);
       } else {
         setErrorMessage(data.error || "Failed to initialize payment.");
       }
@@ -86,8 +90,33 @@ const CheckoutPage = ({
       redirect: "if_required", // Prevent auto-redirect
     });
 
-    console.log("paymentIntent", paymentIntent);
-    
+    const paymentStatus = error ? "failed" : "completed";
+
+    // Call the backend API to update payment status
+    try {
+      const response = await fetch("/api/create-payment-intent/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          book_id: bookingId, // Replace with actual book_id value
+          status: paymentStatus,
+          payment_method: paymentIntent?.payment_method, // Pass the payment method
+          amount: totalPrice, // Pass the amount
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to update payment status.");
+      }
+
+      if (!error) {
+        router.push(`/payment-success?amount=${totalPrice}`);
+      }
+    } catch (apiError) {
+      console.error("API Error:", apiError);
+      setErrorMessage("Failed to update payment status.");
+    }
 
     if (error) {
       // This point is only reached if there's an immediate error when

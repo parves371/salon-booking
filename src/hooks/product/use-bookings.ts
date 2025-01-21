@@ -25,7 +25,6 @@ const fetchBookingsById = async (id: number) => {
   return response.json(); // Assuming the response is in JSON format
 };
 
-//in useBookingsById.ts
 export const useBookingsById = (bookingsId: number) => {
   return useQuery({
     queryKey: ["bookings", bookingsId], // A unique key for this query
@@ -33,7 +32,7 @@ export const useBookingsById = (bookingsId: number) => {
     staleTime: 5 * 60 * 1000, // (Optional) Data remains fresh for 5 minutes
   });
 };
-
+//in useBookingsById.ts
 const fetchBookingsByCustomerID = async (id: number) => {
   const response = await fetch(`/api/product/bookings?customer_id=${id}`, {
     method: "GET",
@@ -55,40 +54,6 @@ export const useBookingsByCustomerID = (customer_id: number) => {
   });
 };
 
-export const useBookingsDetailsById = (bookingsId: number) => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: async (booking_id: number) => {
-      const response = await axios.delete(
-        `/api/product/bookings/${booking_id}`
-      );
-      if (response.status !== 200) {
-        throw new Error("Failed to delete the bookings");
-      }
-      return booking_id;
-    },
-    onSuccess: (booking_id) => {
-      // Optionally invalidate and refetch any queries if needed
-      queryClient.invalidateQueries({
-        queryKey: ["bookings"],
-      });
-      // Local state update can also be handled here if using React Query everywhere
-      toast({
-        title: "Success",
-        description: "Bookings deleted successfully.",
-      });
-    },
-    onError: (error) => {
-      console.error("Error deleting bookings:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete bookings.",
-      });
-    },
-  });
-};
 export const useDeleteBookings = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();

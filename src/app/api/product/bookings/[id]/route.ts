@@ -7,6 +7,7 @@ export async function GET(
 ) {
   try {
     const id = parseInt(params.id); // Get the booking ID from the params
+    console.log("Received ID:", params.id);
 
     if (isNaN(id)) {
       return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
@@ -17,29 +18,29 @@ export async function GET(
     // SQL query to select booking data with JOINs
     const query = `
       SELECT 
-        bookings.id AS booking_id,
-        bookings.start_time,
-        bookings.end_time,
-        bookings.service_id,
-        bookings.customer_id,
-        bookings.staff_id,
-        bookings.status,
-        customers.name AS customer_name,
+        bs.id AS service_id,
+        bs.booking_id,
+        b.customer_id,
+        bs.staff_id,
+        bs.services_id,
         services.name AS service_name,
-        staff.position AS staff_position,
-        users.name AS staff_user_name
-      FROM bookings
-      LEFT JOIN customers ON bookings.customer_id = customers.id
-      LEFT JOIN services ON bookings.service_id = services.id
-      LEFT JOIN staff ON bookings.staff_id = staff.id
-      LEFT JOIN user AS users ON staff.user_id = users.id
-      WHERE bookings.id = ?
+        bs.start_time,
+        bs.end_time,
+        bs.price AS service_price,
+        bs.status AS service_status,
+        bs.discount AS service_discount,
+        bs.created_at AS service_created_at
+      FROM booking_services bs
+      JOIN books b ON bs.booking_id = b.id
+      LEFT JOIN staff ON bs.staff_id = staff.id
+      JOIN services ON bs.services_id = services.id
+      WHERE bs.booking_id = ?  -- Filter by booking_id
+      ORDER BY bs.created_at DESC;
     `;
 
     // Execute the query with the booking ID as a parameter
     const result = await db.query(query, [id]);
 
-    // Type assertion to assume result[0] is an array
     const bookings = result[0] as Array<any>;
 
     if (bookings.length === 0) {
@@ -49,7 +50,32 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(bookings[0], { status: 200 });
+    // Group the services by booking_id
+    const booking = bookings.reduce(
+      (acc, service) => {
+        if (!acc.booking_id) {
+          acc.booking_id = service.booking_id;
+          acc.customer_id = service.customer_id;
+          acc.services = [];
+        }
+
+        acc.services.push({
+          service_id: service.service_id,
+          service_name: service.service_name,
+          service_price: service.service_price,
+          service_status: service.service_status,
+          service_discount: service.service_discount,
+          service_created_at: service.service_created_at,
+          start_time: service.start_time,
+          end_time: service.end_time,
+        });
+
+        return acc;
+      },
+      { services: [] }
+    );
+
+    return NextResponse.json(booking, { status: 200 });
   } catch (error) {
     console.error("Error fetching booking:", error);
     return NextResponse.json(

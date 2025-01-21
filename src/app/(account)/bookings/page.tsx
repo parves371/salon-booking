@@ -1,8 +1,6 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { useBookingsByCustomerID } from "@/hooks/product/use-bookings";
-import { EyeIcon } from "lucide-react";
-import React from "react";
+import { DialogButtonWithModal } from "./DialogButtonWithModal";
 
 // Define the status types explicitly
 type BookingStatusType = "pending" | "processing" | "completed" | "cancelled";
@@ -18,7 +16,7 @@ const BookingStatus: Record<
   cancelled: { label: "Cancelled", color: "bg-red-500" },
 };
 
-const Page = () => {
+const BookingsPage = () => {
   const { data, isLoading, isError } = useBookingsByCustomerID(4);
 
   if (isLoading) {
@@ -74,7 +72,7 @@ const Page = () => {
                   {booking.id}
                 </td>
                 <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  ${parseFloat(booking.price).toFixed(2)}
+                  {parseFloat(booking.price).toFixed(2)}
                 </td>
 
                 <td
@@ -86,7 +84,7 @@ const Page = () => {
                   {formatDate(booking.created_at)}
                 </td>
                 <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  <ModalForBookingsDetails id={booking.id} />
+                  <DialogButtonWithModal bookingId={booking.id} />
                 </td>
               </tr>
             );
@@ -97,19 +95,4 @@ const Page = () => {
   );
 };
 
-export default Page;
-
-const ModalForBookingsDetails = ({ id }: { id: number }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  console.log("isOpen", id);
-
-  return (
-    <Button
-      variant="outline"
-      className="text-neutral-800"
-      onClick={() => setIsOpen((prev) => !prev)}
-    >
-      <EyeIcon />
-    </Button>
-  );
-};
+export default BookingsPage;

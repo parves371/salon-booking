@@ -1,174 +1,131 @@
 "use client";
+import { DialogButtonWithModal } from "@/app/(account)/bookings/DialogButtonWithModal";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  useBookingsByAdminID,
+  useBookingsByCustomerID,
+} from "@/hooks/product/use-bookings";
+import { useUser } from "@/hooks/use-user";
 
-import { useDeleteBookings, useWorks } from "@/hooks/product/use-bookings";
-import { LoaderIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+// Define the status types explicitly
+type BookingStatusType = "pending" | "processing" | "completed" | "cancelled";
+type PaymentStatusType = "pending" | "completed" | "failed" | "refunded";
+
+// Enum for booking statuses with color mappings
+const BookingStatus: Record<
+  BookingStatusType,
+  { label: string; color: string }
+> = {
+  pending: { label: "Pending", color: "bg-yellow-500" },
+  processing: { label: "Processing", color: "bg-blue-500" },
+  completed: { label: "Completed", color: "bg-green-500" },
+  cancelled: { label: "Cancelled", color: "bg-red-500" },
+};
+
+// Enum for payment statuses with color mappings
+const PaymentStatus: Record<
+  PaymentStatusType,
+  { label: string; color: string }
+> = {
+  pending: { label: "Pending", color: "bg-yellow-400" },
+  completed: { label: "Completed", color: "bg-green-400" },
+  failed: { label: "Failed", color: "bg-red-400" },
+  refunded: { label: "Refunded", color: "bg-purple-400" },
+};
 
 const BookingsPage = () => {
-  const router = useRouter();
-  const { data, isError, isLoading, error } = useWorks();
-  const { mutate } = useDeleteBookings();
-
-  const deleteWorkSchedule = async (id: number) => {
-    mutate(id);
-  };
-
-  const editBooking = (id: number) => {
-    router.push(`/admin/bookings/edit/${id}`);
-  };
-
+  const { data: user } = useUser();
+  const { data, isLoading, isError } = useBookingsByAdminID(1);
+  console.log(data);
   if (isLoading) {
+    return <div className="text-center p-5">Loading...</div>;
+  }
+
+  if (isError || !data) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <LoaderIcon className="size-5 spin-in-1" />
-      </div>
+      <div className="text-center p-5 text-red-500">Error loading data</div>
     );
   }
-  if (isError) {
-    return <div>{error.message}</div>;
-  }
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString(); // Formats the date to a readable string
+  };
+
   return (
-    <div className="px-16">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/works">
-              Bookings Schedules
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      <div className="flex justify-between mt-8 items-center">
-        <h2 className="text-3xl font-semibold">Bookings Schedules</h2>
-      </div>
-
-      <div className="overflow-x-auto border rounded-lg p-4 mt-4">
-        <BookingDetails
-          bookings={data || []}
-          onDelete={deleteWorkSchedule}
-          editBooking={editBooking}
-        />
+    <div className="px-4 py-6 max-w-[1200px] mx-auto">
+      <h1 className="text-3xl font-semibold mb-6 text-center">Bookings</h1>
+      <div className="overflow-x-auto">
+        {" "}
+        {/* Make the table scrollable on small screens */}
+        <table className="min-w-full table-auto border-collapse border border-gray-200">
+          <thead>
+            <tr>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Service ID
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Booking ID
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Customer Name
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Service Name
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Start Time
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                End Time
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Price
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Status
+              </th>
+              <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+                Created At
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.map((service: any) => (
+              <tr key={service.service_id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {service.service_id}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {service.booking_id}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {service.customer_name}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {service.service_name}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {formatDate(service.start_time)}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {formatDate(service.end_time)}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  ${parseFloat(service.service_price).toFixed(2)}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {service.service_status}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {formatDate(service.service_created_at)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
 
 export default BookingsPage;
-
-// Define the shape of the booking object
-export interface Booking {
-  booking_id: number;
-  customer_id: number;
-  customer_name: string;
-  end_time: string;
-  service_id: number;
-  service_name: string;
-  staff_id: number;
-  staff_position: string;
-  staff_user_name: string;
-  start_time: string;
-  status: "pending" | "processing" | "completed" | "cancelled";
-}
-
-// Define the props type for the BookingDetails component
-interface BookingDetailsProps {
-  bookings: Booking[];
-  onDelete: (booking_id: number) => void;
-  onEdit?: (booking_id: number) => void;
-  editBooking: (booking_id: number) => void;
-}
-
-const BookingDetails: React.FC<BookingDetailsProps> = ({
-  bookings,
-  onDelete,
-  editBooking,
-  onEdit,
-}) => {
-  return (
-    <div className="overflow-x-auto rounded-lg p-4 mt-4">
-      <table className="table-auto w-full border-collapse border border-gray-200">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border px-4 py-2">Booking ID</th>
-            <th className="border px-4 py-2">Customer ID</th>
-            <th className="border px-4 py-2">Customer Name</th>
-            <th className="border px-4 py-2">Service Name</th>
-            <th className="border px-4 py-2">Staff Name</th>
-            <th className="border px-4 py-2">Staff Position</th>
-            <th className="border px-4 py-2">Start Time</th>
-            <th className="border px-4 py-2">End Time</th>
-            <th className="border px-4 py-2">Status</th>
-            <th className="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bookings.map((booking) => {
-            const formattedStartTime = new Date(
-              booking.start_time
-            ).toLocaleString();
-            const formattedEndTime = new Date(
-              booking.end_time
-            ).toLocaleString();
-
-            return (
-              <tr key={booking.booking_id}>
-                <td className="border px-4 py-2">{booking.booking_id}</td>
-                <td className="border px-4 py-2">{booking.customer_id}</td>
-                <td className="border px-4 py-2">{booking.customer_name}</td>
-                <td className="border px-4 py-2">{booking.service_name}</td>
-                <td className="border px-4 py-2">{booking.staff_user_name}</td>
-                <td className="border px-4 py-2">{booking.staff_position}</td>
-                <td className="border px-4 py-2">{formattedStartTime}</td>
-                <td className="border px-4 py-2">{formattedEndTime}</td>
-                <td className="border px-4 py-2">{booking.status}</td>
-                <td className="border px-4 py-2">
-                  <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    onClick={() => editBooking(booking.booking_id)}
-                  >
-                    Edit
-                  </button>
-                  <Dialog>
-                    <DialogTrigger className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ">
-                      Delete
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle className="py-4">
-                          Are you absolutely sure?
-                        </DialogTitle>
-
-                        <button
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 ml-2"
-                          onClick={() => onDelete(booking.booking_id)}
-                        >
-                          Confirm
-                        </button>
-                      </DialogHeader>
-                    </DialogContent>
-                  </Dialog>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-};

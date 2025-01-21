@@ -1,6 +1,7 @@
 "use client";
 import { useBookingsByCustomerID } from "@/hooks/product/use-bookings";
 import { DialogButtonWithModal } from "./DialogButtonWithModal";
+import { useUser } from "@/hooks/use-user";
 
 // Define the status types explicitly
 type BookingStatusType = "pending" | "processing" | "completed" | "cancelled";
@@ -29,7 +30,8 @@ const PaymentStatus: Record<
 };
 
 const BookingsPage = () => {
-  const { data, isLoading, isError } = useBookingsByCustomerID(4);
+  const { data: user } = useUser();
+  const { data, isLoading, isError } = useBookingsByCustomerID(user?.user?.id);
 
   if (isLoading) {
     return <div className="text-center p-5">Loading...</div>;
@@ -49,7 +51,9 @@ const BookingsPage = () => {
   return (
     <div className="px-4 py-6 max-w-[1200px] mx-auto">
       <h1 className="text-3xl font-semibold mb-6 text-center">Bookings</h1>
-      <div className="overflow-x-auto"> {/* Make the table scrollable on small screens */}
+      <div className="overflow-x-auto">
+        {" "}
+        {/* Make the table scrollable on small screens */}
         <table className="min-w-full table-auto border-collapse border border-gray-200">
           <thead>
             <tr>

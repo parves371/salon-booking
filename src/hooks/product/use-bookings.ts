@@ -53,6 +53,27 @@ export const useBookingsByCustomerID = (customer_id: number) => {
     staleTime: 5 * 60 * 1000,
   });
 };
+const fetchBookingsByAdminID = async (id: number) => {
+  const response = await fetch(`/api/product/bookings/staff-id`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ admin_id: id }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch staff");
+  }
+  return response.json();
+};
+
+export const useBookingsByAdminID = (admin_id: number) => {
+  return useQuery({
+    queryKey: ["customerBookings", admin_id],
+    queryFn: () => fetchBookingsByAdminID(admin_id),
+    staleTime: 5 * 60 * 1000,
+  });
+};
 
 export const useDeleteBookings = () => {
   const queryClient = useQueryClient();

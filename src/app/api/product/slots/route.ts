@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     const [rows] = await dbConnection.query(
       `
         SELECT TIME(start_time) AS start_time, TIME(end_time) AS end_time
-        FROM bookings
+        FROM booking_services
         WHERE staff_id IN (?) AND DATE(start_time) = ? 
       `,
       [staffIds, date]

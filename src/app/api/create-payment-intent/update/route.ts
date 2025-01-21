@@ -1,14 +1,4 @@
 import { createConnection } from "@/lib/db/dbConnect";
-import { NextApiRequest, NextApiResponse } from "next";
-
-interface UpdatePaymentRequest extends NextApiRequest {
-  body: {
-    book_id: number;
-    status: "pending" | "completed" | "failed" | "refunded";
-    payment_method?: string;
-    amount?: number;
-  };
-}
 
 export async function POST(req: Request) {
   const { book_id, status, payment_method, amount } = await req.json();

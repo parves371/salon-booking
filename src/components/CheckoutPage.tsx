@@ -5,6 +5,8 @@ import {
   PaymentElement,
 } from "@stripe/react-stripe-js";
 import { useRouter } from "next/navigation";
+import { useServicesStore } from "@/store/use-professional-store";
+import { useProductStore } from "@/store/use-product-store";
 
 const CheckoutPage = ({
   customerId,
@@ -112,6 +114,11 @@ const CheckoutPage = ({
 
       if (!error) {
         router.push(`/payment-success?amount=${totalPrice}`);
+        const { reset } = useServicesStore.getState();
+        const { reset: resetProduct } = useProductStore.getState();
+        reset();
+        resetProduct();
+        router.push("/appointment");
       }
     } catch (apiError) {
       console.error("API Error:", apiError);

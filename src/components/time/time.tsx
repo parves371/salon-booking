@@ -1,5 +1,5 @@
 "use client";
-import { useBookings, useSlots } from "@/hooks/product/use-slot";
+import { useSlots } from "@/hooks/product/use-slot";
 import { useUser } from "@/hooks/use-user";
 import { useServicesStore } from "@/store/use-professional-store";
 import { useEffect, useState } from "react";
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dialog";
 
 import { useStaff } from "@/hooks/use-staff";
-import { useProductStore } from "@/store/use-product-store";
 import { LoaderIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProfileCard from "../professional/profile-card";
@@ -153,14 +152,10 @@ export const SelectTime = () => {
 
   const handleBooking = async () => {
     if (!selectedSlot || isLoading) return;
-    setIsPaymentTriggered(true);
-    setIsModalOpen(true);
+
     if (user) {
-      // const { reset } = useServicesStore.getState();
-      // const { reset: resetProduct } = useProductStore.getState();
-      // reset();
-      // resetProduct();
-      // router.push("/appointment");
+      setIsPaymentTriggered(true);
+      setIsModalOpen(true);
     } else {
       router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }

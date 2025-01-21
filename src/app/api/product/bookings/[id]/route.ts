@@ -7,7 +7,6 @@ export async function GET(
 ) {
   try {
     const id = parseInt(params.id); // Get the booking ID from the params
-    console.log("Received ID:", params.id);
 
     if (isNaN(id)) {
       return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
@@ -34,7 +33,7 @@ export async function GET(
       JOIN books b ON bs.booking_id = b.id
       LEFT JOIN staff ON bs.staff_id = staff.id
       JOIN services ON bs.services_id = services.id
-      WHERE bs.booking_id = ?  -- Filter by booking_id
+      WHERE bs.booking_id = ?
       ORDER BY bs.created_at DESC;
     `;
 

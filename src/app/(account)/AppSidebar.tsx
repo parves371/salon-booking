@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { MdPayment } from "react-icons/md";
 
 // Menu items.
 const items = [
@@ -23,6 +24,11 @@ const items = [
     title: "Bookings",
     url: "/bookings",
     icon: BookIcon,
+  },
+  {
+    title: "Payments",
+    url: "/payments",
+    icon: MdPayment,
   },
 ];
 

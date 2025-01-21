@@ -145,16 +145,19 @@ export async function GET(req: Request) {
 
     // SQL query with joins
     const query = `
-                  SELECT 
-                    id, 
-                    customer_id, 
-                    status, 
-                    price, 
-                    discount, 
-                    created_at 
-                  FROM books
-                  WHERE customer_id = ?
-                  ORDER BY created_at DESC;
+              SELECT 
+                  b.id AS book_id, 
+                  b.customer_id, 
+                  b.status AS book_status, 
+                  b.price, 
+                  b.discount, 
+                  b.created_at AS book_created_at,
+                  p.status AS payment_status -- Include payment status from the payment table
+              FROM books b
+              LEFT JOIN payment p ON b.id = p.book_id -- Join payment table on book_id
+              WHERE b.customer_id = ?
+              ORDER BY b.created_at DESC;
+
   `;
 
     // Execute the query

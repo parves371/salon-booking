@@ -67,25 +67,17 @@ export async function GET(req: Request) {
 
     // SQL query with joins
     const query = `
-      SELECT 
-        bookings.id AS booking_id,
-        bookings.start_time,
-        bookings.end_time,
-        bookings.service_id,
-        bookings.customer_id,
-        bookings.staff_id,
-        bookings.status,
-        customers.name AS customer_name,
-        services.name AS service_name,
-        staff.position AS staff_position,
-        users.name AS staff_user_name
-      FROM bookings
-      LEFT JOIN customers ON bookings.customer_id = customers.id
-      LEFT JOIN services ON bookings.service_id = services.id
-      LEFT JOIN staff ON bookings.staff_id = staff.id
-      LEFT JOIN user AS users ON staff.user_id = users.id
-      WHERE customer_id = ?
-    `;
+                  SELECT 
+                    id, 
+                    customer_id, 
+                    status, 
+                    price, 
+                    discount, 
+                    created_at 
+                  FROM books
+                  WHERE customer_id = ?
+                  ORDER BY created_at DESC;
+  `;
 
     // Execute the query
     const [results] = await db.query(query, [customer_id]);

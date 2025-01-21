@@ -1,19 +1,21 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useBookingsByCustomerID } from "@/hooks/product/use-bookings";
+import { EyeIcon } from "lucide-react";
 import React from "react";
 
 // Define the status types explicitly
-type BookingStatusType = "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED";
+type BookingStatusType = "pending" | "processing" | "completed" | "cancelled";
 
 // Enum for booking statuses with color mappings
 const BookingStatus: Record<
   BookingStatusType,
   { label: string; color: string }
 > = {
-  PENDING: { label: "pending", color: "bg-yellow-500" },
-  PROCESSING: { label: "processing", color: "bg-blue-500" },
-  COMPLETED: { label: "completed", color: "bg-green-500" },
-  CANCELLED: { label: "cancelled", color: "bg-red-500" },
+  pending: { label: "Pending", color: "bg-yellow-500" },
+  processing: { label: "Processing", color: "bg-blue-500" },
+  completed: { label: "Completed", color: "bg-green-500" },
+  cancelled: { label: "Cancelled", color: "bg-red-500" },
 };
 
 const Page = () => {
@@ -23,7 +25,7 @@ const Page = () => {
     return <div className="text-center p-5">Loading...</div>;
   }
 
-  if (isError) {
+  if (isError || !data) {
     return (
       <div className="text-center p-5 text-red-500">Error loading data</div>
     );
@@ -31,7 +33,7 @@ const Page = () => {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleString(); // This will format the date to a readable format
+    return date.toLocaleString(); // Formats the date to a readable string
   };
 
   return (
@@ -43,54 +45,54 @@ const Page = () => {
             <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
               Booking ID
             </th>
-
             <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
-              Service Name
+              Customer ID
             </th>
             <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
-              Staff User Name
-            </th>
-            <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
-              Start Time
-            </th>
-            <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
-              End Time
+              Price
             </th>
             <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
               Status
             </th>
+            <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+              Created At
+            </th>
+            <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
+              show details
+            </th>
           </tr>
         </thead>
         <tbody>
-          {data?.map((booking: any) => {
+          {data.map((booking: any) => {
             // Ensure the status is a valid key from the BookingStatus enum
-            const statusKey = booking.status.toUpperCase() as BookingStatusType;
+            const statusKey = booking.status.toLowerCase() as BookingStatusType;
             const status = BookingStatus[statusKey] || {
               label: "Unknown",
               color: "bg-gray-500",
             };
 
             return (
-              <tr key={booking.booking_id} className="hover:bg-gray-50">
+              <tr key={booking.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  {booking.booking_id}
+                  {booking.id}
                 </td>
                 <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  {booking.service_name}
+                  {booking.customer_id}
                 </td>
                 <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  {booking.staff_user_name}
+                  ${parseFloat(booking.price).toFixed(2)}
                 </td>
-                <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  {formatDate(booking.start_time)}
-                </td>
-                <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  {formatDate(booking.end_time)}
-                </td>
+
                 <td
                   className={`px-6 py-4 border-b text-sm text-white font-medium text-center ${status.color}`}
                 >
                   {status.label}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  {formatDate(booking.created_at)}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-900">
+                  <ModalForBookingsDetails id={booking.id} />
                 </td>
               </tr>
             );
@@ -102,3 +104,18 @@ const Page = () => {
 };
 
 export default Page;
+
+const ModalForBookingsDetails = ({ id }: { id: number }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  console.log("isOpen", id);
+
+  return (
+    <Button
+      variant="outline"
+      className="text-neutral-800"
+      onClick={() => setIsOpen((prev) => !prev)}
+    >
+      <EyeIcon />
+    </Button>
+  );
+};

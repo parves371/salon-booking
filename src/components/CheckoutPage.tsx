@@ -34,7 +34,7 @@ const CheckoutPage = ({
     try {
       setLoading(true);
       const response = await fetch("/api/product/bookings", {
-        method: "PUT",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },

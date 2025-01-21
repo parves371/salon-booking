@@ -166,7 +166,7 @@ CREATE TABLE books (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Automatically set the creation time
     
     -- Define foreign key constraint
-    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 );
 
 
@@ -201,6 +201,6 @@ CREATE TABLE payment (
     refund DECIMAL(10, 2) DEFAULT NULL,               -- Refund amount, if applicable
 
     -- Define foreign key constraint
-    CONSTRAINT fk_book FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
 );
 

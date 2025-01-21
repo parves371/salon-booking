@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../use-toast";
 import axios from "axios";
 
-
 const fetchWorks = async () => {
   const response = await fetch("/api/product/bookings");
   if (!response.ok) {
@@ -26,6 +25,7 @@ const fetchBookingsById = async (id: number) => {
   return response.json(); // Assuming the response is in JSON format
 };
 
+//in useBookingsById.ts
 export const useBookingsById = (bookingsId: number) => {
   return useQuery({
     queryKey: ["bookings", bookingsId], // A unique key for this query

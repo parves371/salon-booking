@@ -46,9 +46,6 @@ const Page = () => {
               Booking ID
             </th>
             <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
-              Customer ID
-            </th>
-            <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
               Price
             </th>
             <th className="px-6 py-3 bg-gray-100 border-b text-left text-sm font-medium text-gray-700">
@@ -75,9 +72,6 @@ const Page = () => {
               <tr key={booking.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 border-b text-sm text-gray-900">
                   {booking.id}
-                </td>
-                <td className="px-6 py-4 border-b text-sm text-gray-900">
-                  {booking.customer_id}
                 </td>
                 <td className="px-6 py-4 border-b text-sm text-gray-900">
                   ${parseFloat(booking.price).toFixed(2)}

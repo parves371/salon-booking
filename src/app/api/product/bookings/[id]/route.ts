@@ -1,43 +1,6 @@
 import { createConnection } from "@/lib/db/dbConnect";
 import { NextResponse } from "next/server";
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = parseInt(params.id);
-
-    if (isNaN(id)) {
-      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-    }
-
-    const db = await createConnection();
-
-    const [result]: any = await db.query("DELETE FROM bookings WHERE id = ?", [
-      id,
-    ]);
-
-    if (result.affectedRows === 0) {
-      return NextResponse.json(
-        { message: "bookings not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "bookings deleted successfully" },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error deleting bookings:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function GET(
   req: Request,
   { params }: { params: { id: string } }
@@ -89,6 +52,43 @@ export async function GET(
     return NextResponse.json(bookings[0], { status: 200 });
   } catch (error) {
     console.error("Error fetching booking:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = parseInt(params.id);
+
+    if (isNaN(id)) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
+
+    const db = await createConnection();
+
+    const [result]: any = await db.query("DELETE FROM bookings WHERE id = ?", [
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return NextResponse.json(
+        { message: "bookings not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "bookings deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting bookings:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }

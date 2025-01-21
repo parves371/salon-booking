@@ -118,7 +118,6 @@ const CheckoutPage = ({
         const { reset: resetProduct } = useProductStore.getState();
         reset();
         resetProduct();
-        router.push("/appointment");
       }
     } catch (apiError) {
       console.error("API Error:", apiError);

@@ -3,6 +3,12 @@ import bcrypt from "bcryptjs";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
 
+import {
+  authenticateUserByTokenEmail,
+  existingUserByEmail,
+} from "@/lib/user/authenticate";
+import { RowDataPacket } from "mysql2"; // For correct typing
+
 // Define the types for the request body and response
 interface LoginRequestBody {
   email: string;
@@ -202,13 +208,6 @@ export async function GET() {
     );
   }
 }
-
-import {
-  authenticateUserByTokenEmail,
-  existingUserByEmail,
-} from "@/lib/user/authenticate";
-import { RowDataPacket } from "mysql2"; // For correct typing
-import { multerMiddleware, runMiddleware } from "@/lib/user/helper";
 
 export async function PUTE(request: Request) {
   try {

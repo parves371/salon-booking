@@ -93,13 +93,14 @@ export async function POST(req: Request) {
 
     // Save payment details
     await connection.execute(
-      `INSERT INTO payment (book_id, price, payment_method, status,payment_id) VALUES (?, ?, ?, ?,?)`,
+      `INSERT INTO payment (book_id, price, payment_method, status,payment_id,customer_id) VALUES (?, ?, ?, ?,?, ?)`,
       [
         bookingId,
         totalPrice,
         paymentIntent?.payment_method_configuration_details?.id,
         "pending",
         paymentIntent.id,
+        customerId,
       ]
     );
 

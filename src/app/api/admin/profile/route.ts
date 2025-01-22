@@ -1,4 +1,4 @@
-import { AdminAuthenticate, authenticate } from "@/lib/user/auth";
+import { AdminAuthenticate } from "@/lib/user/auth";
 
 export async function GET(request: Request) {
   // Await the result of authenticate to get the user or error

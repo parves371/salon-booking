@@ -46,6 +46,11 @@ const adminItems = [
     icon: User2Icon,
   },
   {
+    title: "Payments",
+    url: "/admin/payment",
+    icon: User2Icon,
+  },
+  {
     title: "options",
     url: "/admin/option",
     icon: OptionIcon,

@@ -64,7 +64,6 @@ export const AdminAuthenticate = async (req: Request) => {
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
     const userId = (decoded as { id: string }).id;
-    console.log(userId);
 
     // Fetch the user profile from the database
     const db = await createConnection();

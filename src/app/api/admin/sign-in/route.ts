@@ -8,13 +8,6 @@ interface LoginRequestBody {
   password: string;
 }
 
-interface User {
-  id: string;
-  email: string;
-  password: string;
-  name: string;
-}
-
 export async function POST(request: Request) {
   try {
     const reqBody: LoginRequestBody = await request.json();
@@ -80,4 +73,4 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json" },
     });
   }
-}   
+}

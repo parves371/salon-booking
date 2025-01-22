@@ -1,3 +1,4 @@
+"use client";
 import {
   Home,
   Inbox,
@@ -17,9 +18,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAdminUser } from "@/hooks/use-user";
 import Link from "next/link";
 import { MdCategory, MdWorkspaces } from "react-icons/md";
-
 // Menu items.
 const items = [
   {
@@ -33,31 +34,6 @@ const items = [
     icon: MdWorkspaces,
   },
   {
-    title: "Staff",
-    url: "/admin/staff",
-    icon: User2Icon,
-  },
-  {
-    title: "options",
-    url: "/admin/option",
-    icon: OptionIcon,
-  },
-  {
-    title: "services",
-    url: "/admin/services",
-    icon: Inbox,
-  },
-  {
-    title: "Category",
-    url: "/admin/category",
-    icon: MdCategory,
-  },
-  {
-    title: "Users",
-    url: "/admin/users",
-    icon: User,
-  },
-  {
     title: "Settings",
     url: "#",
     icon: Settings,
@@ -65,6 +41,37 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { data: user, isLoading } = useAdminUser();
+  const adminRole = user?.user?.role;
+
+  const adminItems = [
+    {
+      title: "Staff",
+      url: "/admin/staff",
+      icon: User2Icon,
+    },
+    {
+      title: "options",
+      url: "/admin/option",
+      icon: OptionIcon,
+    },
+    {
+      title: "services",
+      url: "/admin/services",
+      icon: Inbox,
+    },
+    {
+      title: "Category",
+      url: "/admin/category",
+      icon: MdCategory,
+    },
+    {
+      title: "Users",
+      url: "/admin/users",
+      icon: User,
+    },
+  ];
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -82,6 +89,17 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {adminRole === "superadmin" &&
+                adminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

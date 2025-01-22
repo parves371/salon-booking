@@ -49,3 +49,41 @@ export const authenticate = async (req: Request) => {
     return { error: "Invalid or expired token" };
   }
 };
+export const AdminAuthenticate = async (req: Request) => {
+  const cookies = req.headers.get("cookie");
+  const token = cookies
+    ?.split("; ")
+    .find((cookie) => cookie.startsWith("salon-admin="))
+    ?.split("=")[1];
+
+  if (!token) {
+    return { error: "No token provided" };
+  }
+
+  // Decode and verify the token
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const userId = (decoded as { id: string }).id;
+    console.log(userId);
+
+    // Fetch the user profile from the database
+    const db = await createConnection();
+
+    // Query the database, typing the result as RowDataPacket[]
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT role FROM user WHERE id = ?",
+      [userId]
+    );
+
+    const user = rows[0] as Customer; // Cast the first row to a Customer
+
+    if (!user) {
+      return { error: "User not found" };
+    }
+
+    return { user }; // Return the user data without the password
+  } catch (error) {
+    console.error("JWT verification error:", error);
+    return { error: "Invalid or expired token" };
+  }
+};

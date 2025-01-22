@@ -39,38 +39,37 @@ const items = [
     icon: Settings,
   },
 ];
+const adminItems = [
+  {
+    title: "Staff",
+    url: "/admin/staff",
+    icon: User2Icon,
+  },
+  {
+    title: "options",
+    url: "/admin/option",
+    icon: OptionIcon,
+  },
+  {
+    title: "services",
+    url: "/admin/services",
+    icon: Inbox,
+  },
+  {
+    title: "Category",
+    url: "/admin/category",
+    icon: MdCategory,
+  },
+  {
+    title: "Users",
+    url: "/admin/users",
+    icon: User,
+  },
+];
 
 export function AppSidebar() {
   const { data: user, isLoading } = useAdminUser();
   const adminRole = user?.user?.role;
-
-  const adminItems = [
-    {
-      title: "Staff",
-      url: "/admin/staff",
-      icon: User2Icon,
-    },
-    {
-      title: "options",
-      url: "/admin/option",
-      icon: OptionIcon,
-    },
-    {
-      title: "services",
-      url: "/admin/services",
-      icon: Inbox,
-    },
-    {
-      title: "Category",
-      url: "/admin/category",
-      icon: MdCategory,
-    },
-    {
-      title: "Users",
-      url: "/admin/users",
-      icon: User,
-    },
-  ];
 
   return (
     <Sidebar collapsible="icon">

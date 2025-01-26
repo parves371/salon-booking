@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CategorySchema } from "@/schemas/product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -75,7 +76,7 @@ const CategoryAdd = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/category">category</BreadcrumbLink>
+            <Link href="/admin/category">category</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

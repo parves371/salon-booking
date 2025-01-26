@@ -1,6 +1,6 @@
+import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useToast } from "@/hooks/use-toast";
 
 const fetchStaff = async (skills?: string[]) => {
   const url = skills

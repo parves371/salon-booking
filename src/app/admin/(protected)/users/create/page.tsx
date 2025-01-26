@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 const UserCreatedPage = () => {
   const { toast } = useToast();
@@ -95,7 +96,7 @@ const UserCreatedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/users">User</BreadcrumbLink>
+            <Link href="/admin/users">User</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

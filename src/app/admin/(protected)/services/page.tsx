@@ -2,9 +2,8 @@
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbSeparator,
+  BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import {
   Dialog,
@@ -17,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -83,7 +83,7 @@ const UsersPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/services">services</BreadcrumbLink>
+            <Link href="/admin/services">services</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
         </BreadcrumbList>

@@ -41,6 +41,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Link from "next/link";
 
 interface services {
   category_id: number;
@@ -139,7 +140,7 @@ const page = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/option">Options</BreadcrumbLink>
+            <Link href="/admin/option">Options</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

@@ -28,6 +28,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 interface UserProps {
   id: number;
   email: string;
@@ -148,7 +149,7 @@ const UserEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/users">User</BreadcrumbLink>
+            <Link href="/admin/users">User</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

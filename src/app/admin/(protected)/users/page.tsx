@@ -2,16 +2,16 @@
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbSeparator,
+  BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import moment from "moment";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import moment from "moment";
-import { useToast } from "@/hooks/use-toast";
 
 export interface UserProps {
   id: string | number;
@@ -82,7 +82,7 @@ const UsersPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/users">User</BreadcrumbLink>
+            <Link href="/admin/users">User</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

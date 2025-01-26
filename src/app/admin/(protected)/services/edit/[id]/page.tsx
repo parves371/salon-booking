@@ -29,6 +29,7 @@ import { set, z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
+import Link from "next/link";
 
 interface ServiceProps {
   id: number;
@@ -204,7 +205,7 @@ const ServicesEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/services">Services</BreadcrumbLink>
+            <Link href="/admin/services">Services</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

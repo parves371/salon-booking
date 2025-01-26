@@ -29,8 +29,8 @@ const items = [
     icon: Home,
   },
   {
-    title: "Bookings",
-    url: "/admin/bookings",
+    title: "Appointments",
+    url: "/admin/appointment",
     icon: MdWorkspaces,
   },
   {

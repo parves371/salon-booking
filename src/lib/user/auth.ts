@@ -70,7 +70,7 @@ export const AdminAuthenticate = async (req: Request) => {
 
     // Query the database, typing the result as RowDataPacket[]
     const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT role FROM user WHERE id = ?",
+      "SELECT role, id FROM user WHERE id = ?",
       [userId]
     );
 

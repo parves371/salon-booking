@@ -3,9 +3,8 @@ import {
   Home,
   Inbox,
   OptionIcon,
-  Settings,
   User,
-  User2Icon,
+  User2Icon
 } from "lucide-react";
 
 import {
@@ -24,19 +23,14 @@ import { MdCategory, MdWorkspaces } from "react-icons/md";
 // Menu items.
 const items = [
   {
-    title: "Home",
-    url: "#",
+    title: "Dashboard",
+    url: "/admin/dashboard",
     icon: Home,
   },
   {
     title: "Appointments",
     url: "/admin/appointment",
     icon: MdWorkspaces,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
   },
 ];
 const adminItems = [

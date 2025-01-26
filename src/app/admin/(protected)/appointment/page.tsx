@@ -1,6 +1,13 @@
 "use client";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { useAdminUser, useStaffByAdminUserId } from "@/hooks/use-user";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface Appointment {
@@ -20,14 +27,19 @@ interface Appointment {
 
 const StaffDashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<
+    Appointment[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split("T")[0]);
+  const [filterDate, setFilterDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // Get the admin user data
@@ -79,13 +91,16 @@ const StaffDashboard = () => {
     if (filterDate) {
       filtered = filtered.filter(
         (appointment) =>
-          new Date(appointment.start_time).toISOString().split("T")[0] === filterDate
+          new Date(appointment.start_time).toISOString().split("T")[0] ===
+          filterDate
       );
     }
 
     // Filter by status
     if (filterStatus) {
-      filtered = filtered.filter((appointment) => appointment.status === filterStatus);
+      filtered = filtered.filter(
+        (appointment) => appointment.status === filterStatus
+      );
     }
 
     // Sort by time
@@ -149,31 +164,50 @@ const StaffDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <Link href="/admin/appointment">Appointments</Link>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Appointments for You</h1>
-        <div className="flex items-center space-x-4 mb-4">
-          <input
-            type="date"
-            value={filterDate}
-            onChange={handleDateChange}
-            className="border rounded px-3 py-2 text-sm text-gray-700"
-          />
-          <select
-            onChange={handleStatusChange}
-            className="border rounded px-3 py-2 text-sm text-gray-700"
-          >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">
+          Appointments for You
+        </h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+          {/* Filters Container */}
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            {/* Date Picker */}
+            <input
+              type="date"
+              value={filterDate}
+              onChange={handleDateChange}
+              className="border rounded px-3 py-2 text-sm text-gray-700 w-full sm:w-auto"
+            />
+
+            {/* Status Filter */}
+            <select
+              onChange={handleStatusChange}
+              className="border rounded px-3 py-2 text-sm text-gray-700 w-full sm:w-auto hover:border-blue-500 hover:bg-gray-50 transition"
+            >
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          {/* Sort Button */}
           <button
             onClick={handleSortOrderChange}
-            className="bg-blue-500 text-white px-4 py-2 rounded text-sm"
+            className="bg-blue-500 text-white px-4 py-2 rounded text-sm w-full sm:w-auto"
           >
             Sort by Time ({sortOrder === "asc" ? "Ascending" : "Descending"})
           </button>
         </div>
+
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200">
             <thead className="bg-gray-100">
@@ -217,7 +251,7 @@ const StaffDashboard = () => {
                     {new Date(appointment.end_time).toLocaleString()}
                   </td>
                   <td className="px-4 py-2 border-b text-sm text-gray-600">
-                  AED {appointment.price}
+                    AED {appointment.price}
                   </td>
                   <td
                     className={`px-4 py-2 border-b text-sm ${

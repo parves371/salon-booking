@@ -24,6 +24,7 @@ import { useUser } from "@/hooks/use-user";
 import { StaffSchema } from "@/schemas/staff";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderIcon } from "lucide-react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -157,7 +158,7 @@ const StaffEditedPage = () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/staff">Staff</BreadcrumbLink>
+            <Link href="/admin/staff">Staff</Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

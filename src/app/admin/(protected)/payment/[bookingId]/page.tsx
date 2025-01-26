@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 interface BookingDetails {
   booking_id: number;
@@ -172,7 +174,19 @@ const BookingDetailPage = () => {
 
   return (
     <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold">Booking Details</h1>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <Link href="/admin/payment">payment</Link>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <span>Details</span>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <h1 className="text-2xl font-bold">payment Details</h1>
 
       {/* Booking Information */}
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
@@ -252,91 +266,110 @@ const BookingDetailPage = () => {
         </div>
       </div>
 
-      {/* Customer Details */}
-      <div className="border p-4 rounded shadow">
-        <h2 className="text-lg font-semibold">Customer Details</h2>
-        <p>
-          <strong>Name:</strong> {bookingDetails.customer.name}
-        </p>
-        <p>
-          <strong>Number:</strong> {bookingDetails.customer.number}
-        </p>
-        <p>
-          <strong>Email:</strong> {bookingDetails.customer.email}
-        </p>
-      </div>
+      <div className="flex flex-col md:flex-row gap-6 bg-gray-50 p-6 rounded-2xl shadow-lg">
+        {/* Customer Details */}
+        <div className="w-full md:w-2/3 space-y-6">
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Customer Details
+            </h2>
+            <p className="text-gray-600">
+              <strong className="text-gray-800">Name:</strong>{" "}
+              {bookingDetails.customer.name}
+            </p>
+            <p className="text-gray-600">
+              <strong className="text-gray-800">Number:</strong>{" "}
+              {bookingDetails.customer.number}
+            </p>
+            <p className="text-gray-600">
+              <strong className="text-gray-800">Email:</strong>{" "}
+              {bookingDetails.customer.email}
+            </p>
+          </div>
 
-      {/* Service Details */}
-      <div className="border p-4 rounded shadow">
-        <h2 className="text-lg font-semibold">Service Details</h2>
-        <ul className="space-y-4">
-          {bookingDetails.services.map((service, index) => (
-            <li key={index} className="border p-4 rounded shadow">
-              <p>
-                <strong>Service:</strong> {service.name}
-              </p>
-              <p>
-                <strong>Start Time:</strong>{" "}
-                {new Date(service.start_time).toLocaleString()}
-              </p>
-              <p>
-                <strong>End Time:</strong>{" "}
-                {new Date(service.end_time).toLocaleString()}
-              </p>
-              <p>
-                <strong>Price:</strong> ${Number(service.price).toFixed(2)}
-              </p>
-              <div className="mt-2">
-                <strong>Status:</strong>{" "}
-                <select
-                  value={updatedServiceStatuses[index]}
-                  onChange={(e) => {
-                    const newStatuses = [...updatedServiceStatuses];
-                    newStatuses[index] = e.target.value;
-                    setUpdatedServiceStatuses(newStatuses);
-                  }}
-                  className={`border px-2 py-1 rounded ${getStatusColor(
-                    updatedServiceStatuses[index]
-                  )}`}
+          {/* Service Details */}
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Service Details
+            </h2>
+            <ul className="space-y-4">
+              {bookingDetails.services.map((service, index) => (
+                <li
+                  key={index}
+                  className="bg-gray-50 p-4 rounded-lg shadow border border-gray-200"
                 >
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                  <option value="hold">Hold</option>
-                </select>
-              </div>
-              <button
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={() => handleServiceSubmit(index)}
-              >
-                Submit Service Status
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+                  <p className="text-gray-600">
+                    <strong className="text-gray-800">Service:</strong>{" "}
+                    {service.name}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong className="text-gray-800">Start Time:</strong>{" "}
+                    {new Date(service.start_time).toLocaleString()}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong className="text-gray-800">End Time:</strong>{" "}
+                    {new Date(service.end_time).toLocaleString()}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong className="text-gray-800">Price:</strong> $
+                    {Number(service.price).toFixed(2)}
+                  </p>
+                  <div className="mt-4 flex items-center space-x-2">
+                    <strong className="text-gray-800">Status:</strong>
+                    <select
+                      value={updatedServiceStatuses[index]}
+                      onChange={(e) => {
+                        const newStatuses = [...updatedServiceStatuses];
+                        newStatuses[index] = e.target.value;
+                        setUpdatedServiceStatuses(newStatuses);
+                      }}
+                      className={`border px-3 py-2 rounded-lg text-sm ${getStatusColor(
+                        updatedServiceStatuses[index]
+                      )}`}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="processing">Processing</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="hold">Hold</option>
+                    </select>
+                  </div>
+                  <button
+                    className="mt-4 bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700"
+                    onClick={() => handleServiceSubmit(index)}
+                  >
+                    Submit Service Status
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
-      {/* Payment Details */}
-      <div className="border p-4 rounded shadow">
-        <h2 className="text-lg font-semibold">Payment Details</h2>
-        <p>
-          <strong>Method:</strong> {bookingDetails.payment.method}
-        </p>
-        <p>
-          <strong>Status:</strong>{" "}
-          <span className={getStatusColor(bookingDetails.payment.status)}>
-            {bookingDetails.payment.status}
-          </span>
-        </p>
-        <p>
-          <strong>Date:</strong>{" "}
-          {new Date(bookingDetails.payment.date).toLocaleString()}
-        </p>
-        <p>
-          <strong>Price:</strong> $
-          {Number(bookingDetails.payment.price).toFixed(2)}
-        </p>
+        {/* Payment Details */}
+        <div className="w-full md:w-1/3 bg-white p-6 rounded-xl shadow-md">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Payment Details
+          </h2>
+          <p className="text-gray-600">
+            <strong className="text-gray-800">Method:</strong>{" "}
+            {bookingDetails.payment.method}
+          </p>
+          <p className="text-gray-600">
+            <strong className="text-gray-800">Status:</strong>{" "}
+            <span className={getStatusColor(bookingDetails.payment.status)}>
+              {bookingDetails.payment.status}
+            </span>
+          </p>
+          <p className="text-gray-600">
+            <strong className="text-gray-800">Date:</strong>{" "}
+            {new Date(bookingDetails.payment.date).toLocaleString()}
+          </p>
+          <p className="text-gray-600">
+            <strong className="text-gray-800">Price:</strong> $
+            {Number(bookingDetails.payment.price).toFixed(2)}
+          </p>
+        </div>
       </div>
     </div>
   );

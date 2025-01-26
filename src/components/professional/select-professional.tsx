@@ -8,6 +8,7 @@ import ProfileCard from "./profile-card";
 import { LoaderIcon } from "lucide-react";
 import { useServicesStore } from "@/store/use-professional-store";
 import { useRouter } from "next/navigation";
+import { priceCurrency } from "@/utils/constants";
 
 // Defining the type for the professional data
 export interface StaffProps {
@@ -147,7 +148,7 @@ export const SelectProfessional = () => {
             </div>
             <div>
               <span>
-                AED {treatment.selectedOption?.price || treatment.price}
+                {priceCurrency.currency} {treatment.selectedOption?.price || treatment.price}
               </span>
             </div>
           </div>
@@ -159,7 +160,7 @@ export const SelectProfessional = () => {
 
         <div className="flex justify-between font-bold text-lg px-3">
           <h3>Total</h3>
-          <h3>AED {totalPrice}</h3>
+          <h3>{priceCurrency.currency} {totalPrice}</h3>
         </div>
 
         <Button className="w-full mt-16" onClick={onSubmit}>

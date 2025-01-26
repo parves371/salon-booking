@@ -8,6 +8,7 @@ import { TreatmentCard } from "./treatment-card";
 import { useProductStore } from "@/store/use-product-store";
 import { LoaderIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { priceCurrency } from "@/utils/constants";
 
 type Option = {
   id: number;
@@ -128,7 +129,8 @@ export const SelectServices: React.FC = () => {
               </div>
               <div>
                 <span>
-                  AED {treatment.selectedOption?.price || treatment.price}
+                  {priceCurrency.currency}{" "}
+                  {treatment.selectedOption?.price || treatment.price}
                 </span>
               </div>
             </div>
@@ -138,7 +140,7 @@ export const SelectServices: React.FC = () => {
           </div>
           <div className="flex justify-between font-bold text-lg px-3">
             <h3>Total</h3>
-            <h3>AED {totalPrice} price</h3>
+            <h3>{priceCurrency.currency} {totalPrice} {priceCurrency.symbol}</h3>
           </div>
           <Button className="w-full mt-16" onClick={onsubmit}>
             Continue

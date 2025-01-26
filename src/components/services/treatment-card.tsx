@@ -10,6 +10,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useProductStore } from "@/store/use-product-store";
+import { priceCurrency } from "@/utils/constants";
 import React, { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 
@@ -99,7 +100,7 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
                 {selectedOption ? selectedOption.time : services.time}
               </p>
               <p className="mb-4 text-[#212c43] font-semibold">
-                AED {selectedOption ? selectedOption.price : services.price}
+                {priceCurrency.currency} {selectedOption ? selectedOption.price : services.price}
               </p>
             </div>
             <Button
@@ -167,7 +168,7 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
                           {option.time}
                         </p>
                         <p className="text-gray-500 text-base font-bold">
-                          AED {option.price}
+                        {priceCurrency.currency} {option.price}
                         </p>
                       </Label>
                     </div>

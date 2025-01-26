@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { EyeIcon } from "lucide-react";
+import { priceCurrency } from "@/utils/constants";
 
 interface DialogButtonWithModalProps {
   bookingId: number;
@@ -102,7 +103,7 @@ export const DialogButtonWithModal: React.FC<DialogButtonWithModalProps> = ({
                         {service.service_name}
                       </td>
                       <td className="px-4 py-2 border">
-                        {service.service_price}
+                        {priceCurrency.symbol}{service.service_price}
                       </td>
                       <td className="px-4 py-2 border">
                         {service.service_status}

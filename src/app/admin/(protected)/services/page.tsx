@@ -3,7 +3,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
   Dialog,
@@ -15,6 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { priceCurrency } from "@/utils/constants";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -117,7 +118,10 @@ const UsersPage = () => {
                 <td className="border px-4 py-2">{service.category_name}</td>
                 <td className="border px-4 py-2">{service.service_name}</td>
                 <td className="border px-4 py-2">{service.time}</td>
-                <td className="border px-4 py-2">${service.price}</td>
+                <td className="border px-4 py-2">
+                  {priceCurrency.symbol}
+                  {service.price}
+                </td>
                 <td className="border px-4 py-2">
                   {service.option ? "Yes" : "No"}
                 </td>

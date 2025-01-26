@@ -2,6 +2,7 @@
 import { useBookingsByCustomerID } from "@/hooks/product/use-bookings";
 import { DialogButtonWithModal } from "./DialogButtonWithModal";
 import { useUser } from "@/hooks/use-user";
+import { priceCurrency } from "@/utils/constants";
 
 // Define the status types explicitly
 type BookingStatusType = "pending" | "processing" | "completed" | "cancelled";
@@ -101,7 +102,7 @@ const BookingsPage = () => {
                     {booking.book_id}
                   </td>
                   <td className="px-6 py-4 border-b text-sm text-gray-900">
-                    ${parseFloat(booking.price).toFixed(2)}
+                    {priceCurrency.symbol}{parseFloat(booking.price).toFixed(2)}
                   </td>
 
                   <td

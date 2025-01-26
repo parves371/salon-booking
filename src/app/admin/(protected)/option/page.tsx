@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { useOption } from "@/hooks/product/use-options";
 import { LoaderIcon } from "lucide-react";
 import Link from "next/link";
+import { priceCurrency } from "@/utils/constants";
 
 interface OptionDetails {
   id: number; // Option ID
@@ -135,7 +136,7 @@ const UsersPage = () => {
                 <td className="border px-4 py-2">{service.service_name}</td>
                 <td className="border px-4 py-2">{service.option_name}</td>
                 <td className="border px-4 py-2">{service.option_time}</td>
-                <td className="border px-4 py-2">${service.option_price}</td>
+                <td className="border px-4 py-2"> {priceCurrency.symbol}{service.option_price}</td>
 
                 <td className="border px-4 py-2 flex gap-2">
                   <button

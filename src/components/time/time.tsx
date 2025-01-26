@@ -55,6 +55,7 @@ import CheckoutPage from "@/components/CheckoutPage";
 import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { priceCurrency } from "@/utils/constants";
 
 if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
   throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
@@ -264,7 +265,9 @@ export const SelectTime = () => {
                 </span>
               </div>
               <div>
-                <span>AED {treatment.price}</span>
+                <span>
+                  {priceCurrency.currency} {treatment.price}
+                </span>
               </div>
             </div>
           ))}
@@ -273,7 +276,9 @@ export const SelectTime = () => {
           </div>
           <div className="flex justify-between font-bold text-lg px-3">
             <h3>Total</h3>
-            <h3>AED {totalPrice}</h3>
+            <h3>
+              {priceCurrency.currency} {totalPrice}
+            </h3>
           </div>
 
           {/* Confirm Booking Button */}

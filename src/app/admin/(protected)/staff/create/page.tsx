@@ -4,7 +4,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,7 @@ import { useOption } from "@/hooks/product/use-options";
 import { useServices } from "@/hooks/product/use-services";
 import { useAddStaff } from "@/hooks/use-staff";
 import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@/hooks/use-user";
+import { useAllUser } from "@/hooks/use-user";
 import { StaffSchema } from "@/schemas/staff";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderIcon } from "lucide-react";
@@ -75,7 +75,8 @@ const CategoryAdd = () => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   // feacthing data from the server | admin user
-  const { data, isLoading, isError, error } = useUser();
+  const { data, isLoading, isError, error } = useAllUser();
+  console.log(data);
   // add staff mutation
   const addStaff = useAddStaff();
 

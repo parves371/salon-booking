@@ -23,8 +23,6 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 
-const UPLOAD_DIR = path.resolve(process.env.ROOT_PATH ?? "", "public/uploads");
-
 export async function POST(request: Request) {
   try {
     // 1) Parse the multi-part form data with the built-in Web API
@@ -88,7 +86,7 @@ export async function POST(request: Request) {
       const bytes = await avatar.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // Pick a unique filename, or keep original name
+      // Pick a unique filename, or keep original name 
       // e.g. "someFile.png"
       const originalFilename = avatar.name;
       const ext = path.extname(originalFilename) || "";
@@ -96,7 +94,7 @@ export async function POST(request: Request) {
       const filePath = path.join(
         process.cwd(),
         "public",
-        "uploads",
+        "professionals",
         newFilename
       );
 
@@ -104,7 +102,7 @@ export async function POST(request: Request) {
       fs.writeFileSync(filePath, buffer);
 
       // We'll store the relative path in DB (e.g. "/uploads/avatar-xxxx.png")
-      avatarPath = "/uploads/" + newFilename;
+      avatarPath = "/professionals/" + newFilename;
     }
 
     // 6) Hash password

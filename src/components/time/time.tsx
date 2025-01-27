@@ -185,12 +185,12 @@ export const SelectTime = () => {
   }
 
   return (
-    <div className="mt-12">
+    <section className="py-16">
       <div className="container mx-auto flex gap-16">
         {/* Left Panel */}
         <div className="w-1/2">
-          <h1 className="text-4xl font-bold bg-white sticky top-0">
-            Book a Slot
+          <h1 className="text-4xl font-bold bg-white sticky top-0 p-7">
+            Select time
           </h1>
 
           {/* Professional Selection */}
@@ -332,7 +332,7 @@ export const SelectTime = () => {
           </Dialog>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -81,7 +81,7 @@ export const SelectServices: React.FC = () => {
 
   const totalPrice = getTotalPrice(); // Calculate total price on every render that could affect it
   return (
-    <section>
+    <section className="py-20">
       <div className="container mx-auto mt-16 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 px-4 lg-px-0">
         <div className="w-full md:w-[60%]">
           <Suspense fallback={<div>Loading...</div>}>
@@ -117,7 +117,7 @@ export const SelectServices: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="w-full md:w-[35%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bottom-0 bg-white scrollbar-thin">
+        <div className="w-full md:w-[35%] border border-gray-600 rounded-lg p-4 lg:h-[600px] h-[200px] overflow-y-auto sticky lg:top-10 bg-white scrollbar-thin">
           {selectedTreatments.map((treatment) => (
             <div
               key={treatment.id}

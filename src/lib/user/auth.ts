@@ -65,13 +65,14 @@ export const AdminAuthenticate = async (req: Request) => {
   try {
     const decoded = jwt.verify(token, SECRET_KEY_ADMIN);
     const userId = (decoded as { id: string }).id;
+    const userEmail = (decoded as { email: string }).email;
 
     // Fetch the user profile from the database
     const db = await createConnection();
 
     // Query the database, typing the result as RowDataPacket[]
     const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT role, id FROM user WHERE id = ?",
+      "SELECT role, id, email FROM user WHERE id = ?",
       [userId]
     );
 
@@ -81,7 +82,7 @@ export const AdminAuthenticate = async (req: Request) => {
       return { error: "User not found" };
     }
 
-    return { user }; // Return the user data without the password
+    return { user, userEmail }; // Return the user data without the password
   } catch (error) {
     console.error("JWT verification error:", error);
     return { error: "Invalid or expired token" };

@@ -3,6 +3,7 @@ import { RowDataPacket } from "mysql2"; // Import RowDataPacket for typing
 import jwt from "jsonwebtoken";
 
 const SECRET_KEY = process.env.JWT_SECRET!;
+const SECRET_KEY_ADMIN = process.env.JWT_ADMIN_SECRET!;
 
 // Define the Customer interface (excluding the password for safety)
 interface Customer {
@@ -62,7 +63,7 @@ export const AdminAuthenticate = async (req: Request) => {
 
   // Decode and verify the token
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, SECRET_KEY_ADMIN);
     const userId = (decoded as { id: string }).id;
 
     // Fetch the user profile from the database

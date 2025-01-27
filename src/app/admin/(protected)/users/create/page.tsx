@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -28,10 +29,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { useState } from "react";
 
 const UserCreatedPage = () => {
   const { toast } = useToast();
   const router = useRouter();
+  const [file, setFile] = useState<File | null>(null);
+
   const UserSchema = z.object({
     name: z.string().min(1, {
       message: "Name is required",
@@ -59,25 +63,34 @@ const UserCreatedPage = () => {
 
   const onSubmit = async (data: z.infer<typeof UserSchema>) => {
     try {
-      const res = await axios.post("/api/admin/user", data, {
+      // Create FormData for file and text fields
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("role", data.role);
+      if (file) {
+        formData.append("image", file);
+      }
+
+      const res = await axios.post("/api/admin/user", formData, {
         withCredentials: true, // Ensure cookies are sent
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Handle successful response
       if (res.status === 201) {
         toast({
           title: "User created successfully!",
         });
+        router.push("/admin/users");
       }
     } catch (error: any) {
-      // Handle 400 error specifically
       if (error.response?.status === 400) {
         toast({
           title: "Error",
           description: error.response?.data?.message || "Bad Request",
         });
       } else {
-        // Handle other errors
         toast({
           title: "Error",
           description:
@@ -196,6 +209,19 @@ const UserCreatedPage = () => {
               )}
             />
 
+            {/* File Upload Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Profile Image
+              </label>
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                accept="image/*"
+                className="mt-1 block w-full"
+              />
+            </div>
+
             {/* Submit Buttons */}
             <div className="flex gap-4">
               <button
@@ -203,12 +229,6 @@ const UserCreatedPage = () => {
                 className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600"
               >
                 Create
-              </button>
-              <button
-                type="button"
-                className="border px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-              >
-                Create & Create Another
               </button>
               <button
                 type="button"

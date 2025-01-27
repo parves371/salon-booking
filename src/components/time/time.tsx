@@ -62,8 +62,6 @@ if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
 }
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
-const amount = 49.99;
-
 export const SelectTime = () => {
   const [refreshFlag, setRefreshFlag] = useState(false); // New state for re-rendering
   const [date, setDate] = useState<string>("");
@@ -72,7 +70,6 @@ export const SelectTime = () => {
     null
   );
   const [isPaymentTriggered, setIsPaymentTriggered] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // To handle loading state during payment initiation
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
@@ -152,7 +149,7 @@ export const SelectTime = () => {
   }
 
   const handleBooking = async () => {
-    if (!selectedSlot || isLoading) return;
+    if (!selectedSlot) return;
 
     if (user) {
       setIsPaymentTriggered(true);
@@ -305,7 +302,7 @@ export const SelectTime = () => {
                         <h1 className="text-4xl font-extrabold mb-2">Sonny</h1>
                         <h2 className="text-2xl">
                           has requested
-                          <span className="font-bold"> ${amount}</span>
+                          <span className="font-bold"> {priceCurrency.currency} {totalPrice}</span>
                         </h2>
                       </div>
 

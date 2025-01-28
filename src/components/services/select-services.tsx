@@ -9,6 +9,7 @@ import { useProductStore } from "@/store/use-product-store";
 import { LoaderIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { priceCurrency } from "@/utils/constants";
+import { useWizardStore } from "@/store/wizardStore";
 
 type Option = {
   id: number;
@@ -36,6 +37,7 @@ type Category = {
 export const SelectServices: React.FC = () => {
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const router = useRouter();
+  const { appointmentDone, setAppointmentDone } = useWizardStore();
 
   const {
     selectedTreatments,
@@ -51,6 +53,12 @@ export const SelectServices: React.FC = () => {
   const { data, isError, isLoading, error } = useProducts();
 
   useEffect(() => {
+    if (appointmentDone) {
+      router.push("/professional");
+    }
+  }, [appointmentDone, router]);
+
+  useEffect(() => {
     if (data?.length > 0 && !activeSection) {
       setActiveSection(data[0].id);
       setHydrated(true);
@@ -64,7 +72,14 @@ export const SelectServices: React.FC = () => {
       time: services.selectedOption?.time || services.time,
       price: services.selectedOption?.price || services.price,
     }));
+    
+    // Mark step1 done in Zustand
+    setAppointmentDone(true);
 
+    // Set a cookie so middleware can see we've completed step1
+    document.cookie = "completedSteps=1; Path=/;";
+
+    // Go to step2
     router.push("/professional");
   };
 
@@ -140,7 +155,9 @@ export const SelectServices: React.FC = () => {
           </div>
           <div className="flex justify-between font-bold text-lg px-3">
             <h3>Total</h3>
-            <h3>{priceCurrency.currency} {totalPrice} {priceCurrency.symbol}</h3>
+            <h3>
+              {priceCurrency.currency} {totalPrice} {priceCurrency.symbol}
+            </h3>
           </div>
           <Button className="w-full mt-16" onClick={onsubmit}>
             Continue

@@ -56,6 +56,7 @@ import convertToSubcurrency from "@/lib/convertToSubcurrency";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { priceCurrency } from "@/utils/constants";
+import { useWizardStore } from "@/store/wizardStore";
 
 if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
   throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
@@ -71,6 +72,8 @@ export const SelectTime = () => {
   );
   const [isPaymentTriggered, setIsPaymentTriggered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { appointmentDone, professionalDone } = useWizardStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -99,6 +102,15 @@ export const SelectTime = () => {
   useEffect(() => {
     setDate(new Date().toISOString().split("T")[0]);
   }, []);
+
+  // Client-side check: If user hasn’t done step1 & step2, push them back
+  useEffect(() => {
+    if (!appointmentDone) {
+      router.replace("/appointment");
+    } else if (!professionalDone) {
+      router.replace("/professional");
+    }
+  }, [appointmentDone, professionalDone, router]);
 
   const getEndTime = (startTime: string, durationMinutes: string) => {
     const [hours, minutes] = durationMinutes.split(":").map(Number);
@@ -302,7 +314,10 @@ export const SelectTime = () => {
                         <h1 className="text-4xl font-extrabold mb-2">Sonny</h1>
                         <h2 className="text-2xl">
                           has requested
-                          <span className="font-bold"> {priceCurrency.currency} {totalPrice}</span>
+                          <span className="font-bold">
+                            {" "}
+                            {priceCurrency.currency} {totalPrice}
+                          </span>
                         </h2>
                       </div>
 

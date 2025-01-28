@@ -7,6 +7,7 @@ interface Professional {
   skills: string[] | null;
   name: string;
   role: string;
+  avatar_path?: string;
 }
 
 interface Services {

@@ -31,6 +31,7 @@ interface Professional {
   skills: string[] | null;
   name: string;
   role: string; // Add 'role' to the Professional interface
+  avatar_path?: string;
 }
 
 interface Service {
@@ -89,6 +90,12 @@ export const SelectTime = () => {
     id: service.id,
     time: service.time,
   }));
+
+  const professionalInfo = services?.map((service) => service.professional);
+  const professionalavatars = professionalInfo?.map((info) =>
+    info.id ? info.avatar_path : null
+  );
+  const uniqueAvatars = [...new Set(professionalavatars)];
 
   const {
     data: slotsData,
@@ -223,13 +230,12 @@ export const SelectTime = () => {
             className="flex gap-2 items-center justify-center border p-2 rounded-full mt-6 w-[300px]"
             onClick={() => setSelectedProfessional(null)}
           >
-            {selectedProfessional ? (
-              <Avatar>
-                <AvatarImage
-                  src={selectedProfessional.img}
-                  alt={selectedProfessional.name}
-                />
-              </Avatar>
+            {uniqueAvatars ? (
+              uniqueAvatars.map((avatar, index) => (
+                <Avatar key={index}>
+                  {avatar ? <AvatarImage src={avatar} /> : <RxAvatar />}
+                </Avatar>
+              ))
             ) : (
               <>
                 <RxAvatar className="text-2xl" />

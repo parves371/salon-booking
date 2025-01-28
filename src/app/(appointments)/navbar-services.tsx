@@ -28,7 +28,7 @@ export function NavBarServices() {
         }}
         onClick={() => handleNavClick("/appointment", 1)}
       >
-        Step 1
+        Appointment
       </span>
 
       <span>{">"}</span>
@@ -42,7 +42,7 @@ export function NavBarServices() {
         }}
         onClick={() => handleNavClick("/professional", 2)}
       >
-        Step 2
+        professional
       </span>
 
       <span>{">"}</span>
@@ -56,7 +56,7 @@ export function NavBarServices() {
         }}
         onClick={() => handleNavClick("/time", 3)}
       >
-        Step 3
+        Time
       </span>
     </nav>
   );

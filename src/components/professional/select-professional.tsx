@@ -38,13 +38,17 @@ export const SelectProfessional = () => {
 
   // Access store
   const { services } = useServicesStore.getState();
+  const hasHydrated = useWizardStore.persist.hasHydrated;
+  console.log("outside", step);
 
   // If the user hasn't completed step1, redirect them back to appointments
   useEffect(() => {
+    if (!hasHydrated) return;
     if (step < 2) {
+      console.log("inside if", step);
       router.replace("/appointment");
     }
-  }, [step, router]);
+  }, [step, router, hasHydrated]);
 
   // Derived logic: does services array already have a professional?
   // (Optional: remove entirely if you don't need it.)

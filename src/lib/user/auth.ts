@@ -34,7 +34,7 @@ export const authenticate = async (req: Request) => {
 
     // Query the database, typing the result as RowDataPacket[]
     const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT id, email, name, profile, number FROM customers WHERE id = ?",
+      "SELECT id, email, name, profile, number, date_of_birth, address FROM customers WHERE id = ?",
       [userId]
     );
 

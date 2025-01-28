@@ -1,4 +1,5 @@
 import { createConnection } from "@/lib/db/dbConnect";
+import { RowDataPacket } from "mysql2"; // For correct typing
 import bcrypt from "bcryptjs";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
@@ -7,16 +8,6 @@ import {
   authenticateUserByTokenEmail,
   existingUserByEmail,
 } from "@/lib/user/authenticate";
-import { RowDataPacket } from "mysql2"; // For correct typing
-
-// Define the types for the request body and response
-interface LoginRequestBody {
-  email: string;
-  password: string;
-  name: string;
-  role: "SuperAdmin" | "Admin" | "Manager" | "Employee";
-}
-
 import { AdminAuthenticate } from "@/lib/user/auth";
 
 import { NextResponse } from "next/server";

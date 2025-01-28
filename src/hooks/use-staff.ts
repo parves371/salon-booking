@@ -7,8 +7,6 @@ const fetchStaff = async (skills?: string[]) => {
     ? `/api/staff?skills=${encodeURIComponent(skills.join(","))}`
     : "/api/staff";
 
-  console.log(url);
-
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch staff");

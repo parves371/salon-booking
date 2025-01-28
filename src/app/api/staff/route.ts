@@ -44,7 +44,7 @@ export async function GET(req: Request) {
 
     const db = await createConnection();
     let sql = `
-      SELECT Staff.id, Staff.position, Staff.available, Staff.skills, user.name, user.role
+      SELECT Staff.id, Staff.position, Staff.available, Staff.skills, user.name, user.role, user.avatar_path	
       FROM Staff
       JOIN user ON Staff.user_id = user.id
     `;
@@ -53,13 +53,13 @@ export async function GET(req: Request) {
 
     // Add filtering conditions if `skills` is provided
     if (filterSkills) {
-      const filters = filterSkills.split(",").map(skill => skill.trim());
+      const filters = filterSkills.split(",").map((skill) => skill.trim());
       // WHERE Staff.skills LIKE ? AND Staff.skills LIKE ? AND Staff.skills LIKE ?
       const conditions = filters.map(() => "Staff.skills LIKE ?").join(" AND ");
       sql += ` WHERE ${conditions}`;
-      
+
       // if the skill is "Python", the value becomes "%Python%", allowing partial matches in the database.
-      values = filters.map(skill => `%${skill}%`);
+      values = filters.map((skill) => `%${skill}%`);
     }
 
     // Execute the query with or without filters

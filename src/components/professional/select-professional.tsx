@@ -17,6 +17,7 @@ export interface StaffProps {
   name: string;
   position: string;
   role: string;
+  avatar_path: string;
   skills: string[] | null; // Assuming 'skills' could be an array of strings or null
 }
 
@@ -33,13 +34,9 @@ export const SelectProfessional = () => {
   const { data, isLoading, error, isError } = useStaff(
     selectedTreatmentName.length > 0 ? selectedTreatmentName : undefined
   );
-
+  console.log(data);
   const handleProfessionalSelect = (professional: StaffProps) => {
     setActiveProfessional(professional);
-  };
-
-  const updateAnyProfessional = () => {
-    setActiveProfessional(null);
   };
 
   const onSubmit = () => {
@@ -116,6 +113,7 @@ export const SelectProfessional = () => {
               {data.data.map((i: StaffProps) => (
                 <ProfileCard
                   key={i.id}
+                  imageUrl={i.avatar_path}
                   title={i.name}
                   professional={i.position}
                   isActive={activeProfessional?.id === i.id}

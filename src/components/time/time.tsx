@@ -73,7 +73,7 @@ export const SelectTime = () => {
   const [isPaymentTriggered, setIsPaymentTriggered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { appointmentDone, professionalDone } = useWizardStore();
+  const { step, setStep } = useWizardStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -103,14 +103,17 @@ export const SelectTime = () => {
     setDate(new Date().toISOString().split("T")[0]);
   }, []);
 
-  // Client-side check: If user hasn’t done step1 & step2, push them back
+  // If user hasn't unlocked step3, push them back to step2
   useEffect(() => {
-    if (!appointmentDone) {
-      router.replace("/appointment");
-    } else if (!professionalDone) {
+    if (step < 3) {
       router.replace("/professional");
     }
-  }, [appointmentDone, professionalDone, router]);
+  }, [step, router]);
+  useEffect(() => {
+    if (step < 2) {
+      router.replace("/appointment");
+    }
+  }, [step, router]);
 
   const getEndTime = (startTime: string, durationMinutes: string) => {
     const [hours, minutes] = durationMinutes.split(":").map(Number);
@@ -177,6 +180,19 @@ export const SelectTime = () => {
   const { getTotalPrice } = useServicesStore.getState();
 
   const totalPrice = getTotalPrice();
+
+  function handleBackToStep2() {
+    // If you only want to move them back one step,
+    // do setStep(2) so they must re-complete step2 to return to step3.
+    setStep(2);
+    router.push("/professional");
+  }
+
+  function handleBackToStep1() {
+    // If you want going back to step1 to fully reset progress:
+    setStep(1);
+    router.push("/appointments");
+  }
 
   if (!date) {
     return (

@@ -34,24 +34,17 @@ export const SelectProfessional = () => {
     .map((treatment) => treatment.selectedOption?.name.trim())
     .filter((name) => name !== undefined);
 
-  const { appointmentDone, professionalDone, setProfessionalDone } =
-    useWizardStore();
+  const { step, setStep } = useWizardStore();
 
   // Access store
   const { services } = useServicesStore.getState();
 
-  // useEffect for redirect logic
+  // If the user hasn't completed step1, redirect them back to appointments
   useEffect(() => {
-    if (!appointmentDone) {
+    if (step < 2) {
       router.replace("/appointment");
     }
-  }, [appointmentDone, router]);
-
-  useEffect(() => {
-    if (professionalDone) {
-      router.push("/time");
-    }
-  }, [professionalDone, router]);
+  }, [step, router]);
 
   // Derived logic: does services array already have a professional?
   // (Optional: remove entirely if you don't need it.)
@@ -106,12 +99,17 @@ export const SelectProfessional = () => {
       }
     });
 
-    setProfessionalDone(true);
-    document.cookie = "completedSteps=1,2; Path=/;";
-
+    // Mark step=3, move to time
+    setStep(3);
     router.push("/time");
   };
 
+  function handleBackToStep1() {
+    // If you want to force the user to re-complete step1,
+    // then set step=1 so they cannot skip to step2 or step3
+    setStep(1);
+    router.push("/appointment");
+  }
   // total price
   const totalPrice = getTotalPrice();
 
@@ -156,9 +154,7 @@ export const SelectProfessional = () => {
           ) : (
             <div className="text-center py-10">
               <div className="bg-white rounded-lg shadow-md py-4 w-[240px] overflow-hidden cursor-pointer">
-                <div className="flex justify-center pt-6">
-                  {/* ... */}
-                </div>
+                <div className="flex justify-center pt-6">{/* ... */}</div>
                 <div className="text-center py-2 px-2 overflow-hidden">
                   <h2 className="text-lg font-semibold text-gray-800">
                     No professionals available.

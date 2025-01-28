@@ -1,19 +1,21 @@
-import { create } from 'zustand';
+// store/wizardStore.ts
+
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface WizardState {
-  // Tracks which steps have been completed
-  appointmentDone: boolean;
-  professionalDone: boolean;
-
-  // Actions to set those states
-  setAppointmentDone: (val: boolean) => void;
-  setProfessionalDone: (val: boolean) => void;
+  step: number;             // 1..3
+  setStep: (step: number) => void;
 }
 
-export const useWizardStore = create<WizardState>((set) => ({
-  appointmentDone: false,
-  professionalDone: false,
-
-  setAppointmentDone: (val) => set({ appointmentDone: val }),
-  setProfessionalDone: (val) => set({ professionalDone: val }),
-}));
+export const useWizardStore = create<WizardState>()(
+  persist(
+    (set) => ({
+      step: 1,
+      setStep: (step: number) => set({ step }),
+    }),
+    {
+      name: "wizard-storage", // Key for localStorage
+    }
+  )
+);

@@ -37,7 +37,7 @@ type Category = {
 export const SelectServices: React.FC = () => {
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const router = useRouter();
-  const { appointmentDone, setAppointmentDone } = useWizardStore();
+  const { step, setStep } = useWizardStore();
 
   const {
     selectedTreatments,
@@ -52,11 +52,14 @@ export const SelectServices: React.FC = () => {
   //fetching data from the server | all the products
   const { data, isError, isLoading, error } = useProducts();
 
+  // 1) If we are *below* step1 (theoretically step=0?), set it to 1.
+  //    If we are already beyond step1, do we automatically redirect user forward?
+  //    It's optional. Let's NOT auto-redirect; let them view step1 if they like.
   useEffect(() => {
-    if (appointmentDone) {
-      router.push("/professional");
+    if (step < 1) {
+      setStep(1);
     }
-  }, [appointmentDone, router]);
+  }, [step, setStep]);
 
   useEffect(() => {
     if (data?.length > 0 && !activeSection) {
@@ -72,13 +75,9 @@ export const SelectServices: React.FC = () => {
       time: services.selectedOption?.time || services.time,
       price: services.selectedOption?.price || services.price,
     }));
-    
-    // Mark step1 done in Zustand
-    setAppointmentDone(true);
 
-    // Set a cookie so middleware can see we've completed step1
-    document.cookie = "completedSteps=1; Path=/;";
-
+    // Mark step as at least 2, and go to the next page
+    setStep(2);
     // Go to step2
     router.push("/professional");
   };

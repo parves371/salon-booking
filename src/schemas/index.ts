@@ -31,6 +31,8 @@ export const Registerchema = z.object({
     message: "Name is required",
   }),
   date: z.string(),
+  address: z.string(),
+  avatar: z.any(),
 });
 
 export const SettingsSchema = z

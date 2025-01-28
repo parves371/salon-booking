@@ -86,11 +86,11 @@ export async function POST(request: Request) {
       const bytes = await avatar.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // Pick a unique filename, or keep original name 
+      // Pick a unique filename, or keep original name
       // e.g. "someFile.png"
       const originalFilename = avatar.name;
       const ext = path.extname(originalFilename) || "";
-      const newFilename = `avatar-${Date.now()}${ext}`;
+      const newFilename = `avatar-${name}-${Date.now()}${ext}`;
       const filePath = path.join(
         process.cwd(),
         "public",

@@ -1,13 +1,6 @@
 import { createConnection } from "@/lib/db/dbConnect";
-import { Registerchema } from "@/schemas";
 import bcrypt from "bcryptjs";
 import { RowDataPacket } from "mysql2"; // Import RowDataPacket for typing query results
-interface RegisterRequestBody {
-  email: string;
-  password: string;
-  name: string;
-  number?: string | null;
-}
 
 interface RegisterResponse {
   success: boolean;
@@ -15,17 +8,68 @@ interface RegisterResponse {
   token?: string;
 }
 
-interface CustomerRow {
-  email: string;
-}
+import fs from "fs";
+import path from "path";
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const reqBody: RegisterRequestBody = await request.json();
+    // 1) Parse the multi-part form data with the built-in Web API
+    const formData = await request.formData();
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const name = formData.get("name");
+    const number = formData.get("number");
+    const date = formData.get("date");
+    const address = formData.get("address");
+    const avatar = formData.get("avatar");
+
+    if (
+      !email ||
+      typeof email !== "string" ||
+      !password ||
+      typeof password !== "string" ||
+      !name ||
+      typeof name !== "string" ||
+      (number && typeof number !== "string") ||
+      (date && typeof date !== "string") ||
+      (address && typeof address !== "string") ||
+      (avatar && !(avatar instanceof File))
+    ) {
+      return new Response(
+        JSON.stringify({ success: false, message: "All fields are required" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // 5) If an avatar file is provided, save it to `public/uploads`
+    let avatarPath: string | null = null;
+
+    if (avatar && avatar instanceof File && avatar.size > 0) {
+      // Convert from Web File to Buffer
+      const bytes = await avatar.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Pick a unique filename, or keep original name
+      // e.g. "someFile.png"
+      const originalFilename = avatar.name;
+      const ext = path.extname(originalFilename) || "";
+      const newFilename = `avatar-${name}-${Date.now()}${ext}`;
+      const customersDir = path.join(process.cwd(), "public", "customers");
+      if (!fs.existsSync(customersDir)) {
+        fs.mkdirSync(customersDir, { recursive: true });
+      }
+
+      const filePath = path.join(customersDir, newFilename);
+
+      // Write file to disk
+      fs.writeFileSync(filePath, buffer);
+
+      // We'll store the relative path in DB (e.g. "/uploads/avatar-xxxx.png")
+      avatarPath = "/customers/" + newFilename;
+    }
+
     const db = await createConnection();
 
-    const validatedData = Registerchema.parse(reqBody);
-    const { email, password, name, number, date } = validatedData;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const emailCheckQuery = "SELECT email FROM customers WHERE email = ?";
@@ -40,11 +84,17 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    console.log();
-
     // Insert the new user with the generated UUID
-    const sql = `INSERT INTO customers (profile, email, name, number, password,date_of_birth) VALUES (?, ?, ?, ?, ?, ?)`;
-    const values = ["", email, name, number, hashedPassword, date];
+    const sql = `INSERT INTO customers (profile, email, name, number, password,date_of_birth,	address) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const values = [
+      avatarPath,
+      email,
+      name,
+      number,
+      hashedPassword,
+      date,
+      address,
+    ];
     await db.query(sql, values);
 
     const response: RegisterResponse = {

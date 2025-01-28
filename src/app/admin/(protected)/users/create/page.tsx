@@ -191,7 +191,7 @@ const UserCreatedPage = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Upload Avatar (optional)</FormLabel>
+                  <FormLabel>Upload Avatar</FormLabel>
                   <FormControl>
                     <input
                       type="file"

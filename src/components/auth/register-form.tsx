@@ -33,6 +33,10 @@ export const RegisterForm = () => {
       email: "",
       password: "",
       name: "",
+      number: "",
+      date: "",
+      address: "",
+      avatar: "",
     },
   });
 
@@ -41,12 +45,30 @@ export const RegisterForm = () => {
     setSuccess("");
 
     try {
-      const res = await axios.post("/api/sign-up", {
-        email: values.email,
-        password: values.password,
-        name: values.name,
-        number: values.number,
-        date: values.date,
+      const formData = new FormData();
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("name", values.name);
+      formData.append("date", values.date);
+      formData.append("address", values.address);
+
+      if (values.number) {
+        formData.append("number", values.number);
+      }
+      // `avatar` is optional - only append if user selected a file
+      if (
+        values.avatar &&
+        values.avatar instanceof FileList &&
+        values.avatar[0]
+      ) {
+        formData.append("avatar", values.avatar[0]);
+      }
+
+      const res = await axios.post("/api/sign-up", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       if (res.status === 201) {
@@ -72,7 +94,6 @@ export const RegisterForm = () => {
       headerLabel="Create an account"
       backButtonLabel="Already have an account?"
       backButtonHref="/login"
-      showSocial
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -123,6 +144,46 @@ export const RegisterForm = () => {
                       disabled={isPending}
                       placeholder="#####"
                       {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="address"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      disabled={isPending}
+                      placeholder="#####"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="avatar"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Upload Avatar (optional)</FormLabel>
+                  <FormControl>
+                    <input
+                      type="file"
+                      className="border rounded-md px-3 py-2 w-full"
+                      // React Hook Form can't directly store a File object in `field.value`
+                      // so we override onChange manually:
+                      onChange={(e) => {
+                        // We pass the FileList back to react-hook-form's field.onChange
+                        field.onChange(e.target.files);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

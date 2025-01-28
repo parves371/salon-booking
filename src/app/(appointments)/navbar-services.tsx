@@ -19,14 +19,15 @@ export function NavBarServices() {
   }
 
   return (
-    <nav style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+    <nav className="flex gap-4 items-center container mx-auto pt-8">
       {/* Step 1 Link (always accessible) */}
       <span
         style={{
           cursor: "pointer",
-          textDecoration: pathname === "/appointment" ? "underline" : "none",
+          color: pathname === "/appointment" ? "black" : "#ACACB4",
         }}
         onClick={() => handleNavClick("/appointment", 1)}
+        className="text-2xl font-semiibold hover:text-black"
       >
         Appointment
       </span>
@@ -38,9 +39,10 @@ export function NavBarServices() {
         style={{
           cursor: step >= 2 ? "pointer" : "not-allowed",
           opacity: step >= 2 ? 1 : 0.5,
-          textDecoration: pathname === "/professional" ? "underline" : "none",
+          color: pathname === "/professional" ? "black" : "#ACACB4",
         }}
         onClick={() => handleNavClick("/professional", 2)}
+        className="text-2xl font-semiibold"
       >
         professional
       </span>
@@ -52,9 +54,10 @@ export function NavBarServices() {
         style={{
           cursor: step >= 3 ? "pointer" : "not-allowed",
           opacity: step >= 3 ? 1 : 0.5,
-          textDecoration: pathname === "/time" ? "underline" : "none",
+          color: pathname === "/time" ? "black" : "#ACACB4",
         }}
         onClick={() => handleNavClick("/time", 3)}
+        className="text-2xl font-semiibold"
       >
         Time
       </span>

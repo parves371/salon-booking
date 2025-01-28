@@ -37,29 +37,18 @@ export const SelectProfessional = () => {
   const { step, setStep } = useWizardStore();
 
   // Access store
-  const { services } = useServicesStore.getState();
   const hasHydrated = useWizardStore.persist.hasHydrated;
-  console.log("outside", step);
 
   // If the user hasn't completed step1, redirect them back to appointments
   useEffect(() => {
     if (!hasHydrated) return;
     if (step < 2) {
-      console.log("inside if", step);
       router.replace("/appointment");
     }
   }, [step, router, hasHydrated]);
 
   // Derived logic: does services array already have a professional?
   // (Optional: remove entirely if you don't need it.)
-  useEffect(() => {
-    const alreadyHasPro = services.some(
-      (service) => service.professional && service.professional.id !== -1
-    );
-    if (alreadyHasPro) {
-      setIsActiveProfessional(true);
-    }
-  }, [services]);
 
   // Staff fetching
   const { data, isLoading, error, isError } = useStaff(
@@ -140,9 +129,7 @@ export const SelectProfessional = () => {
           {data?.data?.length > 0 ? (
             data.data.map((i: StaffProps) => {
               // Could also check if i.id is in the store
-              const isActive =
-                activeProfessional?.id === i.id ||
-                services.some((s) => s.professional.id === i.id);
+              const isActive = activeProfessional?.id === i.id;
 
               return (
                 <ProfileCard

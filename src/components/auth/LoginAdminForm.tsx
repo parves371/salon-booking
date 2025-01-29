@@ -67,12 +67,7 @@ export const LoginAdminForm = () => {
   };
 
   return (
-    <CardWrapper
-      headerLabel="Welcome Back"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
-      showSocial
-    >
+    <CardWrapper headerLabel="Welcome Back">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">

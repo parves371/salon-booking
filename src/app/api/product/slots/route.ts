@@ -68,7 +68,8 @@ export async function POST(req: Request) {
       services,
       bookedSet,
       salonStartTime,
-      salonEndTime
+      salonEndTime,
+      date
     );
 
     return NextResponse.json({ availableSlots });
@@ -98,9 +99,25 @@ const getCombinedAvailableSlots = (
   services: { id: number; time: string }[],
   bookedSet: Set<string>,
   salonStartTime: string,
-  salonEndTime: string
+  salonEndTime: string,
+  date: string // Pass the date to check if it's today, tomorrow, or any future date
 ): string[] => {
   const combinedAvailableSlots = new Set<string>();
+
+  // Get the current time and ensure the slots are after now if it's today
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes(); // Current time in minutes
+
+  // Get today's date in string format (YYYY-MM-DD)
+  const today = now.toISOString().split("T")[0];
+  // Get tomorrow's date in string format (YYYY-MM-DD)
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+  // Compare the date string with today's and tomorrow's date strings
+  const isTomorrow = date === tomorrowStr;
+  const isToday = date === today;
 
   // Calculate total service duration in minutes
   const totalDuration = services.reduce((sum, service) => {
@@ -110,6 +127,23 @@ const getCombinedAvailableSlots = (
 
   allSlots.forEach((slot) => {
     const start = new Date(`1970-01-01T${slot}`);
+    const startTimeInMinutes = start.getHours() * 60 + start.getMinutes();
+
+    // If it's today, skip past slots (only show future slots)
+    if (isToday && startTimeInMinutes < currentTime) {
+      return; // Skip this slot if it’s in the past and it's today
+    }
+
+    // If it's tomorrow, skip slots before 10:00 AM
+    if (isTomorrow && startTimeInMinutes < 10 * 60) {
+      return; // Skip slots before 10:00 AM for tomorrow
+    }
+
+    // For all other future dates, show slots from salon opening time (10:00 AM)
+    if (!isToday && !isTomorrow && startTimeInMinutes < 10 * 60) {
+      return; // Skip slots before 10:00 AM for any future date other than today/tomorrow
+    }
+
     const end = new Date(start.getTime() + totalDuration * 60000);
 
     // Ensure the combined services fit within salon hours
@@ -138,3 +172,6 @@ const getCombinedAvailableSlots = (
 
   return Array.from(combinedAvailableSlots);
 };
+
+
+

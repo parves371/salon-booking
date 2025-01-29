@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
 import Link from "next/link";
+import React, { useState } from "react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,31 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUser } from "@/hooks/use-user";
-import { LoaderIcon } from "lucide-react";
-import { Button } from "../ui/button";
+import { useLogout, useUser } from "@/hooks/use-user";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 export const Navbar: React.FC = () => {
   const { data, isError, error, isLoading } = useUser();
+  const mutate = useLogout();
   const user = data?.user;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const handleLogout = async () => {
     setLoading(true);
-    try {
-      const response = await fetch("/api/logout", { method: "GET" });
-
-      if (response.ok) {
-        router.push("/"); // Redirect after logout
-      } else {
-        console.error("Failed to log out");
-      }
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
-      setLoading(false);
-    }
+    mutate.mutate();
+    setLoading(false);
+    router.push("/");
   };
   return (
     <header className="bg-gray-500 text-white">

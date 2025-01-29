@@ -17,19 +17,6 @@ export const Navbar: React.FC = () => {
   const { data, isError, error, isLoading } = useUser();
   const user = data?.user;
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <LoaderIcon className="animate-spin" />
-      </div>
-    );
-  }
-
-  if (isError) {
-    // Show an error message if the hook fails
-    return <div className="mt-4 text-red-600">{error?.message}</div>;
-  }
-
   return (
     <header className="bg-gray-500 text-white">
       <div className="container mx-auto flex items-center justify-between py-4 px-6">

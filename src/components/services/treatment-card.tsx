@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,7 +16,7 @@ import { priceCurrency } from "@/utils/constants";
 import React, { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 
-// Types for the props and treatments
+// Types for services and options
 interface ServicesOption {
   id: number;
   name: string;
@@ -47,17 +49,24 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
   onTreatmentRemove,
   isActive,
 }) => {
-  const [selectedOption, setSelectedOption] = useState<
-    ServicesOption | undefined
-  >(undefined);
+  const [selectedOption, setSelectedOption] = useState<ServicesOption | undefined>(
+    services.selectedOption
+  );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasBeenSelected, setHasBeenSelected] = useState(false);
-  const { addOrUpdateTreatment, removeTreatment } = useProductStore();
 
+  const { addOrUpdateTreatment, removeTreatment, selectedTreatments } =
+    useProductStore();
+
+  // When component mounts, check if this treatment is already selected and set the default option
   useEffect(() => {
-    // Assume Zustand might be handling part of the state or replace this if all state is centralized
-    setSelectedOption(services.selectedOption);
-  }, [services]);
+    const existingTreatment = selectedTreatments.find(
+      (t) => t.id === services.id
+    );
+    if (existingTreatment?.selectedOption) {
+      setSelectedOption(existingTreatment.selectedOption);
+    }
+  }, [selectedTreatments, services.id]);
 
   const handleOptionSelect = (option: ServicesOption) => {
     setSelectedOption(option);
@@ -65,18 +74,15 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
 
   const handleAddOrUpdate = () => {
     const updatedService = { ...services, selectedOption };
-
-    addOrUpdateTreatment(updatedService); // Zustand store update
-    onTreatmentUpdate(updatedService); // Prop callback
-
+    addOrUpdateTreatment(updatedService);
+    onTreatmentUpdate(updatedService);
     setHasBeenSelected(true);
     setIsDialogOpen(false);
   };
 
   const handleRemove = () => {
-    removeTreatment(services.id); // Zustand store removal
-    onTreatmentRemove(services.id); // Prop callback
-    
+    removeTreatment(services.id);
+    onTreatmentRemove(services.id);
     setHasBeenSelected(false);
     setIsDialogOpen(false);
   };
@@ -100,7 +106,8 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
                 {selectedOption ? selectedOption.time : services.time}
               </p>
               <p className="mb-4 text-[#212c43] font-semibold">
-                {priceCurrency.currency} {selectedOption ? selectedOption.price : services.price}
+                {priceCurrency.currency}{" "}
+                {selectedOption ? selectedOption.price : services.price}
               </p>
             </div>
             <Button
@@ -127,11 +134,12 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
             </DialogDescription>
           </DialogHeader>
 
+          {/* ✅ Set default selected option correctly */}
           <RadioGroup
             className={`${
               services.option ? "h-[400px] overflow-auto scrollbar-hidden" : ""
             }`}
-            defaultValue={selectedOption?.name || ""}
+            value={selectedOption?.name || ""}
             onValueChange={(value) => {
               if (services.option) {
                 const option = services.options.find(
@@ -168,7 +176,7 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
                           {option.time}
                         </p>
                         <p className="text-gray-500 text-base font-bold">
-                        {priceCurrency.currency} {option.price}
+                          {priceCurrency.currency} {option.price}
                         </p>
                       </Label>
                     </div>
@@ -190,7 +198,7 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
                       {services.time}
                     </p>
                     <p className="text-gray-500 text-lg font-bold">
-                      AED {services.price}
+                      {priceCurrency.currency} {services.price}
                     </p>
                   </Label>
                 </div>

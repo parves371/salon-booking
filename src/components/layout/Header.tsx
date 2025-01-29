@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 
 import {
@@ -13,10 +13,29 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@/hooks/use-user";
 import { LoaderIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 export const Navbar: React.FC = () => {
   const { data, isError, error, isLoading } = useUser();
   const user = data?.user;
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/logout", { method: "GET" });
 
+      if (response.ok) {
+        router.push("/"); // Redirect after logout
+      } else {
+        console.error("Failed to log out");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <header className="bg-gray-500 text-white">
       <div className="container mx-auto flex items-center justify-between py-4 px-6">
@@ -87,6 +106,17 @@ export const Navbar: React.FC = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href="/bookings">Bookings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  {/* 🔹 Logout Button */}
+                  <Button
+                    onClick={handleLogout}
+                    className="bg-red-500 hover:bg-red-600 text-white"
+                    disabled={loading}
+                  >
+                    {loading ? "Logging out..." : "Logout"}
+                  </Button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

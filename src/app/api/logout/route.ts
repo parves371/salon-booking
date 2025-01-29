@@ -9,6 +9,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   response.cookies.set("salon", "", {
     httpOnly: true,
     expires: new Date(0),
+    path: "/", // Clear the cookie for the entire domain
   });
 
   return response;

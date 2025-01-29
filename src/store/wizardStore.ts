@@ -1,21 +1,15 @@
-// store/wizardStore.ts
-
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import Cookies from "js-cookie";
 
 interface WizardState {
-  step: number;             // 1..3
+  step: number;
   setStep: (step: number) => void;
 }
 
-export const useWizardStore = create<WizardState>()(
-  persist(
-    (set) => ({
-      step: 1,
-      setStep: (step: number) => set({ step }),
-    }),
-    {
-      name: "wizard-storage", // Key for localStorage
-    }
-  )
-);
+export const useWizardStore = create<WizardState>((set) => ({
+  step: parseInt(Cookies.get("step") || "1", 10), // Read from cookie or default to 1
+  setStep: (step) => {
+    Cookies.set("step", step.toString(), { expires: 1 }); // Store step in cookie for 1 day
+    set({ step });
+  },
+}));

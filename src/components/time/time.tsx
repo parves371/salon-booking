@@ -75,7 +75,6 @@ export const SelectTime = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { step, setStep } = useWizardStore();
-  const hasHydrated = useWizardStore.persist.hasHydrated;
 
   const router = useRouter();
   const pathname = usePathname();
@@ -117,12 +116,12 @@ export const SelectTime = () => {
     if (step < 3) {
       router.replace("/professional");
     }
-  }, [step, router, hasHydrated]);
+  }, [step, router]);
   useEffect(() => {
     if (step < 2) {
       router.replace("/appointment");
     }
-  }, [step, router, hasHydrated]);
+  }, [step, router]);
 
   const getEndTime = (startTime: string, durationMinutes: string) => {
     const [hours, minutes] = durationMinutes.split(":").map(Number);

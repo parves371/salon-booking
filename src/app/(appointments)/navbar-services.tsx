@@ -2,16 +2,25 @@
 
 import { useWizardStore } from "@/store/wizardStore";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
 
 export function NavBarServices() {
   const { step, setStep } = useWizardStore();
   const pathname = usePathname();
   const router = useRouter();
 
+  // Ensure state persists across reloads
+  useEffect(() => {
+    const storedStep = parseInt(Cookies.get("step") || "1", 10);
+    if (storedStep !== step) {
+      setStep(storedStep);
+    }
+  }, [step, setStep]);
+
   function handleNavClick(target: string, minStepRequired: number) {
     // If current step < required step, block navigation:
     if (step < minStepRequired) {
-      // You could show a toast or alert here if you want
       return;
     }
     router.push(target);
@@ -27,7 +36,7 @@ export function NavBarServices() {
           color: pathname === "/appointment" ? "black" : "#ACACB4",
         }}
         onClick={() => handleNavClick("/appointment", 1)}
-        className="text-2xl font-semiibold hover:text-black"
+        className="text-2xl font-semibold hover:text-black"
       >
         Appointment
       </span>
@@ -42,9 +51,9 @@ export function NavBarServices() {
           color: pathname === "/professional" ? "black" : "#ACACB4",
         }}
         onClick={() => handleNavClick("/professional", 2)}
-        className="text-2xl font-semiibold"
+        className="text-2xl font-semibold"
       >
-        professional
+        Professional
       </span>
 
       <span>{">"}</span>
@@ -57,7 +66,7 @@ export function NavBarServices() {
           color: pathname === "/time" ? "black" : "#ACACB4",
         }}
         onClick={() => handleNavClick("/time", 3)}
-        className="text-2xl font-semiibold"
+        className="text-2xl font-semibold"
       >
         Time
       </span>

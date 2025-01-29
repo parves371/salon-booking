@@ -7,6 +7,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useServicesStore } from "@/store/use-professional-store";
 import { useProductStore } from "@/store/use-product-store";
+import { useWizardStore } from "@/store/wizardStore";
 
 const CheckoutPage = ({
   customerId,
@@ -70,6 +71,7 @@ const CheckoutPage = ({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+    const { resetStep } = useWizardStore(); // Access the reset function
 
     if (!stripe || !elements || !clientSecret) {
       return;
@@ -118,6 +120,7 @@ const CheckoutPage = ({
         const { reset: resetProduct } = useProductStore.getState();
         reset();
         resetProduct();
+        resetStep();
       }
     } catch (apiError) {
       console.error("API Error:", apiError);

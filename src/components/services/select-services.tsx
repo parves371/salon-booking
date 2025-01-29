@@ -49,12 +49,9 @@ export const SelectServices: React.FC = () => {
     getTotalPrice,
   } = useProductStore();
 
-  //fetching data from the server | all the products
+  // Fetching data from the server | all the products
   const { data, isError, isLoading, error } = useProducts();
 
-  // 1) If we are *below* step1 (theoretically step=0?), set it to 1.
-  //    If we are already beyond step1, do we automatically redirect user forward?
-  //    It's optional. Let's NOT auto-redirect; let them view step1 if they like.
   useEffect(() => {
     if (step < 1) {
       setStep(1);
@@ -78,7 +75,6 @@ export const SelectServices: React.FC = () => {
 
     // Mark step as at least 2, and go to the next page
     setStep(2);
-    // Go to step2
     router.push("/professional");
   };
 
@@ -90,10 +86,13 @@ export const SelectServices: React.FC = () => {
     );
   }
   if (isError) {
-    return <div>Error:{error.message}</div>;
+    return <div>Error: {error.message}</div>;
   }
 
   const totalPrice = getTotalPrice(); // Calculate total price on every render that could affect it
+
+  const isContinueDisabled = selectedTreatments.length === 0; // Disable the button if no treatment is selected
+
   return (
     <section className="py-20">
       <div className="container mx-auto mt-16 flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 px-4 lg-px-0">
@@ -158,7 +157,11 @@ export const SelectServices: React.FC = () => {
               {priceCurrency.currency} {totalPrice} {priceCurrency.symbol}
             </h3>
           </div>
-          <Button className="w-full mt-16" onClick={onsubmit}>
+          <Button
+            className="w-full mt-16"
+            onClick={onsubmit}
+            disabled={isContinueDisabled} // Disable the button when there are no selected items
+          >
             Continue
           </Button>
         </div>
@@ -168,7 +171,7 @@ export const SelectServices: React.FC = () => {
 };
 
 interface CustomSliderProps {
-  data: Category[]; // Ensure data is an array of Category
+  data: Category[];
   activeSection: number | null;
   scrollToSection: (index: number) => void;
 }
@@ -181,7 +184,6 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const sliderContainerRef = useRef<HTMLDivElement>(null);
 
-  // Calculate the width of each slider item on mount
   useEffect(() => {
     const widths: number[] = [];
     const sliderItems =
@@ -192,7 +194,7 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
       });
       setCurrentIndex(
         data?.findIndex((category) => category.id === activeSection)
-      ); // Update initial index based on activeSection
+      );
     }
   }, [data, activeSection]);
 
@@ -210,7 +212,7 @@ const CustomSlider: React.FC<CustomSliderProps> = ({
   };
 
   const sliderStyle = {
-    transform: `translateX(-${currentIndex * 100}%)`, // Simplified for illustration
+    transform: `translateX(-${currentIndex * 100}%)`,
     transition: "transform 0.5s ease-in-out",
   };
 

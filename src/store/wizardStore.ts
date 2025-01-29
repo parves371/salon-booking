@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 interface WizardState {
   step: number;
   setStep: (step: number) => void;
+  resetStep: () => void;  // Add reset method
 }
 
 export const useWizardStore = create<WizardState>((set) => ({
@@ -11,5 +12,9 @@ export const useWizardStore = create<WizardState>((set) => ({
   setStep: (step) => {
     Cookies.set("step", step.toString(), { expires: 1 }); // Store step in cookie for 1 day
     set({ step });
+  },
+  resetStep: () => {
+    Cookies.remove("step");  // Remove the cookie
+    set({ step: 1 });         // Reset the step to 1 in the store
   },
 }));

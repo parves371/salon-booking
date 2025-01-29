@@ -16,7 +16,6 @@ import { priceCurrency } from "@/utils/constants";
 import React, { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 
-// Types for services and options
 interface ServicesOption {
   id: number;
   name: string;
@@ -49,22 +48,25 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
   onTreatmentRemove,
   isActive,
 }) => {
+  const { addOrUpdateTreatment, removeTreatment, selectedTreatments } =
+    useProductStore();
+
   const [selectedOption, setSelectedOption] = useState<ServicesOption | undefined>(
     services.selectedOption
   );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasBeenSelected, setHasBeenSelected] = useState(false);
 
-  const { addOrUpdateTreatment, removeTreatment, selectedTreatments } =
-    useProductStore();
-
-  // When component mounts, check if this treatment is already selected and set the default option
+  // On mount, check if the service is already selected
   useEffect(() => {
     const existingTreatment = selectedTreatments.find(
       (t) => t.id === services.id
     );
     if (existingTreatment?.selectedOption) {
       setSelectedOption(existingTreatment.selectedOption);
+      setHasBeenSelected(true); // ✅ Ensure "Remove" and "Upgrade" buttons appear
+    } else {
+      setHasBeenSelected(false); // ✅ Show "Add" button if not selected
     }
   }, [selectedTreatments, services.id]);
 
@@ -76,14 +78,14 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
     const updatedService = { ...services, selectedOption };
     addOrUpdateTreatment(updatedService);
     onTreatmentUpdate(updatedService);
-    setHasBeenSelected(true);
+    setHasBeenSelected(true); // ✅ Update state to show "Remove" and "Upgrade"
     setIsDialogOpen(false);
   };
 
   const handleRemove = () => {
     removeTreatment(services.id);
     onTreatmentRemove(services.id);
-    setHasBeenSelected(false);
+    setHasBeenSelected(false); // ✅ Update state to show "Add" button
     setIsDialogOpen(false);
   };
 
@@ -134,7 +136,6 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          {/* ✅ Set default selected option correctly */}
           <RadioGroup
             className={`${
               services.option ? "h-[400px] overflow-auto scrollbar-hidden" : ""
@@ -207,15 +208,8 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
           </RadioGroup>
 
           <div className="flex justify-between gap-4">
-            {!hasBeenSelected ? (
-              <Button
-                className="mt-6 w-full"
-                onClick={handleAddOrUpdate}
-                disabled={!selectedOption && services.option}
-              >
-                Add
-              </Button>
-            ) : (
+            {/* ✅ Show "Upgrade" and "Remove" if treatment is already selected */}
+            {hasBeenSelected ? (
               <>
                 <Button
                   className="mt-6 w-full bg-red-500 hover:bg-red-600"
@@ -231,6 +225,14 @@ export const TreatmentCard: React.FC<TreatmentCardProps> = ({
                   Upgrade
                 </Button>
               </>
+            ) : (
+              <Button
+                className="mt-6 w-full"
+                onClick={handleAddOrUpdate}
+                disabled={!selectedOption && services.option}
+              >
+                Add
+              </Button>
             )}
           </div>
         </DialogContent>

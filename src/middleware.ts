@@ -3,30 +3,34 @@ import { NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-
   const url = request.nextUrl;
   const pathname = url.pathname;
 
-  // Authentication Logic (Only for Admin Routes)
-  const isAdminPath = path.startsWith("/admin");
-  const token = request.cookies.get("salon-admin")?.value || "";
+  // Get authentication tokens
+  const adminToken = request.cookies.get("salon-admin")?.value || "";
+  const customerToken = request.cookies.get("salon")?.value || "";
 
-  if (isAdminPath) {
-    const isPublicAdminPath = path === "/admin/login";
+  // 🔹 Admin Authentication (For `/admin/*` routes)
+  if (pathname.startsWith("/admin")) {
+    const isPublicAdminPath = pathname === "/admin/login";
 
-    if (isPublicAdminPath && token) {
+    if (isPublicAdminPath && adminToken) {
       return NextResponse.redirect(new URL("/", request.url)); // Redirect logged-in admins away from login
     }
-    if (!isPublicAdminPath && !token) {
-      return NextResponse.redirect(new URL("/admin/login", request.url)); // Redirect unauthenticated users to login
+    if (!isPublicAdminPath && !adminToken) {
+      return NextResponse.redirect(new URL("/admin/login", request.url)); // Redirect unauthenticated admins to login
     }
     return NextResponse.next();
   }
 
-  // Step Navigation Logic (For Public Routes)
-  const step = parseInt(request.cookies.get("step")?.value || "1", 10);
+  // 🔹 Customer Authentication (For Protected Customer Routes)
+  const protectedCustomerRoutes = ["/profile", "/bookings"]; // Add future routes here
+  if (protectedCustomerRoutes.includes(pathname) && !customerToken) {
+    return NextResponse.redirect(new URL("/login", request.url)); // Redirect to customer login if not authenticated
+  }
 
-  // Define valid steps and their required order
+  // 🔹 Step Navigation Logic (For Public Routes)
+  const step = parseInt(request.cookies.get("step")?.value || "1", 10);
   const stepsMap: Record<string, number> = {
     "/appointment": 1,
     "/professional": 2,
@@ -35,7 +39,7 @@ export function middleware(request: NextRequest) {
 
   const requiredStep = stepsMap[pathname];
 
-  // If user tries to access a step they haven't reached, redirect them to their last completed step
+  // Redirect users if they try to access a step they haven't completed
   if (requiredStep && requiredStep > step) {
     const lastCompletedPath = Object.keys(stepsMap).find(
       (key) => stepsMap[key] === step
@@ -48,7 +52,14 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Apply middleware only to relevant paths
+// 🔹 Apply middleware only to relevant paths
 export const config = {
-  matcher: ["/admin/:path*", "/appointment", "/professional", "/time"],
+  matcher: [
+    "/admin/:path*", // Admin Routes (Require `salon-admin`)
+    "/profile", // Customer Route (Require `salon`)
+    "/bookings", // Customer Route (Require `salon`)
+    "/appointment", // Public
+    "/professional", // Public
+    "/time", // Public
+  ],
 };

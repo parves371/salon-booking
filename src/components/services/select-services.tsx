@@ -154,7 +154,7 @@ export const SelectServices: React.FC = () => {
           <div className="flex justify-between font-bold text-lg px-3">
             <h3>Total</h3>
             <h3>
-              {priceCurrency.currency} {totalPrice} {priceCurrency.symbol}
+              {priceCurrency.currency} {totalPrice}
             </h3>
           </div>
           <Button

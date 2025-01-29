@@ -24,7 +24,7 @@ export function middleware(request: NextRequest) {
   }
 
   // 🔹 Customer Authentication (For Protected Customer Routes)
-  const protectedCustomerRoutes = ["/profile", "/bookings"]; // Add future routes here
+  const protectedCustomerRoutes = ["/profile", "/bookings", "/contact"]; // Add future routes here
   if (protectedCustomerRoutes.includes(pathname) && !customerToken) {
     return NextResponse.redirect(new URL("/login", request.url)); // Redirect to customer login if not authenticated
   }

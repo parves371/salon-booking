@@ -24,6 +24,7 @@ const CheckoutPage = ({
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [bookingId, setBookingId] = useState<string | null>(null);
+  const { resetStep } = useWizardStore(); // Access the reset function
 
   const router = useRouter();
   // Stripe hooks
@@ -71,7 +72,6 @@ const CheckoutPage = ({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    const { resetStep } = useWizardStore(); // Access the reset function
 
     if (!stripe || !elements || !clientSecret) {
       return;
